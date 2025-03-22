@@ -6,7 +6,16 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/Scenes/RoleSelectionScene.unity
+    guid: 2569d93a6b91eff43aca2b498353d2b7
+  - enabled: 1
+    path: Assets/Scenes/CommanderGeneralScene.unity
+    guid: 8a076615b721a97489482d0a29fee608
+  - enabled: 1
+    path: Assets/Scenes/PilotGeneralScene.unity
+    guid: b12368d36dfb743488da691eee15d5d0
+  - enabled: 1
+    path: Assets/Scenes/PilotIPInputScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

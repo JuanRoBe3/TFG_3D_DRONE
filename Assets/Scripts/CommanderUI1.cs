@@ -1,24 +1,19 @@
 ﻿using UnityEngine;
 using TMPro;
+using System.Collections.Generic;
 
 public class CommanderUI1 : MonoBehaviour
 {
-    public TMP_Text positionText; // Referencia al objeto de texto en la UI
+    public TMP_Text positionText;       // Texto principal que muestra la última posición
+    public TMP_Text positionLogText;    // Texto de log con las últimas 10 posiciones
+
     private string tempMessage = "";
+    private Queue<string> positionLog = new Queue<string>(10); // FIFO de 10 elementos
 
     private void Start()
     {
-        if (positionText == null)
-        {
-            Debug.LogError("❌ ERROR: positionText NO está asignado en el Inspector.");
-            return;
-        }
-
-        positionText.text = "Esperando posición del dron...";
-
         if (MQTTClient.Instance != null)
         {
-            Debug.Log("✅ Suscribiéndose a MQTTClient...");
             MQTTClient.Instance.OnMessageReceived += UpdatePositionText;
         }
         else
@@ -35,18 +30,35 @@ public class CommanderUI1 : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (positionText != null)
+        {
+            positionText.text = tempMessage;
+        }
+
+        if (positionLogText != null)
+        {
+            positionLogText.text = string.Join("\n", positionLog);
+        }
+    }
+
     private void UpdatePositionText(string topic, string message)
     {
         if (topic == MQTTConstants.DronePositionTopic)
         {
             tempMessage = LogMessagesConstants.DronePositionPrefix + message;
-            Debug.Log($"📍 Posición actualizada: {tempMessage}");
-        }
-    }
 
-    private void Update()
-    {
-        positionText.text = tempMessage;
+            // Añadir al log
+            if (positionLog.Count >= 10)
+            {
+                positionLog.Dequeue(); // Eliminar el más antiguo
+            }
+
+            positionLog.Enqueue(tempMessage); // Añadir nuevo al final
+
+            Debug.Log($"📍 Posición recibida: {tempMessage}");
+        }
     }
 
     public void SendCommand()

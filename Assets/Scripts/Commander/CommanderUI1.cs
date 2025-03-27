@@ -10,10 +10,13 @@ public class CommanderUI1 : MonoBehaviour
     private string tempMessage = "";
     private Queue<string> positionLog = new Queue<string>(10); // FIFO de 10 elementos
 
+    private MQTTPublisher publisher; // ✅ NUEVO
+
     private void Start()
     {
         if (MQTTClient.Instance != null)
         {
+            publisher = new MQTTPublisher(MQTTClient.Instance.GetClient()); // ✅ NUEVO
             MQTTClient.Instance.OnMessageReceived += UpdatePositionText;
         }
         else
@@ -65,9 +68,9 @@ public class CommanderUI1 : MonoBehaviour
     {
         string command = "{\"action\": \"move\", \"direction\": \"forward\"}";
 
-        if (MQTTClient.Instance != null)
+        if (publisher != null)
         {
-            MQTTClient.Instance.PublishMessage(MQTTConstants.CommandTopic, command);
+            publisher.PublishMessage(MQTTConstants.CommandTopic, command); // ✅ CAMBIADO
             Debug.Log(LogMessagesConstants.DebugMQTTPublished + command);
         }
         else

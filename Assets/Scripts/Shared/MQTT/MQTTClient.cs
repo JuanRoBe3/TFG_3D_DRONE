@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Options;
@@ -14,8 +15,19 @@ public class MQTTClient : MonoBehaviour
     private IMqttClientOptions options;
     private string uniqueClientId;
 
-    // Define an event to notify when a message is received
-    public event System.Action<string, string> OnMessageReceived;
+    /// <summary>
+    /// Evento que se dispara cuando se recibe un mensaje MQTT.
+    /// Proporciona el topic y el contenido del mensaje.
+    /// </summary>
+    public event Action<string, string> OnMessageReceived;
+
+    // ✅ Diccionario de topics por rol
+    private readonly Dictionary<string, List<string>> roleTopicMap = new()
+    {
+        { "Commander", new List<string> { MQTTConstants.DroneStatusTopic, MQTTConstants.DronePositionTopic } },
+        { "Pilot",     new List<string> { MQTTConstants.CommandTopic } }
+        // Si agregas más roles, los añades aquí
+    };
 
     void Awake()
     {
@@ -37,11 +49,10 @@ public class MQTTClient : MonoBehaviour
         var factory = new MqttFactory();
         client = factory.CreateMqttClient();
 
-        // ✅ Generar un Client ID único para evitar desconexiones
-        uniqueClientId = "Client-" + System.Guid.NewGuid().ToString();
+        uniqueClientId = "Client-" + Guid.NewGuid().ToString();
 
         options = new MqttClientOptionsBuilder()
-            .WithClientId(uniqueClientId)  // 🔹 Ahora cada instancia tendrá un Client ID único
+            .WithClientId(uniqueClientId)
             .WithTcpServer(MQTTConfig.GetBrokerIP(), MQTTConstants.BrokerPort)
             .WithCredentials(MQTTConstants.Username, MQTTConstants.Password)
             .WithCleanSession()
@@ -57,7 +68,6 @@ public class MQTTClient : MonoBehaviour
             var result = await client.ConnectAsync(options);
             Debug.Log($"🔌 MQTT Client '{uniqueClientId}' connected! Result: {result.ResultCode}");
 
-            // ✅ Manejador de mensajes MQTT
             client.UseApplicationMessageReceivedHandler(e =>
             {
                 if (e.ApplicationMessage == null)
@@ -66,9 +76,13 @@ public class MQTTClient : MonoBehaviour
                     return;
                 }
 
-                Debug.Log($"📩 Message received in Unity - Topic: '{e.ApplicationMessage.Topic}', Message: {Encoding.UTF8.GetString(e.ApplicationMessage.Payload)}");
+                string topic = e.ApplicationMessage.Topic;
+                string payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
 
-                OnMessageReceived?.Invoke(e.ApplicationMessage.Topic, Encoding.UTF8.GetString(e.ApplicationMessage.Payload));
+                Debug.Log($"📩 MQTT received - Topic: '{topic}', Payload: {payload}");
+
+                // 🔁 Delegar el procesamiento al exterior mediante evento
+                OnMessageReceived?.Invoke(topic, payload);
             });
         }
         catch (Exception ex)
@@ -85,15 +99,18 @@ public class MQTTClient : MonoBehaviour
             return;
         }
 
-        // ✅ Suscripción basada en el rol seleccionado
-        if (RoleSelection.IsCommander)
+        string role = PlayerPrefs.GetString("Role");
+
+        if (roleTopicMap.TryGetValue(role, out var topics))
         {
-            await SubscribeToTopic(MQTTConstants.DroneStatusTopic);
-            await SubscribeToTopic(MQTTConstants.DronePositionTopic);
+            foreach (var topic in topics)
+            {
+                await SubscribeToTopic(topic);
+            }
         }
-        else if (RoleSelection.IsPilot)
+        else
         {
-            await SubscribeToTopic(MQTTConstants.CommandTopic);
+            Debug.LogWarning($"⚠️ No topics configured for role: {role}");
         }
     }
 
@@ -110,22 +127,8 @@ public class MQTTClient : MonoBehaviour
         }
     }
 
-    public async void PublishMessage(string topic, string payload)
+    public IMqttClient GetClient()
     {
-        if (client.IsConnected)
-        {
-            var message = new MqttApplicationMessageBuilder()
-                .WithTopic(topic)
-                .WithPayload(payload)
-                .WithQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.AtLeastOnce)
-                .Build();
-
-            await client.PublishAsync(message);
-            Debug.Log($"📤 Publishing message to {topic}: {payload}");
-        }
-        else
-        {
-            Debug.LogError("⚠️ The message could not be sent, the client is not connected.");
-        }
+        return client;
     }
 }

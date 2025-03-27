@@ -2,6 +2,7 @@
 
 public class DroneController : MonoBehaviour
 {
+    private MQTTPublisher publisher;
     public float speed = DroneConstants.DefaultSpeed; // Uses drone movement speed constant
     private float positionUpdateTimer = 0f; // Timer for position updates
 
@@ -10,6 +11,10 @@ public class DroneController : MonoBehaviour
         if (MQTTClient.Instance == null)
         {
             Debug.LogError(LogMessagesConstants.ErrorMQTTClientNotFound);
+        }
+        else
+        {
+            publisher = new MQTTPublisher(MQTTClient.Instance.GetClient());
         }
     }
 
@@ -49,7 +54,7 @@ public class DroneController : MonoBehaviour
             Debug.Log("fenooooomeno, instance no es null");
             Vector3 position = transform.position;
             string message = $"{{\"x\": {position.x}, \"y\": {position.y}, \"z\": {position.z}}}";
-            MQTTClient.Instance.PublishMessage(MQTTConstants.DronePositionTopic, message);
+            publisher.PublishMessage(MQTTConstants.DronePositionTopic, message);
         }
     }
 }

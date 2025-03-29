@@ -1,0 +1,12 @@
+ManifestFileVersion: 0
+UnityVersion: 6000.0.28f1
+CRC: 441440799
+HashAppended: 0
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: drone1bundle
+      Dependencies: {}
+    Info_1:
+      Name: drone2bundle
+      Dependencies: {}

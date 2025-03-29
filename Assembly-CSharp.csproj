@@ -60,9 +60,10 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.0.28f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Drone\DroneLoader.cs" />
+    <Compile Include="Assets\Scripts\Drone\DroneController.cs" />
     <Compile Include="Assets\Scripts\Shared\SceneLoader.cs" />
     <Compile Include="Assets\Scripts\GlobalConstants\MQTTConstants.cs" />
-    <Compile Include="Assets\Scripts\Pilot\DroneController.cs" />
     <Compile Include="Assets\Scripts\GlobalConstants\DroneConstants.cs" />
     <Compile Include="Assets\Scripts\Pilot\IPConfigUI.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
@@ -71,8 +72,10 @@
     <Compile Include="Assets\Scripts\Shared\RoleSelection.cs" />
     <Compile Include="Assets\Scripts\GlobalConstants\SceneConstants.cs" />
     <Compile Include="Assets\Scripts\Shared\MQTT\MQTTClient.cs" />
+    <Compile Include="Assets\Scripts\GlobalConstants\PathConstants.cs" />
     <Compile Include="Assets\Scripts\Shared\MQTT\MQTTSubscriber.cs" />
     <Compile Include="Assets\Scripts\Shared\MQTT\MQTTConfig.cs" />
+    <Compile Include="Assets\Scripts\Drone\DroneData.cs" />
     <Compile Include="Assets\Scripts\Shared\MQTT\MQTTPublisher.cs" />
     <Compile Include="Assets\Scripts\Commander\CommanderUI1.cs" />
   </ItemGroup>

@@ -1,0 +1,39 @@
+ManifestFileVersion: 0
+UnityVersion: 6000.0.28f1
+CRC: 1470078693
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 167036e151dd9d26d9b78aa07b45d647
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 906d96d938f8339570ba23e45ad5d5d1
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: ddfecd77415d240f29c5e25d4bc4de76
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: a3fc544df65133243bd87807fa479ff1, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 07606113d05f4424a848c32b239fbc04, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Prefabs/DronePrefabs/Drone1.prefab
+Dependencies: []

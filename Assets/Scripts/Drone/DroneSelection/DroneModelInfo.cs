@@ -8,5 +8,9 @@ public class DroneModelInfo
     public float maxDurationMinutes;
     public float storageGB;
     public float rangeMeters;
-    public float batteryPercent;
+
+    public DroneRuntimeStats runtimeStats;
+
+    public string bundleName;
+    public string assetName;
 }

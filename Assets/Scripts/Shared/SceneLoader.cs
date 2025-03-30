@@ -25,4 +25,9 @@ public class SceneLoader : MonoBehaviour
     {
         SceneManager.LoadScene(SceneConstants.PilotUI1);
     }
+
+    public static void LoadPilotDroneSelectionUI()
+    {
+        SceneManager.LoadScene(SceneConstants.PilotDroneSelectionUI);
+    }
 }

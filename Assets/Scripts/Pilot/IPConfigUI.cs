@@ -30,7 +30,7 @@ public class IPConfigUI : MonoBehaviour
         if (!string.IsNullOrEmpty(ip))
         {
             MQTTConfig.SetBrokerIP(ip); // Save the IP using MQTTConfig
-            SceneLoader.LoadPilotUI(); // Move to the pilot's main scene
+            SceneLoader.LoadPilotDroneSelectionUI(); // Move to the drone selection scene
         }
     }
 }

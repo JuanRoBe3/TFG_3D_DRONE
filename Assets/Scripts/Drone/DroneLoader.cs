@@ -3,22 +3,36 @@ using System.IO;
 
 public class DroneLoader : MonoBehaviour
 {
-    public string bundleName = "drone2bundle";  // Nombre del archivo bundle (sin extensión)
-    public string assetName = "Drone2";         // Nombre del prefab dentro del bundle
-
     void Start()
     {
-        LoadDroneFromAssetBundle();
+        LoadDroneFromSelectedInfo();
     }
 
-    private void LoadDroneFromAssetBundle()
+    private void LoadDroneFromSelectedInfo()
     {
+        DroneModelInfo selectedDrone = SelectedDroneHolder.GetDrone();
+
+        if (selectedDrone == null)
+        {
+            Debug.LogError("❌ No se ha seleccionado ningún dron.");
+            return;
+        }
+
+        string bundleName = selectedDrone.bundleName;
+        string assetName = selectedDrone.assetName;
+
+        if (string.IsNullOrEmpty(bundleName) || string.IsNullOrEmpty(assetName))
+        {
+            Debug.LogError("❌ El dron seleccionado no tiene definido bundleName o assetName.");
+            return;
+        }
+
         string bundlePath = Path.Combine(Application.streamingAssetsPath, "AssetBundlesOutput", bundleName);
-        Debug.Log("OLA K ASE: " + bundlePath);
+        Debug.Log($"📦 Cargando AssetBundle desde: {bundlePath}");
 
         if (!File.Exists(bundlePath))
         {
-            Debug.LogError($"❌ AssetBundle no encontrado: {bundlePath}");
+            Debug.LogError($"❌ AssetBundle no encontrado en la ruta: {bundlePath}");
             return;
         }
 
@@ -34,7 +48,7 @@ public class DroneLoader : MonoBehaviour
 
         if (dronePrefab == null)
         {
-            Debug.LogError($"❌ Prefab '{assetName}' no encontrado en el bundle.");
+            Debug.LogError($"❌ Prefab '{assetName}' no encontrado dentro del AssetBundle.");
             return;
         }
 
@@ -55,7 +69,7 @@ public class DroneLoader : MonoBehaviour
             Debug.LogWarning("⚠️ El dron instanciado no contiene componente DroneData.");
         }
 
-        // Puedes descargar el bundle si no vas a usar más cosas
+        // Descargar el bundle (mantener los assets en memoria)
         bundle.Unload(false);
     }
 }

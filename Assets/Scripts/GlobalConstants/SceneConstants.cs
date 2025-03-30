@@ -7,4 +7,6 @@ public static class SceneConstants
     //Pilot Scenes
     public const string PilotIPInput = "PilotIPInputScene";
     public const string PilotUI1 = "PilotGeneralScene";
+    public const string PilotDroneSelectionUI = "PilotDroneSelectionScene";
+
 }

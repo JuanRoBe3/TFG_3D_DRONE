@@ -13,4 +13,6 @@ public static class MQTTConstants
     public const string DronePositionTopic = "drone/position";
     public const string DroneStatusTopic = "drone/status";
     public const string CommandTopic = "drone/commands";
+    public const string SelectedDroneTopic = "droneselection/selected";
+
 }

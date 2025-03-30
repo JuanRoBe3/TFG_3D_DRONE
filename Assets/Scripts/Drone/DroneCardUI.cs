@@ -25,7 +25,7 @@ public class DroneCardUI : MonoBehaviour
         durationText.text = $"{info.maxDurationMinutes} min";
         storageText.text = $"{info.storageGB} GB";
         rangeText.text = $"{info.rangeMeters} m";
-        batteryText.text = $"{info.batteryPercent}%";
+        batteryText.text = $"{info.runtimeStats.batteryPercent}%";
 
         selectButton.onClick.AddListener(() => onSelectedCallback?.Invoke(droneInfo));
     }

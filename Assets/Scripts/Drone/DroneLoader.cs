@@ -55,8 +55,32 @@ public class DroneLoader : MonoBehaviour
         GameObject droneInstance = Instantiate(dronePrefab);
         Debug.Log("✅ Dron instanciado desde AssetBundle.");
 
-        DroneData data = droneInstance.GetComponent<DroneData>();
+        // === Asignar HUD y UI al ObstacleDetector ===
+        ObstacleDetector detector = droneInstance.GetComponent<ObstacleDetector>();
+        DroneHUDWarning hud = Object.FindFirstObjectByType<DroneHUDWarning>();
+        CollisionDistanceUI distanceUI = Object.FindFirstObjectByType<CollisionDistanceUI>();
 
+        if (detector != null)
+        {
+            detector.hudWarning = hud;
+            detector.distanceUI = distanceUI;
+            detector.obstacleLayer = LayerMask.GetMask("Terrain"); // Usa "Default" si el landscape está ahí
+
+            Debug.Log("✅ ObstacleDetector: HUD, UI y capa asignados.");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ No se encontró componente ObstacleDetector en el dron.");
+        }
+
+        // Activar la cámara del dron
+        ActivatePilotCamera(droneInstance);
+
+        // Asignar esa cámara al Canvas fijo de la escena
+        AssignPilotCameraToSharedCanvas(droneInstance);
+
+        // Mostrar información si existe
+        DroneData data = droneInstance.GetComponent<DroneData>();
         if (data != null)
         {
             Debug.Log($"🔋 Battery: {data.batteryLevel}%");
@@ -69,7 +93,50 @@ public class DroneLoader : MonoBehaviour
             Debug.LogWarning("⚠️ El dron instanciado no contiene componente DroneData.");
         }
 
-        // Descargar el bundle (mantener los assets en memoria)
+        // Mantener los assets en memoria
         bundle.Unload(false);
+    }
+
+    private void ActivatePilotCamera(GameObject droneInstance)
+    {
+        if (Camera.main != null)
+        {
+            Camera.main.enabled = false;
+            AudioListener listener = Camera.main.GetComponent<AudioListener>();
+            if (listener != null) listener.enabled = false;
+        }
+
+        Transform cameraTransform = droneInstance.transform.Find("PilotCamera");
+
+        if (cameraTransform != null)
+        {
+            Camera droneCamera = cameraTransform.GetComponent<Camera>();
+            AudioListener droneListener = cameraTransform.GetComponent<AudioListener>();
+
+            if (droneCamera != null) droneCamera.enabled = true;
+            if (droneListener != null) droneListener.enabled = true;
+
+            Debug.Log("🎥 Cámara del dron activada.");
+        }
+        else
+        {
+            Debug.Log("⚠️ El dron no contiene un hijo llamado 'PilotCamera'.");
+        }
+    }
+
+    private void AssignPilotCameraToSharedCanvas(GameObject droneInstance)
+    {
+        Canvas canvas = GameObject.Find("CanvasPilotUI")?.GetComponent<Canvas>();
+
+        if (canvas == null)
+        {
+            Debug.LogError("🚫 No se encontró el Canvas 'CanvasPilotUI' en la escena.");
+            return;
+        }
+
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.worldCamera = null;
+
+        Debug.Log("✅ CanvasPilotUI forzado a Overlay (sin cámara).");
     }
 }

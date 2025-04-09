@@ -64,8 +64,11 @@
     <Compile Include="Assets\Scripts\Drone\DroneSelection\DroneSelectionManager.cs" />
     <Compile Include="Assets\Scripts\Drone\MQTT\DroneSelectionMessage.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneController.cs" />
+    <Compile Include="Assets\Scripts\Drone\DroneCameraManager.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneCardUI.cs" />
     <Compile Include="Assets\Scripts\Shared\SceneLoader.cs" />
+    <Compile Include="Assets\Scripts\Drone\DroneObstacles\ObstacleDetector.cs" />
+    <Compile Include="Assets\Scripts\Drone\DroneObstacles\DroneHUDWarning.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneSelection\DroneSelectionUI.cs" />
     <Compile Include="Assets\Scripts\GlobalConstants\MQTTConstants.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneSelection\DroneModelInfo.cs" />
@@ -83,6 +86,7 @@
     <Compile Include="Assets\Scripts\Shared\MQTT\MQTTConfig.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneSelection\DroneCarouselUI.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneData.cs" />
+    <Compile Include="Assets\Scripts\Drone\DroneObstacles\CollisionDistanceUI.cs" />
     <Compile Include="Assets\Scripts\Shared\MQTT\MQTTPublisher.cs" />
     <Compile Include="Assets\Scripts\Commander\CommanderUI1.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneSelection\DroneCarouselController.cs" />

@@ -65,6 +65,7 @@
     <Compile Include="Assets\Scripts\Drone\MQTT\DroneSelectionMessage.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneController.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneCameraManager.cs" />
+    <Compile Include="Assets\Scripts\Drone\AssignRenderTexture.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneCardUI.cs" />
     <Compile Include="Assets\Scripts\Shared\SceneLoader.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneObstacles\ObstacleDetector.cs" />
@@ -73,12 +74,15 @@
     <Compile Include="Assets\Scripts\GlobalConstants\MQTTConstants.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneSelection\DroneModelInfo.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneRuntimeStats.cs" />
+    <Compile Include="Assets\Scripts\Drone\DroneMinimap\DroneMinimapMarker.cs" />
     <Compile Include="Assets\Scripts\GlobalConstants\DroneConstants.cs" />
     <Compile Include="Assets\Scripts\Pilot\IPConfigUI.cs" />
+    <Compile Include="Assets\Scripts\Drone\DroneMinimap\SingleMinimapMarker.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\Scripts\Commander\CommanderUIManager.cs" />
     <Compile Include="Assets\Scripts\GlobalConstants\LogMessagesConstants.cs" />
     <Compile Include="Assets\Scripts\Shared\RoleSelection.cs" />
+    <Compile Include="Assets\Scripts\Drone\DroneMinimap\TopDownCameraFollow.cs" />
     <Compile Include="Assets\Scripts\GlobalConstants\SceneConstants.cs" />
     <Compile Include="Assets\Scripts\Shared\MQTT\MQTTClient.cs" />
     <Compile Include="Assets\Scripts\GlobalConstants\PathConstants.cs" />

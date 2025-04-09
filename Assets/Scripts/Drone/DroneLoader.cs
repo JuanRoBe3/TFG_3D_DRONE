@@ -53,6 +53,7 @@ public class DroneLoader : MonoBehaviour
         }
 
         GameObject droneInstance = Instantiate(dronePrefab);
+        droneInstance.tag = "Drone";
         Debug.Log("✅ Dron instanciado desde AssetBundle.");
 
         // === Asignar HUD y UI al ObstacleDetector ===
@@ -106,7 +107,7 @@ public class DroneLoader : MonoBehaviour
             if (listener != null) listener.enabled = false;
         }
 
-        Transform cameraTransform = droneInstance.transform.Find("PilotCamera");
+        Transform cameraTransform = FindChildByName(droneInstance.transform, "PilotCamera");
 
         if (cameraTransform != null)
         {
@@ -139,4 +140,19 @@ public class DroneLoader : MonoBehaviour
 
         Debug.Log("✅ CanvasPilotUI forzado a Overlay (sin cámara).");
     }
+
+    private Transform FindChildByName(Transform parent, string name)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.name == name)
+                return child;
+
+            Transform result = FindChildByName(child, name);
+            if (result != null)
+                return result;
+        }
+        return null;
+    }
+
 }

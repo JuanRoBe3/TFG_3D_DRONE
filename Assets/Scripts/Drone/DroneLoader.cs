@@ -94,6 +94,23 @@ public class DroneLoader : MonoBehaviour
             Debug.LogWarning("⚠️ El dron instanciado no contiene componente DroneData.");
         }
 
+        // === Conectar TargetDetector con TargetPopupUI ===
+        TargetPopupUI popupUI = Object.FindFirstObjectByType<TargetPopupUI>();
+        TargetDetector targetDetector = droneInstance.GetComponentInChildren<TargetDetector>();
+
+        if (popupUI != null && targetDetector != null)
+        {
+            targetDetector.popupUI = popupUI;
+            Debug.Log("✅ TargetDetector conectado correctamente al TargetPopupUI.");
+        }
+        else
+        {
+            if (popupUI == null)
+                Debug.LogWarning("⚠️ No se encontró TargetPopupUI en la escena.");
+            if (targetDetector == null)
+                Debug.LogWarning("⚠️ No se encontró TargetDetector en el dron instanciado.");
+        }
+
         // Mantener los assets en memoria
         bundle.Unload(false);
     }
@@ -154,5 +171,4 @@ public class DroneLoader : MonoBehaviour
         }
         return null;
     }
-
 }

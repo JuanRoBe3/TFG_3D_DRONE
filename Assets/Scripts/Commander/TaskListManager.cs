@@ -5,9 +5,10 @@ using TMPro;
 public class TaskListManager : MonoBehaviour
 {
     [Header("Prefabs y referencias")]
-    public GameObject taskItemPrefab;
+    public GameObject taskItemPrefab;                 // Prefab del Task_Item
     public Transform contentParent;                   // Content del ScrollView
     public RectTransform scrollViewRectTransform;     // RectTransform del ScrollView
+    public TaskEditorUI taskEditorUI;                 // Panel flotante para crear tareas
 
     [Header("Altura relativa de las tareas")]
     [Range(0.1f, 1f)]
@@ -15,36 +16,36 @@ public class TaskListManager : MonoBehaviour
 
     private void Start()
     {
-        // Al iniciar, ajusta cualquier tarea existente (por si hay alguna manual)
-        AdjustAllTaskItems();
+        AdjustAllTaskItems(); // Ajustar si ya hay tareas puestas
     }
 
     private void OnRectTransformDimensionsChange()
     {
-        // Se llama automáticamente si cambia el tamaño del objeto con RectTransform asignado
-        AdjustAllTaskItems();
+        AdjustAllTaskItems(); // Redimensionar tareas cuando cambia el tamaño
     }
 
     /// <summary>
-    /// Añade una nueva tarea a la lista con valores de prueba.
+    /// Abre el panel de creación de tareas.
     /// </summary>
-    public void AddTask()
+    public void OpenCreateTask()
     {
-        GameObject item = Instantiate(taskItemPrefab, contentParent);
-        AdjustTaskItemHeight(item);
-
-        // Valores de ejemplo (puedes sustituir esto por un formulario luego)
-        TaskItemUI taskUI = item.GetComponent<TaskItemUI>();
-        if (taskUI != null)
+        taskEditorUI.Show((taskData) =>
         {
-            string randomName = "Tarea " + Random.Range(1, 100);
-            string status = "Pendiente";
-            taskUI.Setup(randomName, status);
-        }
+            // 1. Instanciar el prefab
+            GameObject item = Instantiate(taskItemPrefab, contentParent);
+
+            // 2. Ajustar altura
+            AdjustTaskItemHeight(item);
+
+            // 3. Visualizar la tarea
+            TaskItemUI taskUI = item.GetComponent<TaskItemUI>();
+            if (taskUI != null)
+                taskUI.Setup(taskData, this);
+        });
     }
 
     /// <summary>
-    /// Ajusta la altura de un único item.
+    /// Ajusta la altura de una tarea concreta.
     /// </summary>
     private void AdjustTaskItemHeight(GameObject taskItem)
     {
@@ -77,4 +78,21 @@ public class TaskListManager : MonoBehaviour
             }
         }
     }
+
+    public void EditTask(TaskData existingData, TaskItemUI itemUI)
+    {
+        taskEditorUI.Show((updatedData) =>
+        {
+            // Actualizamos la referencia de datos
+            existingData.title = updatedData.title;
+            existingData.description = updatedData.description;
+            existingData.status = updatedData.status;
+            existingData.assignedDrone = updatedData.assignedDrone;
+
+            // Volvemos a mostrar la UI con los nuevos datos
+            itemUI.Setup(existingData, this);
+        }, existingData);
+    }
+
+
 }

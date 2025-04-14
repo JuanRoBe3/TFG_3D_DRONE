@@ -79,6 +79,8 @@
     <Compile Include="Assets\Scripts\GlobalConstants\DroneConstants.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneObstacles\CollisionWarning\ObstacleDetector.cs" />
     <Compile Include="Assets\Scripts\Pilot\IPConfigUI.cs" />
+    <Compile Include="Assets\Scripts\Commander\TaskData.cs" />
+    <Compile Include="Assets\Scripts\Commander\TaskEditorUI.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneObstacles\CollisionWarning\CollisionDistanceUI.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneMinimap\SingleMinimapMarker.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />

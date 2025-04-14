@@ -63,6 +63,7 @@
     <Compile Include="Assets\Scripts\Drone\DroneLoader.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneSelection\DroneSelectionManager.cs" />
     <Compile Include="Assets\Scripts\Drone\MQTT\DroneSelectionMessage.cs" />
+    <Compile Include="Assets\Scripts\Commander\ResizeTasksListener.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneController.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneCameraManager.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneObstacles\CollisionWarning\DroneHUDWarning.cs" />
@@ -87,6 +88,8 @@
     <Compile Include="Assets\Scripts\Shared\RoleSelection.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneMinimap\TopDownCameraFollow.cs" />
     <Compile Include="Assets\Scripts\GlobalConstants\SceneConstants.cs" />
+    <Compile Include="Assets\Scripts\Commander\TaskItemUI.cs" />
+    <Compile Include="Assets\Scripts\Commander\TaskListManager.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneObstacles\TargetObjects\TargetPopupUI.cs" />
     <Compile Include="Assets\Scripts\Shared\MQTT\MQTTClient.cs" />
     <Compile Include="Assets\Scripts\GlobalConstants\PathConstants.cs" />

@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class DroneCarouselUI : MonoBehaviour
 {
+    [Header("Referencias UI")]
     public Image displayImage;
     public TMP_Text droneNameText;
     public TMP_Text storageText;
@@ -11,15 +12,18 @@ public class DroneCarouselUI : MonoBehaviour
     public TMP_Text batteryText;
     public TMP_Text rangeText;
 
-    public void DisplayDrone(DroneModelInfo drone)
+    /// <summary>
+    /// Muestra la información del dron en el carrusel, solo datos estáticos.
+    /// </summary>
+    public void DisplayDrone(DroneData droneData)
     {
-        if (drone == null) return;
+        if (droneData == null) return;
 
-        displayImage.sprite = drone.droneImage;
-        droneNameText.text = drone.droneName;
-        storageText.text = $"{drone.storageGB} GB";
-        durationText.text = $"{drone.maxDurationMinutes} min";
-        batteryText.text = $"{drone.runtimeStats.batteryPercent}%";
-        rangeText.text = $"{drone.rangeMeters} m";
+        displayImage.sprite = droneData.icon;
+        droneNameText.text = droneData.droneName;
+        storageText.text = $"{droneData.storageCapacityMB} MB";
+        durationText.text = $"{(droneData.estimatedFlightDurationMinutes):0} min";
+        batteryText.text = $"{droneData.maxBattery:0}%";
+        rangeText.text = $"{droneData.maxRange} m";
     }
 }

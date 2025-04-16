@@ -3,14 +3,17 @@ using UnityEngine;
 
 public class DroneSelectionManager : MonoBehaviour
 {
+    //SOLO UTIL SI VOY A HACER CARTAS EN VEZ DE CAROUSEL
+    /*
     [Header("Drone Card Settings")]
     public Transform cardContainer; // El contenedor donde se instancian las tarjetas
-    public DroneCardUI cardPrefab;  // Prefab de la tarjeta
+    public DroneCardUI cardPrefab;  // Prefab de la tarjeta 
+    */
 
     [Header("Drones Available")]
-    public List<DroneModelInfo> availableDrones; // Aquí arrastras los datos desde el Inspector
+    public List<DroneData> availableDrones; // Aquí arrastras los datos desde el Inspector
 
-    private DroneModelInfo selectedDrone;
+    private DroneData selectedDrone;
 
     // ✅ Singleton Instance
     public static DroneSelectionManager Instance { get; private set; }
@@ -29,30 +32,40 @@ public class DroneSelectionManager : MonoBehaviour
 
     void Start()
     {
-        /*
-         foreach (var drone in availableDrones)
-        {
-            var card = Instantiate(cardPrefab, cardContainer);
-            card.Setup(drone, OnDroneSelected);
-        }
-         */
+        //para hacer tarjetas en vez de carousel (mostrar varios drones a la vez)
+        //////////////////////////////
+        //instantiateCards();
+        //////////////////////////////
     }
 
     // ✅ Método llamado por las tarjetas al pulsar "Select"
-    void OnDroneSelected(DroneModelInfo drone)
+    void OnDroneSelected(DroneData drone)
     {
         SetSelectedDrone(drone);
     }
 
     // ✅ Lo que te faltaba: lo puedes usar desde cualquier script externo
-    public void SetSelectedDrone(DroneModelInfo drone)
+    public void SetSelectedDrone(DroneData drone)
     {
         selectedDrone = drone;
         Debug.Log($"Dron seleccionado manualmente: {drone.droneName}");
     }
 
-    public DroneModelInfo GetSelectedDrone()
+    public DroneData GetSelectedDrone()
     {
         return selectedDrone;
     }
+
+    //METODO PARA HACER TARJETAS EN VEZ DE CAROUSEL
+    /*
+    private void instantiateCards()
+    {
+        foreach (var drone in availableDrones)
+        {
+            var card = Instantiate(cardPrefab, cardContainer);
+            card.Setup(drone, OnDroneSelected);
+        }
+    } 
+     */
+
 }

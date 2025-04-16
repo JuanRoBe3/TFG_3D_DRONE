@@ -1,16 +1,16 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.0.28f1
-CRC: 3477442453
+CRC: 1766213794
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 770aeaf10448f6cc27843589e3306f36
+    Hash: 714339fd9ad5b496a6c804fc8c6ac665
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 284ac391d2779bbefd51d0d160844736
+    Hash: 17abebbf0d2373a1c0fe4370a1b5d91f
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: 97b9b4047372d3347155567082622df9
+    Hash: 0cf01a286ccc70cc96bc7777a52ed320
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -22,6 +22,8 @@ ClassTypes:
 - Class: 21
   Script: {instanceID: 0}
 - Class: 23
+  Script: {instanceID: 0}
+- Class: 28
   Script: {instanceID: 0}
 - Class: 33
   Script: {instanceID: 0}
@@ -49,9 +51,12 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 135
   Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers:
 - AssemblyName: Unity.RenderPipelines.Universal.Runtime
   ClassName: UnityEngine.Rendering.Universal.TemporalAA/Settings
 Assets:
+- Assets/Prueba/drone1.asset
 - Assets/Prefabs/DronePrefabs/Drone1.prefab
 Dependencies: []

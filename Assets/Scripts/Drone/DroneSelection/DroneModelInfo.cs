@@ -1,5 +1,7 @@
 using UnityEngine;
 
+//Creo que esta ya no sirve para nada
+
 [System.Serializable]
 public class DroneModelInfo
 {
@@ -9,7 +11,7 @@ public class DroneModelInfo
     public float storageGB;
     public float rangeMeters;
 
-    public DroneRuntimeStats runtimeStats;
+    public DroneRuntimeStatus runtimeStatus;
 
     public string bundleName;
     public string assetName;

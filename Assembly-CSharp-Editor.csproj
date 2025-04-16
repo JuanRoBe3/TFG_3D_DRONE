@@ -61,7 +61,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\TutorialInfo\Scripts\Editor\ReadmeEditor.cs" />
-    <Compile Include="Assets\Editor\BuildAssetBundles.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetBundleAutoLabeler.cs" />
+    <Compile Include="Assets\Scripts\Editor\BuildAssetBundles.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

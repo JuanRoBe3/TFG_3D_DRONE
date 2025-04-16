@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
@@ -21,28 +21,28 @@ public class TaskListManager : MonoBehaviour
 
     private void OnRectTransformDimensionsChange()
     {
-        AdjustAllTaskItems(); // Redimensionar tareas cuando cambia el tama�o
+        AdjustAllTaskItems(); // Redimensionar tareas cuando cambia el tamaño
     }
 
     /// <summary>
-    /// Abre el panel de creaci�n de tareas.
+    /// Abre el panel de creación de tareas.
     /// </summary>
     public void OpenCreateTask()
     {
+        // ✅ Inyectamos los drones automáticamente desde el CommanderDroneManager
+        var drones = CommanderDroneManager.Instance.GetAvailableDrones();
+        taskEditorUI.SetAvailableDrones(drones);
+
         taskEditorUI.Show((taskData) =>
         {
-            // 1. Instanciar el prefab
             GameObject item = Instantiate(taskItemPrefab, contentParent);
-
-            // 2. Ajustar altura
             AdjustTaskItemHeight(item);
-
-            // 3. Visualizar la tarea
             TaskItemUI taskUI = item.GetComponent<TaskItemUI>();
             if (taskUI != null)
                 taskUI.Setup(taskData, this);
         });
     }
+
 
     /// <summary>
     /// Ajusta la altura de una tarea concreta.
@@ -81,15 +81,17 @@ public class TaskListManager : MonoBehaviour
 
     public void EditTask(TaskData existingData, TaskItemUI itemUI)
     {
+        // ✅ Inyectamos la lista de drones también al editar
+        var drones = CommanderDroneManager.Instance.GetAvailableDrones();
+        taskEditorUI.SetAvailableDrones(drones);
+
         taskEditorUI.Show((updatedData) =>
         {
-            // Actualizamos la referencia de datos
             existingData.title = updatedData.title;
             existingData.description = updatedData.description;
             existingData.status = updatedData.status;
             existingData.assignedDrone = updatedData.assignedDrone;
 
-            // Volvemos a mostrar la UI con los nuevos datos
             itemUI.Setup(existingData, this);
         }, existingData);
     }

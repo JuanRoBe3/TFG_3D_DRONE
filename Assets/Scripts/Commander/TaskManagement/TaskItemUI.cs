@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
@@ -8,9 +8,6 @@ public class TaskItemUI : MonoBehaviour
     public TextMeshProUGUI statusText;
     public TextMeshProUGUI droneNameText;
     public Image droneIcon;
-
-    public Sprite drone1Icon;
-    public Sprite drone2Icon;
 
     public Button editButton;
 
@@ -24,15 +21,28 @@ public class TaskItemUI : MonoBehaviour
 
         taskNameText.text = data.title;
         statusText.text = data.status;
-        droneNameText.text = data.assignedDrone;
 
-        switch (data.assignedDrone)
+        if (data.assignedDrone != null)
         {
-            case "Drone1": droneIcon.sprite = drone1Icon; break;
-            case "Drone2": droneIcon.sprite = drone2Icon; break;
+            droneNameText.text = data.assignedDrone.droneName;
+
+            if (data.assignedDrone.icon != null)
+            {
+                droneIcon.sprite = data.assignedDrone.icon;
+                droneIcon.enabled = true;
+            }
+            else
+            {
+                droneIcon.enabled = false;
+                Debug.LogWarning($"⚠️ El dron '{data.assignedDrone.droneName}' no tiene icono asignado.");
+            }
+        }
+        else
+        {
+            droneNameText.text = "Sin dron";
+            droneIcon.enabled = false;
         }
 
-        // Asignar el listener del bot�n de editar
         if (editButton != null)
             editButton.onClick.AddListener(OnEditButtonClicked);
     }

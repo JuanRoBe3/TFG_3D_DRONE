@@ -10,7 +10,7 @@ public class DroneLoader : MonoBehaviour
 
     private void LoadDroneFromSelectedInfo()
     {
-        DroneModelInfo selectedDrone = SelectedDroneHolder.GetDrone();
+        DroneData selectedDrone = SelectedDroneHolder.GetDrone();
 
         if (selectedDrone == null)
         {
@@ -18,8 +18,8 @@ public class DroneLoader : MonoBehaviour
             return;
         }
 
-        string bundleName = selectedDrone.bundleName;
-        string assetName = selectedDrone.assetName;
+        string bundleName = selectedDrone.assetBundleName;
+        string assetName = selectedDrone.name;
 
         if (string.IsNullOrEmpty(bundleName) || string.IsNullOrEmpty(assetName))
         {
@@ -27,7 +27,9 @@ public class DroneLoader : MonoBehaviour
             return;
         }
 
-        string bundlePath = Path.Combine(Application.streamingAssetsPath, "AssetBundlesOutput", bundleName);
+        // ✅ Usamos selectedDrone, no droneData (que no existe aquí)
+        string fileName = bundleName.EndsWith(".bundle") ? bundleName : bundleName + ".bundle";
+        string bundlePath = Path.Combine(Application.streamingAssetsPath, "AssetBundlesOutput", fileName);
         Debug.Log($"📦 Cargando AssetBundle desde: {bundlePath}");
 
         if (!File.Exists(bundlePath))
@@ -84,10 +86,10 @@ public class DroneLoader : MonoBehaviour
         DroneData data = droneInstance.GetComponent<DroneData>();
         if (data != null)
         {
-            Debug.Log($"🔋 Battery: {data.batteryLevel}%");
+            Debug.Log($"🔋 Battery: {data.maxBattery}%");
             Debug.Log($"📡 Range: {data.maxRange}m");
-            Debug.Log($"💾 Storage: {data.storageAvailableMB}MB");
-            Debug.Log($"⏱️ Duration: {data.flightDurationSeconds} sec");
+            Debug.Log($"💾 Storage: {data.storageCapacityMB}MB");
+            Debug.Log($"⏱️ Duration: {data.estimatedFlightDurationMinutes} min");
         }
         else
         {

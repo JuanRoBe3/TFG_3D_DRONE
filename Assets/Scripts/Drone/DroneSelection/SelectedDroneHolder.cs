@@ -1,13 +1,13 @@
 public static class SelectedDroneHolder
 {
-    private static DroneModelInfo selectedDrone;
+    private static DroneData selectedDrone;
 
-    public static void SetDrone(DroneModelInfo drone)
+    public static void SetDrone(DroneData drone)
     {
         selectedDrone = drone;
     }
 
-    public static DroneModelInfo GetDrone()
+    public static DroneData GetDrone()
     {
         return selectedDrone;
     }

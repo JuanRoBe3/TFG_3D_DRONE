@@ -331,9 +331,6 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2d63b876931d7f141a6d0de7f0851b3b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8864333736000472414}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2d63b876931d7f141a6d0de7f0851b3b, type: 3}
-      insertIndex: -1
       addedObject: {fileID: -7075902102405891161}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2d63b876931d7f141a6d0de7f0851b3b, type: 3}
       insertIndex: -1
@@ -358,22 +355,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 2d63b876931d7f141a6d0de7f0851b3b, type: 3}
   m_PrefabInstance: {fileID: 44437020913281386}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8864333736000472414
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 890787958731609147}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 07606113d05f4424a848c32b239fbc04, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  batteryLevel: 100
-  maxRange: 500
-  storageAvailableMB: 2048
-  flightDurationSeconds: 0
 --- !u!114 &-7075902102405891161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -475,4 +456,5 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   detectionRange: 100
+  sphereRadius: 6
   popupUI: {fileID: 0}

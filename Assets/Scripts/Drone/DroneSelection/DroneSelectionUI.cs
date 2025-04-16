@@ -6,7 +6,7 @@ using TMPro;
 public class DroneSelectionUI : MonoBehaviour
 {
     [Header("Drone Info List")]
-    public List<DroneModelInfo> droneModels;
+    public List<DroneData> droneModels;
 
     [Header("UI Prefabs and Parents")]
     public GameObject droneCardPrefab; // Prefab visual de la tarjeta
@@ -14,7 +14,7 @@ public class DroneSelectionUI : MonoBehaviour
 
     [Header("Selection")]
     public Button confirmButton;
-    private DroneModelInfo selectedDrone;
+    private DroneData selectedDrone;
 
     void Start()
     {
@@ -25,7 +25,7 @@ public class DroneSelectionUI : MonoBehaviour
 
     void PopulateDroneCards()
     {
-        foreach (DroneModelInfo drone in droneModels)
+        foreach (DroneData drone in droneModels)
         {
             GameObject card = Instantiate(droneCardPrefab, cardParent);
             DroneCardUI cardUI = card.GetComponent<DroneCardUI>();
@@ -33,7 +33,7 @@ public class DroneSelectionUI : MonoBehaviour
         }
     }
 
-    void OnDroneSelected(DroneModelInfo drone)
+    void OnDroneSelected(DroneData drone)
     {
         selectedDrone = drone;
         confirmButton.interactable = true;

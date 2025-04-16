@@ -775,6 +775,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919895008684971212, guid: 93198ff02a4d5f24a84b494e5ceb2567, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919895008684971212, guid: 93198ff02a4d5f24a84b494e5ceb2567, type: 3}
       propertyPath: rangeText
       value: 
       objectReference: {fileID: 1122718926}
@@ -1181,27 +1185,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 965e9d2581a98ce49837fa04dece08ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cardContainer: {fileID: 0}
-  cardPrefab: {fileID: 0}
   availableDrones:
-  - droneName: Drone1
-    droneImage: {fileID: 21300000, guid: 3a633bb178810dc48a08d9d725e7e83f, type: 3}
-    maxDurationMinutes: 20
-    storageGB: 128
-    rangeMeters: 0
-    runtimeStats:
-      batteryPercent: 0
-    bundleName: drone1bundle
-    assetName: Drone1
-  - droneName: Drone2
-    droneImage: {fileID: 21300000, guid: aeef8adecc8a01c4a836d3e0989f0bf2, type: 3}
-    maxDurationMinutes: 40
-    storageGB: 26
-    rangeMeters: 300
-    runtimeStats:
-      batteryPercent: 0
-    bundleName: drone2bundle
-    assetName: Drone2
+  - {fileID: 11400000, guid: 538c5aa3c3fc46c46b4efd084b3c8884, type: 2}
+  - {fileID: 11400000, guid: 05500f89f8453d04fa33fd86d136afc5, type: 2}
 --- !u!4 &1462845796
 Transform:
   m_ObjectHideFlags: 0
@@ -1614,9 +1600,9 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 372102809}
+  - {fileID: 1867296670}
   - {fileID: 1064974149}
   - {fileID: 1794609034}
-  - {fileID: 1867296670}
   - {fileID: 276531372}
   - {fileID: 1462845796}
   - {fileID: 728359459}

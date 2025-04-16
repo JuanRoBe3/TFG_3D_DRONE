@@ -8,7 +8,7 @@ public class DroneCarouselController : MonoBehaviour
     public Button rightButton;
     public Button selectButton;
 
-    private List<DroneModelInfo> drones;
+    private List<DroneData> drones;
     private int currentIndex = 0;
 
     [SerializeField] private DroneCarouselUI uiUpdater;
@@ -44,24 +44,24 @@ public class DroneCarouselController : MonoBehaviour
 
     void UpdateUI()
     {
-        DroneModelInfo drone = drones[currentIndex];
+        DroneData drone = drones[currentIndex];
         DroneSelectionManager.Instance.SetSelectedDrone(drone);
         uiUpdater?.DisplayDrone(drone);
     }
 
     void OnSelectClicked()
     {
-        DroneModelInfo selected = DroneSelectionManager.Instance.GetSelectedDrone();
+        DroneData selected = DroneSelectionManager.Instance.GetSelectedDrone();
         if (selected == null) return;
 
         SelectedDroneHolder.SetDrone(selected);
 
         string message =
-            $"{selected.droneName};" +
-            $"{selected.runtimeStats.batteryPercent};" +
-            $"{selected.maxDurationMinutes};" +
-            $"{selected.storageGB};" +
-            $"{selected.rangeMeters}";
+            $"{selected.name};" +
+            $"{selected.maxBattery};" +
+            $"{selected.estimatedFlightDurationMinutes};" +
+            $"{selected.storageCapacityMB};" +
+            $"{selected.maxRange}";
 
         /*
         MQTTPublisher.Instance.PublishMessage(

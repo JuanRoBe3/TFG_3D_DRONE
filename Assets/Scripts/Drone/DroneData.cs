@@ -1,9 +1,14 @@
 using UnityEngine;
 
-public class DroneData : MonoBehaviour
+[CreateAssetMenu(fileName = "NewDroneData", menuName = "Drone/Drone Data")]
+public class DroneData : ScriptableObject
 {
-    public float batteryLevel = 100f;         // %
-    public float maxRange = 500f;             // metros
-    public float storageAvailableMB = 1024f;  // MB
-    public float flightDurationSeconds = 0f;  // tiempo actual de vuelo o restante
+    public string droneName;
+    public string assetBundleName; // USE "droneXbundle" WHERE X is the nº of the drone (new one please)
+    public Sprite icon;
+    public float maxBattery = 100f;
+    public float maxRange = 500f;
+    public float storageCapacityMB = 1024f;
+    public float estimatedFlightDurationMinutes = 1200f;
+    public GameObject prefab;
 }

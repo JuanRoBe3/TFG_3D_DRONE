@@ -11,6 +11,7 @@ public class DroneSelectionDropdownManager : MonoBehaviour
 
     void Start()
     {
+        
         string fullPath = Path.Combine(Application.streamingAssetsPath, "AssetBundlesOutput");
         Debug.Log("📂 Escaneando: " + fullPath);
 
@@ -27,7 +28,7 @@ public class DroneSelectionDropdownManager : MonoBehaviour
         {
             string bundleName = Path.GetFileName(filePath);
 
-            AssetBundle bundle = AssetBundle.LoadFromFile(filePath);
+            AssetBundle bundle = AssetBundleManager.Instance.LoadBundle(filePath); // ✅ cambio aquí
             if (bundle == null)
             {
                 Debug.LogWarning($"⚠️ Fallo al cargar bundle: {bundleName}");
@@ -49,7 +50,7 @@ public class DroneSelectionDropdownManager : MonoBehaviour
                 Debug.LogWarning($"❌ No se encontró DroneData en {bundleName}");
             }
 
-            bundle.Unload(false);
+            // ❌ bundle.Unload(false); // No lo descargues si vas a usarlo más tarde
         }
 
         if (friendlyNames.Count == 0)
@@ -59,6 +60,7 @@ public class DroneSelectionDropdownManager : MonoBehaviour
 
         PopulateDropdown(friendlyNames);
     }
+
 
     void PopulateDropdown(List<string> droneNames)
     {

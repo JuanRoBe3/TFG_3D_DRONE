@@ -4,7 +4,7 @@ public class TargetDetector : MonoBehaviour
 {
     public LayerMask detectableLayer;
     public float detectionRange = 100f;
-    public float sphereRadius = 6.0f;
+    public float sphereRadius = 4.0f;
     public TargetPopupUI popupUI;
 
     private RaycastHit lastHit;

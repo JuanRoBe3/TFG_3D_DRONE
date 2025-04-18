@@ -6,7 +6,7 @@ public class TargetPopupUI : MonoBehaviour
     public GameObject popupPanel;
     public TextMeshProUGUI targetIdText;
     public TextMeshProUGUI directionText;
-    public float popupDuration = 5f;
+    public float popupDuration = 2f;
 
     private float timer = 0f;
 

@@ -34,6 +34,10 @@ public class CommanderDroneManager : MonoBehaviour
 
     private void LoadAllDroneDataFromAssetBundles()
     {
+        availableDrones.Clear(); // ✅ Evita duplicados
+
+        AssetBundleManager.EnsureExists(); // 🔒 Asegura que esté disponible
+
         string path = Path.Combine(Application.streamingAssetsPath, "AssetBundlesOutput");
         if (!Directory.Exists(path))
         {
@@ -46,7 +50,7 @@ public class CommanderDroneManager : MonoBehaviour
         {
             if (!bundlePath.EndsWith(".bundle")) continue;
 
-            AssetBundle bundle = AssetBundle.LoadFromFile(bundlePath);
+            AssetBundle bundle = AssetBundleManager.Instance.LoadBundle(bundlePath);
             if (bundle == null)
             {
                 Debug.LogWarning($"⚠️ Error al cargar el bundle: {bundlePath}");
@@ -59,8 +63,8 @@ public class CommanderDroneManager : MonoBehaviour
                 availableDrones.Add(drone);
                 Debug.Log($"✅ Dron añadido: {drone.droneName} (bundle: {Path.GetFileName(bundlePath)})");
             }
-
-            bundle.Unload(false);
         }
     }
+
+
 }

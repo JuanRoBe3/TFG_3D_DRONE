@@ -14,9 +14,11 @@ public class CommanderUI1 : MonoBehaviour
 
     private void Start()
     {
+        MQTTClient.EnsureExists(); // 🔒 Asegura que existe el singleton ANTES de usarlo
+
         if (MQTTClient.Instance != null)
         {
-            publisher = new MQTTPublisher(MQTTClient.Instance.GetClient()); // ✅ NUEVO
+            publisher = new MQTTPublisher(MQTTClient.Instance.GetClient());
             MQTTClient.Instance.OnMessageReceived += UpdatePositionText;
         }
         else
@@ -24,6 +26,7 @@ public class CommanderUI1 : MonoBehaviour
             Debug.LogError(LogMessagesConstants.ErrorMQTTClientNotFound);
         }
     }
+
 
     private void OnDestroy()
     {
@@ -64,6 +67,7 @@ public class CommanderUI1 : MonoBehaviour
         }
     }
 
+    /*
     public void SendCommand()
     {
         string command = "{\"action\": \"move\", \"direction\": \"forward\"}";
@@ -77,5 +81,6 @@ public class CommanderUI1 : MonoBehaviour
         {
             Debug.LogError(LogMessagesConstants.ErrorMessageNotSent);
         }
-    }
+    } 
+     */
 }

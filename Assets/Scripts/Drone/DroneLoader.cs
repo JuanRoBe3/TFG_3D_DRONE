@@ -5,6 +5,7 @@ public class DroneLoader : MonoBehaviour
 {
     void Start()
     {
+        AssetBundleManager.EnsureExists(); // 🔒 Asegura que existe
         LoadDroneFromSelectedInfo();
     }
 
@@ -27,19 +28,11 @@ public class DroneLoader : MonoBehaviour
             return;
         }
 
-        // ✅ Usamos selectedDrone, no droneData (que no existe aquí)
         string fileName = bundleName.EndsWith(".bundle") ? bundleName : bundleName + ".bundle";
         string bundlePath = Path.Combine(Application.streamingAssetsPath, "AssetBundlesOutput", fileName);
         Debug.Log($"📦 Cargando AssetBundle desde: {bundlePath}");
 
-        if (!File.Exists(bundlePath))
-        {
-            Debug.LogError($"❌ AssetBundle no encontrado en la ruta: {bundlePath}");
-            return;
-        }
-
-        AssetBundle bundle = AssetBundle.LoadFromFile(bundlePath);
-
+        AssetBundle bundle = AssetBundleManager.Instance.LoadBundle(bundlePath);
         if (bundle == null)
         {
             Debug.LogError("❌ Error al cargar el AssetBundle.");
@@ -58,7 +51,6 @@ public class DroneLoader : MonoBehaviour
         droneInstance.tag = "Drone";
         Debug.Log("✅ Dron instanciado desde AssetBundle.");
 
-        // === Asignar HUD y UI al ObstacleDetector ===
         ObstacleDetector detector = droneInstance.GetComponent<ObstacleDetector>();
         DroneHUDWarning hud = Object.FindFirstObjectByType<DroneHUDWarning>();
         CollisionDistanceUI distanceUI = Object.FindFirstObjectByType<CollisionDistanceUI>();
@@ -67,7 +59,7 @@ public class DroneLoader : MonoBehaviour
         {
             detector.hudWarning = hud;
             detector.distanceUI = distanceUI;
-            detector.obstacleLayer = LayerMask.GetMask("Terrain"); // Usa "Default" si el landscape está ahí
+            detector.obstacleLayer = LayerMask.GetMask("Terrain");
 
             Debug.Log("✅ ObstacleDetector: HUD, UI y capa asignados.");
         }
@@ -76,27 +68,17 @@ public class DroneLoader : MonoBehaviour
             Debug.LogWarning("⚠️ No se encontró componente ObstacleDetector en el dron.");
         }
 
-        // Activar la cámara del dron
         ActivatePilotCamera(droneInstance);
-
-        // Asignar esa cámara al Canvas fijo de la escena
         AssignPilotCameraToSharedCanvas(droneInstance);
 
-        // Mostrar información si existe
-        DroneData data = droneInstance.GetComponent<DroneData>();
-        if (data != null)
+        if (selectedDrone != null)
         {
-            Debug.Log($"🔋 Battery: {data.maxBattery}%");
-            Debug.Log($"📡 Range: {data.maxRange}m");
-            Debug.Log($"💾 Storage: {data.storageCapacityMB}MB");
-            Debug.Log($"⏱️ Duration: {data.estimatedFlightDurationMinutes} min");
-        }
-        else
-        {
-            Debug.LogWarning("⚠️ El dron instanciado no contiene componente DroneData.");
+            Debug.Log($"🔋 Battery: {selectedDrone.maxBattery}%");
+            Debug.Log($"📡 Range: {selectedDrone.maxRange}m");
+            Debug.Log($"💾 Storage: {selectedDrone.storageCapacityMB}MB");
+            Debug.Log($"⏱️ Duration: {selectedDrone.estimatedFlightDurationMinutes} min");
         }
 
-        // === Conectar TargetDetector con TargetPopupUI ===
         TargetPopupUI popupUI = Object.FindFirstObjectByType<TargetPopupUI>();
         TargetDetector targetDetector = droneInstance.GetComponentInChildren<TargetDetector>();
 
@@ -112,9 +94,6 @@ public class DroneLoader : MonoBehaviour
             if (targetDetector == null)
                 Debug.LogWarning("⚠️ No se encontró TargetDetector en el dron instanciado.");
         }
-
-        // Mantener los assets en memoria
-        bundle.Unload(false);
     }
 
     private void ActivatePilotCamera(GameObject droneInstance)

@@ -22,26 +22,19 @@ public class MQTTClient : MonoBehaviour
     public event Action<string, string> OnMessageReceived;
 
     // ✅ Diccionario de topics por rol
-    private readonly Dictionary<string, List<string>> roleTopicMap = new()
-    {
-        { "Commander", new List<string> { MQTTConstants.DroneStatusTopic, MQTTConstants.DronePositionTopic } },
-        { "Pilot",     new List<string> { MQTTConstants.CommandTopic } }
-        // Si agregas más roles, los añades aquí
-    };
+    private readonly Dictionary<string, List<string>> roleTopicMap = MQTTTopicSubscriptions.RoleTopics;
 
     void Awake()
     {
-        if (Instance == null)
+        if (Instance != null && Instance != this)
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Debug.LogWarning(LogMessagesConstants.WarningDuplicateMQTTClient);
+            Debug.LogWarning("⚠ Duplicate MQTTClient detected and destroyed.");
             Destroy(gameObject);
             return;
         }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     async void Start()
@@ -131,4 +124,14 @@ public class MQTTClient : MonoBehaviour
     {
         return client;
     }
+
+    public static void EnsureExists()
+    {
+        if (Instance == null)
+        {
+            GameObject obj = new GameObject("MQTTClient");
+            obj.AddComponent<MQTTClient>();
+        }
+    }
+
 }

@@ -11,6 +11,12 @@ public class RoleSelection : MonoBehaviour
     public static bool IsCommander => PlayerPrefs.GetString(RoleKey) == CommanderRole;
     public static bool IsPilot => PlayerPrefs.GetString(RoleKey) == PilotRole;
 
+    void Start()
+    {
+        MQTTClient.EnsureExists();
+        AssetBundleManager.EnsureExists();
+    }
+
     public void SelectCommander()
     {
         PlayerPrefs.SetString(RoleKey, CommanderRole);

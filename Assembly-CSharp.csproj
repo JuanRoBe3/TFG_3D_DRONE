@@ -68,16 +68,22 @@
     <Compile Include="Assets\Scripts\Shared\MQTT\MQTTTopicSubscriptions.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneCameraManager.cs" />
     <Compile Include="Assets\Scripts\Data_Pilot_to_Commander\DroneCameraPublisher.cs" />
+    <Compile Include="Assets\Scripts\CommanderRenderTextureAssigner.cs" />
     <Compile Include="Assets\Scripts\Commander\TaskManagement\TaskData.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneObstacles\CollisionWarning\DroneHUDWarning.cs" />
-    <Compile Include="Assets\Scripts\Drone\AssignRenderTexture.cs" />
+    <Compile Include="Assets\Scripts\Drone\UselessRightNow\AssignRenderTexture.cs" />
     <Compile Include="Assets\Scripts\Commander\TaskManagement\TaskEditorUI.cs" />
+    <Compile Include="Assets\Scripts\SerializablesJSON\SerializableVector3.cs" />
     <Compile Include="Assets\Scripts\Shared\AssetBundleManager.cs" />
     <Compile Include="Assets\Scripts\Shared\SceneLoader.cs" />
+    <Compile Include="Assets\Scripts\DroneCameraLocator.cs" />
+    <Compile Include="Assets\Scripts\SerializablesJSON\SerializableQuaternion.cs" />
+    <Compile Include="Assets\Scripts\RenderTextureRegystry.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneSelection\DroneSelectionUI.cs" />
     <Compile Include="Assets\Scripts\GlobalConstants\MQTTConstants.cs" />
     <Compile Include="Assets\Scripts\Commander\TaskManagement\ResizeTasksListener.cs" />
     <Compile Include="Assets\Scripts\Commander\TaskManagement\TaskListManager.cs" />
+    <Compile Include="Assets\Scripts\MiniMapDebugHelper.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneObstacles\TargetObjects\TargetDetector.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneSelection\DroneModelInfo.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneRuntimeStatus.cs" />
@@ -94,14 +100,18 @@
     <Compile Include="Assets\Scripts\GlobalConstants\LogMessagesConstants.cs" />
     <Compile Include="Assets\Scripts\Commander\CommanderDroneManager.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneObstacles\TargetObjects\TargetData.cs" />
+    <Compile Include="Assets\Scripts\DroneCameraInitializer.cs" />
     <Compile Include="Assets\Scripts\Shared\RoleSelection.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneMinimap\TopDownCameraFollow.cs" />
+    <Compile Include="Assets\Scripts\DebugRawImageChecker.cs" />
     <Compile Include="Assets\Scripts\GlobalConstants\SceneConstants.cs" />
     <Compile Include="Assets\Scripts\Drone\UselessRightNow\DroneCardUI.cs" />
+    <Compile Include="Assets\Scripts\RenderTextureAssigner.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneObstacles\TargetObjects\TargetPopupUI.cs" />
     <Compile Include="Assets\Scripts\Shared\MQTT\MQTTClient.cs" />
     <Compile Include="Assets\Scripts\Commander\TaskManagement\DroneSelectionDropdownManager.cs" />
     <Compile Include="Assets\Scripts\GlobalConstants\PathConstants.cs" />
+    <Compile Include="Assets\Scripts\DroneCameraManagement.cs" />
     <Compile Include="Assets\Scripts\Shared\MQTT\MQTTSubscriber.cs" />
     <Compile Include="Assets\Scripts\Shared\MQTT\MQTTConfig.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneSelection\DroneCarouselUI.cs" />
@@ -615,6 +625,10 @@
     </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
       <HintPath>Library\PackageCache\com.unity.visualscripting\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json\Runtime\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Cecil">

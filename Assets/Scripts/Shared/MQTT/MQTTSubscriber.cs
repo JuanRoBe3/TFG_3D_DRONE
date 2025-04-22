@@ -1,6 +1,8 @@
 ﻿using System;
 using UnityEngine;
 
+//DE MOMENTO NO SIRVE DE UN CAGAO ASÍ QUE TOCARÁ BORRAR
+
 public class MQTTSubscriber
 {
     private readonly MQTTClient mqttClient;

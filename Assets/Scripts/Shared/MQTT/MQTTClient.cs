@@ -16,12 +16,14 @@ public class MQTTClient : MonoBehaviour
     private string uniqueClientId;
 
     /// <summary>
-    /// Evento que se dispara cuando se recibe un mensaje MQTT.
-    /// Proporciona el topic y el contenido del mensaje.
+    /// Evento antiguo para compatibilidad (aún puedes usarlo)
     /// </summary>
     public event Action<string, string> OnMessageReceived;
 
-    // ✅ Diccionario de topics por rol
+    // 🔁 Nuevo: Diccionario de handlers específicos por topic
+    private Dictionary<string, Action<string>> topicHandlers = new Dictionary<string, Action<string>>();
+
+    // 🔁 Ya existente: tópicos por rol
     private readonly Dictionary<string, List<string>> roleTopicMap = MQTTTopicSubscriptions.RoleTopics;
 
     void Awake()
@@ -74,8 +76,16 @@ public class MQTTClient : MonoBehaviour
 
                 Debug.Log($"📩 MQTT received - Topic: '{topic}', Payload: {payload}");
 
-                // 🔁 Delegar el procesamiento al exterior mediante evento
-                OnMessageReceived?.Invoke(topic, payload);
+                // ✅ Modular: redirige según el topic
+                if (topicHandlers.TryGetValue(topic, out Action<string> handler))
+                {
+                    handler.Invoke(payload);
+                }
+                else
+                {
+                    // Solo para debug: aún puedes mantener el evento global si quieres
+                    OnMessageReceived?.Invoke(topic, payload);
+                }
             });
         }
         catch (Exception ex)
@@ -120,6 +130,28 @@ public class MQTTClient : MonoBehaviour
         }
     }
 
+    public void RegisterHandler(string topic, Action<string> handler)
+    {
+        if (!topicHandlers.ContainsKey(topic))
+        {
+            topicHandlers.Add(topic, handler);
+            Debug.Log($"✅ Handler registrado para el topic: {topic}");
+        }
+        else
+        {
+            Debug.LogWarning($"⚠️ Ya hay un handler registrado para el topic: {topic}");
+        }
+    }
+
+    public void UnregisterHandler(string topic)
+    {
+        if (topicHandlers.ContainsKey(topic))
+        {
+            topicHandlers.Remove(topic);
+            Debug.Log($"❌ Handler eliminado para el topic: {topic}");
+        }
+    }
+
     public IMqttClient GetClient()
     {
         return client;
@@ -133,5 +165,4 @@ public class MQTTClient : MonoBehaviour
             obj.AddComponent<MQTTClient>();
         }
     }
-
 }

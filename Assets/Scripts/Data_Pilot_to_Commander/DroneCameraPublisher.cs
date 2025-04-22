@@ -1,20 +1,16 @@
 ﻿using UnityEngine;
 using MQTTnet;
+using Newtonsoft.Json;
 
-/// <summary>
-/// Publica periódicamente la posición y rotación de las cámaras del piloto por MQTT.
-/// </summary>
 public class DroneCameraPublisher : MonoBehaviour
 {
-    public Transform firstPersonCameraTransform;
-    public Transform topDownCameraTransform;
-
     private MQTTPublisher publisher;
+    private Transform firstPersonCameraTransform;
+    private Transform topDownCameraTransform;
 
     private void Start()
     {
         var client = MQTTClient.Instance.GetClient();
-
         if (client == null)
         {
             Debug.LogError("❌ No MQTT client found.");
@@ -27,14 +23,30 @@ public class DroneCameraPublisher : MonoBehaviour
 
     private void PublishCameraData()
     {
-        Vector3 pos1 = firstPersonCameraTransform.position;
-        Quaternion rot1 = firstPersonCameraTransform.rotation;
-        Vector3 pos2 = topDownCameraTransform.position;
-        Quaternion rot2 = topDownCameraTransform.rotation;
+        if (firstPersonCameraTransform == null || topDownCameraTransform == null)
+        {
+            Debug.LogWarning("⚠️ Cámaras no asignadas todavía.");
+            return;
+        }
 
-        var message = new CameraDataMessage(pos1, rot1, pos2, rot2);
-        string json = JsonUtility.ToJson(message);
+        var msg = new CameraDataMessage
+        {
+            firstPersonPos = new SerializableVector3(firstPersonCameraTransform.position),
+            firstPersonRot = new SerializableQuaternion(firstPersonCameraTransform.rotation),
+            topDownPos = new SerializableVector3(topDownCameraTransform.position),
+            topDownRot = new SerializableQuaternion(topDownCameraTransform.rotation)
+        };
 
+
+        string json = JsonConvert.SerializeObject(msg);
+        Debug.Log($"📤 Enviando cámaras: {json}");
         publisher.PublishMessage(MQTTConstants.DroneCameraTopic, json);
+    }
+
+    public void SetCameras(Transform fpCam, Transform tdCam)
+    {
+        firstPersonCameraTransform = fpCam;
+        topDownCameraTransform = tdCam;
+        Debug.Log("📸 Cámaras asignadas al DroneCameraPublisher.");
     }
 }

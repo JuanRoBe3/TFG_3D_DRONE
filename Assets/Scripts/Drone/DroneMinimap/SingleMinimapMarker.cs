@@ -24,8 +24,14 @@ public class SingleMinimapMarker : MonoBehaviour
         // 💡 El dron siempre está en el centro del minimapa
         markerImage.anchoredPosition = Vector2.zero;
 
+        /*
         // La rotación del ícono (flecha) debe representar el yaw del dron
         float yaw = droneTransform.eulerAngles.y;
-        markerImage.localEulerAngles = new Vector3(0, 0, -yaw); // rotación inversa porque en UI es horaria
+        markerImage.localEulerAngles = new Vector3(0, 0, -yaw); // rotación inversa porque en UI es horaria 
+         */
+
+        // No rotamos el marcador si la cámara cenital es fija
+        markerImage.localEulerAngles = Vector3.zero;
+
     }
 }

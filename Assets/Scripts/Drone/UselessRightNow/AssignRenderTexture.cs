@@ -10,10 +10,12 @@ public class AssignRenderTexture : MonoBehaviour
         if (cam != null && renderTexture != null)
         {
             cam.targetTexture = renderTexture;
+            Debug.Log("✅ RenderTexture asignado correctamente.");
         }
         else
         {
             Debug.LogError("❌ Faltan referencias en AssignRenderTexture.");
         }
     }
+
 }

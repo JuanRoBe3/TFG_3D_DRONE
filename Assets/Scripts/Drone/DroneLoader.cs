@@ -1,8 +1,13 @@
 ﻿using UnityEngine;
 using System.IO;
+using System;
+using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 public class DroneLoader : MonoBehaviour
 {
+    public static event Action<GameObject> OnDroneInstantiated;
+
     void Start()
     {
         AssetBundleManager.EnsureExists(); // 🔒 Asegura que existe
@@ -50,6 +55,9 @@ public class DroneLoader : MonoBehaviour
         GameObject droneInstance = Instantiate(dronePrefab);
         droneInstance.tag = "Drone";
         Debug.Log("✅ Dron instanciado desde AssetBundle.");
+
+        // 🔔 Notificar al sistema que el dron ha sido instanciado
+        OnDroneInstantiated?.Invoke(droneInstance);
 
         ObstacleDetector detector = droneInstance.GetComponent<ObstacleDetector>();
         DroneHUDWarning hud = Object.FindFirstObjectByType<DroneHUDWarning>();

@@ -1,26 +1,41 @@
-using UnityEngine;
+锘縰sing UnityEngine;
 
 public class TopDownCameraFollow : MonoBehaviour
 {
-    public string droneTag = "Drone"; // Aseg鷕ate de que el prefab tenga este tag
-    public Vector3 offset = new Vector3(0, 50, 0); // Distancia encima del dron
-
     private Transform droneTransform;
+    public float height = 50f; // Altura deseada sobre el dron
 
-    void Update()
+    void Start()
     {
-        if (droneTransform == null)
-        {
-            GameObject droneObj = GameObject.FindGameObjectWithTag(droneTag);
-            if (droneObj != null)
-            {
-                droneTransform = droneObj.transform;
-            }
-        }
-        else
-        {
-            transform.position = droneTransform.position + offset;
-            transform.rotation = Quaternion.Euler(90, 0, 0); // Mira hacia abajo (cenital)
-        }
+        DroneLoader.OnDroneInstantiated += HandleDroneInstantiated;
+    }
+
+    void OnDestroy()
+    {
+        DroneLoader.OnDroneInstantiated -= HandleDroneInstantiated;
+    }
+
+    private void HandleDroneInstantiated(GameObject drone)
+    {
+        droneTransform = drone.transform;
+
+        // 馃攧 Desvincular para que no herede rotaci贸n
+        transform.SetParent(null);
+        Debug.Log("馃摳 C谩mara cenital desvinculada del dron para mantener rotaci贸n fija.");
+    }
+
+    void LateUpdate()
+    {
+        if (droneTransform == null) return;
+
+        // 馃 Solo seguimos la posici贸n XZ, ignorando la rotaci贸n del dron en pitch/roll
+        Vector3 flatPosition = new Vector3(
+            droneTransform.position.x,
+            0f,
+            droneTransform.position.z
+        );
+
+        transform.position = flatPosition + Vector3.up * height;
+        transform.rotation = Quaternion.Euler(90f, 0f, 0f); // Totalmente cenital
     }
 }

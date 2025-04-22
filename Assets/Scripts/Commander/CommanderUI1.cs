@@ -10,16 +10,16 @@ public class CommanderUI1 : MonoBehaviour
     private string tempMessage = "";
     private Queue<string> positionLog = new Queue<string>(10); // FIFO de 10 elementos
 
-    private MQTTPublisher publisher; // ✅ NUEVO
+    private MQTTPublisher publisher;
 
     private void Start()
     {
-        MQTTClient.EnsureExists(); // 🔒 Asegura que existe el singleton ANTES de usarlo
+        MQTTClient.EnsureExists();
 
         if (MQTTClient.Instance != null)
         {
             publisher = new MQTTPublisher(MQTTClient.Instance.GetClient());
-            MQTTClient.Instance.OnMessageReceived += UpdatePositionText;
+            MQTTClient.Instance.RegisterHandler(MQTTConstants.DronePositionTopic, HandlePositionPayload);
         }
         else
         {
@@ -27,12 +27,12 @@ public class CommanderUI1 : MonoBehaviour
         }
     }
 
-
     private void OnDestroy()
     {
         if (MQTTClient.Instance != null)
         {
-            MQTTClient.Instance.OnMessageReceived -= UpdatePositionText;
+            MQTTClient.Instance.UnregisterHandler(MQTTConstants.DronePositionTopic);
+            Debug.Log("📴 CommanderUI1 DESACTIVADO y handler limpiado");
         }
     }
 
@@ -49,22 +49,18 @@ public class CommanderUI1 : MonoBehaviour
         }
     }
 
-    private void UpdatePositionText(string topic, string message)
+    private void HandlePositionPayload(string message)
     {
-        if (topic == MQTTConstants.DronePositionTopic)
+        tempMessage = LogMessagesConstants.DronePositionPrefix + message;
+
+        if (positionLog.Count >= 10)
         {
-            tempMessage = LogMessagesConstants.DronePositionPrefix + message;
-
-            // Añadir al log
-            if (positionLog.Count >= 10)
-            {
-                positionLog.Dequeue(); // Eliminar el más antiguo
-            }
-
-            positionLog.Enqueue(tempMessage); // Añadir nuevo al final
-
-            Debug.Log($"📍 Posición recibida: {tempMessage}");
+            positionLog.Dequeue();
         }
+
+        positionLog.Enqueue(tempMessage);
+
+        Debug.Log($"📍 Posición recibida: {tempMessage}");
     }
 
     /*
@@ -74,7 +70,7 @@ public class CommanderUI1 : MonoBehaviour
 
         if (publisher != null)
         {
-            publisher.PublishMessage(MQTTConstants.CommandTopic, command); // ✅ CAMBIADO
+            publisher.PublishMessage(MQTTConstants.CommandTopic, command);
             Debug.Log(LogMessagesConstants.DebugMQTTPublished + command);
         }
         else
@@ -82,5 +78,5 @@ public class CommanderUI1 : MonoBehaviour
             Debug.LogError(LogMessagesConstants.ErrorMessageNotSent);
         }
     } 
-     */
+    */
 }

@@ -16,8 +16,15 @@ public class TaskListManager : MonoBehaviour
 
     private void Start()
     {
-        AdjustAllTaskItems(); // Ajustar si ya hay tareas puestas
+        AdjustAllTaskItems();
+
+        // 🔁 Conectamos las tareas existentes con el manager, sin tocar su data interna
+        foreach (TaskItemUI taskUI in contentParent.GetComponentsInChildren<TaskItemUI>())
+        {
+            taskUI.BindManager(this);
+        }
     }
+
 
     private void OnRectTransformDimensionsChange()
     {

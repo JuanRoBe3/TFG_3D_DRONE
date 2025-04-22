@@ -68,6 +68,7 @@
     <Compile Include="Assets\Scripts\Shared\MQTT\MQTTTopicSubscriptions.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneCameraManager.cs" />
     <Compile Include="Assets\Scripts\Data_Pilot_to_Commander\DroneCameraPublisher.cs" />
+    <Compile Include="Assets\Scripts\Commander\TaskManagement\TaskStatusColor.cs" />
     <Compile Include="Assets\Scripts\CommanderRenderTextureAssigner.cs" />
     <Compile Include="Assets\Scripts\Commander\TaskManagement\TaskData.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneObstacles\CollisionWarning\DroneHUDWarning.cs" />

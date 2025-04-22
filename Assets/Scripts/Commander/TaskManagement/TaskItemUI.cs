@@ -5,36 +5,70 @@ using UnityEngine.UI;
 public class TaskItemUI : MonoBehaviour
 {
     public TextMeshProUGUI taskNameText;
+    public TextMeshProUGUI taskDescription;
     public TextMeshProUGUI statusText;
+    public Image taskStatusColor; // Asignado desde el Inspector
     public TextMeshProUGUI droneNameText;
     public Image droneIcon;
-
     public Button editButton;
 
-    private TaskData currentData;
+    [SerializeField] private TaskData taskData; // 🔐 Ahora privado pero serializable
+
     private TaskListManager taskListManager;
 
+    // ✅ Método principal para instancias nuevas
     public void Setup(TaskData data, TaskListManager managerRef)
     {
-        currentData = data;
+        taskData = data;
         taskListManager = managerRef;
+        UpdateVisual();
+        BindEditButton();
+    }
 
-        taskNameText.text = data.title;
-        statusText.text = data.status;
+    // ✅ Método auxiliar para tareas ya existentes
+    public void BindManager(TaskListManager managerRef)
+    {
+        taskListManager = managerRef;
+        BindEditButton(); // Solo el botón
+    }
 
-        if (data.assignedDrone != null)
+    private void BindEditButton()
+    {
+        if (editButton != null)
         {
-            droneNameText.text = data.assignedDrone.droneName;
+            editButton.onClick.RemoveAllListeners();
+            editButton.onClick.AddListener(OnEditButtonClicked);
+        }
+    }
 
-            if (data.assignedDrone.icon != null)
+    private void OnEditButtonClicked()
+    {
+        if (taskData != null && taskListManager != null)
+            taskListManager.EditTask(taskData, this);
+    }
+
+    private void UpdateVisual()
+    {
+        if (taskData == null) return;
+
+        taskNameText.text = taskData.title;
+        statusText.text = taskData.status;
+        taskStatusColor.color = TaskStatusColor.GetColorForStatus(taskData.status);
+        taskDescription.text = taskData.description;
+
+        if (taskData.assignedDrone != null)
+        {
+            droneNameText.text = taskData.assignedDrone.droneName;
+
+            if (taskData.assignedDrone.icon != null)
             {
-                droneIcon.sprite = data.assignedDrone.icon;
+                droneIcon.sprite = taskData.assignedDrone.icon;
                 droneIcon.enabled = true;
             }
             else
             {
                 droneIcon.enabled = false;
-                Debug.LogWarning($"⚠️ El dron '{data.assignedDrone.droneName}' no tiene icono asignado.");
+                Debug.LogWarning($"⚠️ El dron '{taskData.assignedDrone.droneName}' no tiene icono asignado.");
             }
         }
         else
@@ -42,13 +76,5 @@ public class TaskItemUI : MonoBehaviour
             droneNameText.text = "Sin dron";
             droneIcon.enabled = false;
         }
-
-        if (editButton != null)
-            editButton.onClick.AddListener(OnEditButtonClicked);
-    }
-
-    private void OnEditButtonClicked()
-    {
-        taskListManager.EditTask(currentData, this);
     }
 }

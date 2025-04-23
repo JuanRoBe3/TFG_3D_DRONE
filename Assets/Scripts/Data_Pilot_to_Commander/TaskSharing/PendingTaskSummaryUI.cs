@@ -10,6 +10,7 @@ public class PendingTaskSummaryUI : MonoBehaviour
     public TextMeshProUGUI droneText;
     public TextMeshProUGUI statusText;
     public Image statusColorImage;
+    public Image droneIconImage;
 
     /// <summary>
     /// Rellena el UI con los datos de una tarea recibida por MQTT
@@ -17,8 +18,8 @@ public class PendingTaskSummaryUI : MonoBehaviour
     /// <param name="summary">Resumen de la tarea</param>
     public void Setup(TaskSummary summary)
     {
-        Debug.Log($"COLIFLOOOOOOR");
         Debug.Log($"🛠 Configurando tarea: {summary.title}");
+
         if (summary == null)
         {
             Debug.LogWarning("⚠️ No se puede configurar la UI: TaskSummary es null.");
@@ -32,5 +33,18 @@ public class PendingTaskSummaryUI : MonoBehaviour
 
         if (statusColorImage != null)
             statusColorImage.color = TaskStatusColor.GetColorForStatus(summary.status);
+
+        // Buscar el icono del dron por su nombre
+        var droneData = DroneSelectionManager.Instance.availableDrones
+            .Find(d => d.droneName == summary.drone);
+
+        if (droneData != null && droneIconImage != null)
+        {
+            droneIconImage.sprite = droneData.icon;
+        }
+        else
+        {
+            Debug.LogWarning($"⚠️ No se encontró el icono del dron '{summary.drone}'");
+        }
     }
 }

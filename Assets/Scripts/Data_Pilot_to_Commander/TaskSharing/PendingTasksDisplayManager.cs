@@ -11,7 +11,8 @@ public class PendingTasksDisplayManager : MonoBehaviour
     public Transform contentParent;
 
     private readonly List<GameObject> instantiatedItems = new();
-    private readonly Queue<string> pendingJsonQueue = new(); // 🔁 Cola de JSONs a procesar
+    private readonly Queue<string> pendingJsonQueue = new();
+    private List<TaskSummary> lastReceivedTasks = new(); // 🔁 Almacena última tanda
 
     void Start()
     {
@@ -30,6 +31,8 @@ public class PendingTasksDisplayManager : MonoBehaviour
 
     void OnEnable()
     {
+        DroneSelectionManager.OnDroneChanged += UpdateTaskDisplay;
+
         MQTTClient.Instance.RegisterHandler(MQTTConstants.PendingTasksTopic, EnqueueJson);
 
         new MQTTPublisher(MQTTClient.Instance.GetClient())
@@ -38,12 +41,12 @@ public class PendingTasksDisplayManager : MonoBehaviour
 
     void OnDisable()
     {
+        DroneSelectionManager.OnDroneChanged -= UpdateTaskDisplay;
         MQTTClient.Instance.UnregisterHandler(MQTTConstants.PendingTasksTopic);
     }
 
     void EnqueueJson(string json)
     {
-        // 🔁 Guarda el mensaje para que se procese en Update()
         lock (pendingJsonQueue)
         {
             pendingJsonQueue.Enqueue(json);
@@ -52,7 +55,6 @@ public class PendingTasksDisplayManager : MonoBehaviour
 
     void Update()
     {
-        // Procesamos las tareas pendientes solo en el hilo principal
         while (pendingJsonQueue.Count > 0)
         {
             string json;
@@ -67,10 +69,6 @@ public class PendingTasksDisplayManager : MonoBehaviour
     void ProcessTasks(string json)
     {
         Debug.Log("📥 Procesando JSON en main thread: " + json);
-
-        foreach (var go in instantiatedItems)
-            Destroy(go);
-        instantiatedItems.Clear();
 
         TaskSummaryListWrapper wrapper;
         try
@@ -90,23 +88,40 @@ public class PendingTasksDisplayManager : MonoBehaviour
         }
 
         Debug.Log($"📦 {wrapper.tasks.Count} tareas recibidas.");
+        lastReceivedTasks = wrapper.tasks; // 💾 Guardamos tareas recibidas
 
-        foreach (var task in wrapper.tasks)
+        UpdateTaskDisplay(DroneSelectionManager.Instance.GetSelectedDrone());
+    }
+
+    void UpdateTaskDisplay(DroneData selectedDrone)
+    {
+        if (selectedDrone == null)
         {
-            Debug.Log($"🔧 Instanciando prefab para tarea: {task.title}");
+            Debug.Log("⚠️ Ningún dron seleccionado.");
+            return;
+        }
 
+        string selectedDroneId = selectedDrone.droneName;
+
+        foreach (var go in instantiatedItems)
+            Destroy(go);
+        instantiatedItems.Clear();
+
+        var filtered = lastReceivedTasks.FindAll(task =>
+            task.status == "To be executed" &&
+            !string.IsNullOrEmpty(task.drone) &&
+            task.drone.StartsWith(selectedDroneId)
+        );
+
+        Debug.Log($"🎯 Mostrando {filtered.Count} tareas para {selectedDroneId}");
+
+        foreach (var task in filtered)
+        {
             GameObject go = Instantiate(taskPrefab, contentParent);
             var summaryUI = go.GetComponent<PendingTaskSummaryUI>();
 
             if (summaryUI != null)
-            {
                 summaryUI.Setup(task);
-                Debug.Log($"✅ Setup() completado para tarea: {task.title}");
-            }
-            else
-            {
-                Debug.LogWarning("⚠️ Prefab sin PendingTaskSummaryUI.");
-            }
 
             instantiatedItems.Add(go);
         }

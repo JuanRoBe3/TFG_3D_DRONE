@@ -118,6 +118,7 @@ MonoBehaviour:
   droneText: {fileID: 8021621019237836962}
   statusText: {fileID: 5963759388913701315}
   statusColorImage: {fileID: 3749760232683678904}
+  droneIconImage: {fileID: 4523632542209642919}
 --- !u!1 &2019648039986302493
 GameObject:
   m_ObjectHideFlags: 0

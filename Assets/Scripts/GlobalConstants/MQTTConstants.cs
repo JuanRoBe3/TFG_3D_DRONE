@@ -1,4 +1,4 @@
-public static class MQTTConstants
+﻿public static class MQTTConstants
 {
     // MQTT Broker Default Settings
     public const int BrokerPort = 1883;
@@ -15,4 +15,9 @@ public static class MQTTConstants
     public const string CommandTopic = "drone/commands";
     public const string SelectedDroneTopic = "droneselection/selected";
     public const string DroneCameraTopic= "drone/droneCamera";
+
+    // 🟨 NUEVOS TOPICS relacionados con tareas
+    public const string PendingTasksTopic = "drone/tasks/pending";       // ← Para publicar tareas pendientes
+    public const string PendingTasksRequestTopic = "drone/tasks/request"; // ← (Opcional) Si quieres que el piloto pida tareas
+
 }

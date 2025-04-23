@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System;
 
 public class TaskItemUI : MonoBehaviour
 {
@@ -13,24 +14,33 @@ public class TaskItemUI : MonoBehaviour
     public Button editButton;
 
     [SerializeField] private TaskData taskData; // 🔐 Ahora privado pero serializable
+    public TaskData TaskData => taskData;
 
     private TaskListManager taskListManager;
 
     // ✅ Método principal para instancias nuevas
     public void Setup(TaskData data, TaskListManager managerRef)
     {
+        if (string.IsNullOrEmpty(data.id))
+        {
+            data.id = Guid.NewGuid().ToString();
+            Debug.Log($"🆔 Se asignó un ID automático a una tarea existente: {data.title} => {data.id}");
+        }
+
         taskData = data;
         taskListManager = managerRef;
         UpdateVisual();
         BindEditButton();
     }
 
-    // ✅ Método auxiliar para tareas ya existentes
+    // ✅ Método auxiliar para tareas ya existentes //ya no esnecesario porque se actualiza todo
+    /*
     public void BindManager(TaskListManager managerRef)
     {
         taskListManager = managerRef;
         BindEditButton(); // Solo el botón
-    }
+    } 
+     */
 
     private void BindEditButton()
     {

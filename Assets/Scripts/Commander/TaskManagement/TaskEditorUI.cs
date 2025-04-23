@@ -68,7 +68,10 @@ public class TaskEditorUI : MonoBehaviour
     public void Confirm()
     {
         if (editingTask == null)
+        {
             editingTask = new TaskData();
+            editingTask.id = Guid.NewGuid().ToString(); // 🔑 ID único solo si es nueva
+        }
 
         editingTask.title = inputTitle.text;
         editingTask.description = inputDescription.text;
@@ -92,4 +95,5 @@ public class TaskEditorUI : MonoBehaviour
     {
         gameObject.SetActive(false);
     }
+
 }

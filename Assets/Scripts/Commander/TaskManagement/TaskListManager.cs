@@ -1,42 +1,73 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections.Generic;
+using System;
 
 public class TaskListManager : MonoBehaviour
 {
     [Header("Prefabs y referencias")]
-    public GameObject taskItemPrefab;                 // Prefab del Task_Item
-    public Transform contentParent;                   // Content del ScrollView
-    public RectTransform scrollViewRectTransform;     // RectTransform del ScrollView
-    public TaskEditorUI taskEditorUI;                 // Panel flotante para crear tareas
+    public GameObject taskItemPrefab;
+    public Transform contentParent;
+    public RectTransform scrollViewRectTransform;
+    public TaskEditorUI taskEditorUI;
 
     [Header("Altura relativa de las tareas")]
     [Range(0.1f, 1f)]
     public float taskHeightPercentage = 0.3f;
 
+    private void OnEnable()
+    {
+        // 📥 El comandante escucha peticiones de tareas del piloto
+        MQTTClient.Instance.RegisterHandler(MQTTConstants.PendingTasksRequestTopic, OnPendingTasksRequestReceived);
+    }
+
+    private void OnDisable()
+    {
+        // 🔇 Se desuscribe al salir de escena
+        MQTTClient.Instance.UnregisterHandler(MQTTConstants.PendingTasksRequestTopic);
+    }
+
+    private void OnPendingTasksRequestReceived(string _)
+    {
+        Debug.Log("📨 Petición de tareas recibida por MQTT desde el piloto.");
+        PublishPendingTasks(); // Reutilizamos tu método
+    }
+
     private void Start()
     {
         AdjustAllTaskItems();
 
-        // 🔁 Conectamos las tareas existentes con el manager, sin tocar su data interna
         foreach (TaskItemUI taskUI in contentParent.GetComponentsInChildren<TaskItemUI>())
         {
-            taskUI.BindManager(this);
-        }
-    }
+            var data = taskUI.TaskData;
 
+            if (data != null)
+            {
+                if (string.IsNullOrEmpty(data.id))
+                {
+                    data.id = Guid.NewGuid().ToString();
+                    Debug.Log($"🆕 ID generado para tarea: {data.title} => {data.id}");
+                }
+
+                taskUI.Setup(data, this);
+            }
+            else
+            {
+                Debug.LogWarning("⚠️ Tarea sin datos. No será incluida.");
+            }
+        }
+
+        PublishPendingTasks(); // Primera publicación al cargar
+    }
 
     private void OnRectTransformDimensionsChange()
     {
-        AdjustAllTaskItems(); // Redimensionar tareas cuando cambia el tamaño
+        AdjustAllTaskItems();
     }
 
-    /// <summary>
-    /// Abre el panel de creación de tareas.
-    /// </summary>
     public void OpenCreateTask()
     {
-        // ✅ Inyectamos los drones automáticamente desde el CommanderDroneManager
         var drones = CommanderDroneManager.Instance.GetAvailableDrones();
         taskEditorUI.SetAvailableDrones(drones);
 
@@ -47,13 +78,28 @@ public class TaskListManager : MonoBehaviour
             TaskItemUI taskUI = item.GetComponent<TaskItemUI>();
             if (taskUI != null)
                 taskUI.Setup(taskData, this);
+
+            PublishPendingTasks();
         });
     }
 
+    public void EditTask(TaskData existingData, TaskItemUI itemUI)
+    {
+        var drones = CommanderDroneManager.Instance.GetAvailableDrones();
+        taskEditorUI.SetAvailableDrones(drones);
 
-    /// <summary>
-    /// Ajusta la altura de una tarea concreta.
-    /// </summary>
+        taskEditorUI.Show((updatedData) =>
+        {
+            existingData.title = updatedData.title;
+            existingData.description = updatedData.description;
+            existingData.status = updatedData.status;
+            existingData.assignedDrone = updatedData.assignedDrone;
+
+            itemUI.Setup(existingData, this);
+            PublishPendingTasks();
+        }, existingData);
+    }
+
     private void AdjustTaskItemHeight(GameObject taskItem)
     {
         float containerHeight = scrollViewRectTransform.rect.height;
@@ -67,9 +113,6 @@ public class TaskListManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Ajusta la altura de todas las tareas visibles.
-    /// </summary>
     public void AdjustAllTaskItems()
     {
         float containerHeight = scrollViewRectTransform.rect.height;
@@ -86,22 +129,35 @@ public class TaskListManager : MonoBehaviour
         }
     }
 
-    public void EditTask(TaskData existingData, TaskItemUI itemUI)
+    public List<TaskData> GetAllTasks()
     {
-        // ✅ Inyectamos la lista de drones también al editar
-        var drones = CommanderDroneManager.Instance.GetAvailableDrones();
-        taskEditorUI.SetAvailableDrones(drones);
-
-        taskEditorUI.Show((updatedData) =>
+        List<TaskData> all = new();
+        foreach (Transform child in contentParent)
         {
-            existingData.title = updatedData.title;
-            existingData.description = updatedData.description;
-            existingData.status = updatedData.status;
-            existingData.assignedDrone = updatedData.assignedDrone;
-
-            itemUI.Setup(existingData, this);
-        }, existingData);
+            TaskItemUI taskUI = child.GetComponent<TaskItemUI>();
+            if (taskUI != null && taskUI.TaskData != null)
+                all.Add(taskUI.TaskData);
+        }
+        return all;
     }
 
+    public void PublishPendingTasks()
+    {
+        List<TaskData> all = GetAllTasks();
+        foreach (var task in all)
+        {
+            Debug.Log($"🔍 Tarea detectada: {task.title}, estado: '{task.status}'");
+        }
 
+        List<TaskData> pending = all.FindAll(t => t.status == "To be executed");
+        List<TaskSummary> summaries = pending.ConvertAll(t => new TaskSummary(t));
+        var wrapper = new TaskSummaryListWrapper { tasks = summaries };
+
+        string json = JsonUtility.ToJson(wrapper);
+
+        new MQTTPublisher(MQTTClient.Instance.GetClient())
+            .PublishMessage(MQTTConstants.PendingTasksTopic, json);
+
+        Debug.Log($"📤 Publicadas {pending.Count} tareas pendientes");
+    }
 }

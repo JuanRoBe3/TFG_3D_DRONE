@@ -29,11 +29,9 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 455346655208158781}
-  - {fileID: 6076863384378008526}
+  m_Children: []
   m_Father: {fileID: 510989513444871809}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!23 &7186522975580653357
@@ -116,6 +114,38 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.12404958, y: 0.044086862, z: 0.033543628}
   m_Center: {x: 0, y: 0.0012571499, z: 0.0018598461}
+--- !u!1 &3836378346865342001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3097451708708073034}
+  m_Layer: 0
+  m_Name: GimbalPivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3097451708708073034
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3836378346865342001}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 455346655208158781}
+  m_Father: {fileID: 510989513444871809}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &5502738738832426576
 GameObject:
   m_ObjectHideFlags: 0
@@ -143,13 +173,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5502738738832426576}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.76604444, y: 0, z: 0, w: 0.64278764}
-  m_LocalPosition: {x: 0, y: -0.015, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0.08715578, y: 0, z: 0, w: 0.9961947}
+  m_LocalPosition: {x: 0, y: 0, z: 0.015000006}
+  m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1473785447447853621}
-  m_LocalEulerAnglesHint: {x: 100, y: 0, z: 0}
+  m_Father: {fileID: 3097451708708073034}
+  m_LocalEulerAnglesHint: {x: 10, y: 0, z: 0}
 --- !u!20 &8642473401744978196
 Camera:
   m_ObjectHideFlags: 0
@@ -280,13 +310,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8879406594755180455}
   serializedVersion: 2
-  m_LocalRotation: {x: 1, y: 0, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 50}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 50, z: 0}
+  m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1473785447447853621}
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 180}
+  m_Father: {fileID: 510989513444871809}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!20 &1912561712407403975
 Camera:
   m_ObjectHideFlags: 0
@@ -475,6 +505,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2d63b876931d7f141a6d0de7f0851b3b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1473785447447853621}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2d63b876931d7f141a6d0de7f0851b3b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3097451708708073034}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2d63b876931d7f141a6d0de7f0851b3b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6076863384378008526}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2d63b876931d7f141a6d0de7f0851b3b, type: 3}
       insertIndex: -1
@@ -515,12 +551,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
-  verticalSpeed: 5
-  yawSpeed: 50
+  verticalSpeed: 3
+  yawSpeed: 90
   maxPitchAngle: 10
   maxRollAngle: 15
   tiltSmoothSpeed: 5
-  gimbalCamera: {fileID: 455346655208158781}
+  gimbalCamera: {fileID: 3097451708708073034}
+  gimbalPitchSpeed: 30
+  gimbalMinAngle: -20
+  gimbalMaxAngle: 80
 --- !u!54 &4019647882017822768
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -15,6 +15,11 @@ public class DroneController : MonoBehaviour
 
     [Header("Gimbal Camera")]
     public Transform gimbalCamera;
+    public float gimbalPitchSpeed = 30f;
+    public float gimbalMinAngle = -20f; // mirar un poco hacia arriba
+    public float gimbalMaxAngle = 80f;  // mirar bien hacia el suelo
+
+    private float currentGimbalPitch = 0f;
 
     private float positionUpdateTimer = 0f;
     private Rigidbody rb;
@@ -48,6 +53,11 @@ public class DroneController : MonoBehaviour
     private void Update()
     {
         HandlePositionUpdate();
+        Debug.Log("Pitch: " + gimbalCamera.localRotation.eulerAngles.x);
+        Debug.DrawRay(gimbalCamera.position, gimbalCamera.right * 2f, Color.red);
+        Debug.DrawRay(gimbalCamera.position, gimbalCamera.up * 2f, Color.green);
+        Debug.DrawRay(gimbalCamera.position, gimbalCamera.forward * 2f, Color.blue);
+
     }
 
     private void HandleMovement()
@@ -69,16 +79,10 @@ public class DroneController : MonoBehaviour
         transform.Rotate(Vector3.up * yawInput * yawSpeed * Time.fixedDeltaTime, Space.Self);
 
         // Inclinación lateral (roll)
-        if (Mathf.Abs(moveX) > 0.01f)
-            targetRoll = -moveX * maxRollAngle;
-        else
-            targetRoll = 0f;
+        targetRoll = Mathf.Abs(moveX) > 0.01f ? -moveX * maxRollAngle : 0f;
 
-        // ✅ Inclinación hacia delante/atrás (pitch) corregida
-        if (Mathf.Abs(moveZ) > 0.01f)
-            targetPitch = moveZ * maxPitchAngle; // corregido aquí
-        else
-            targetPitch = 0f;
+        // Inclinación hacia delante/atrás (pitch)
+        targetPitch = Mathf.Abs(moveZ) > 0.01f ? moveZ * maxPitchAngle : 0f;
     }
 
     private void HandleVisualTilt()
@@ -94,10 +98,16 @@ public class DroneController : MonoBehaviour
     {
         if (gimbalCamera == null) return;
 
-        Vector3 cameraEuler = gimbalCamera.rotation.eulerAngles;
-        cameraEuler.x = 0f;
-        cameraEuler.z = 0f;
-        gimbalCamera.rotation = Quaternion.Euler(cameraEuler);
+        // Control del pitch de la cámara con teclas F (hacia abajo) y R (hacia arriba)
+        float gimbalInput = 0f;
+        if (Input.GetKey(KeyCode.F)) gimbalInput = 1f;   // bajar cámara
+        if (Input.GetKey(KeyCode.R)) gimbalInput = -1f;  // subir cámara
+
+        currentGimbalPitch += gimbalInput * gimbalPitchSpeed * Time.fixedDeltaTime;
+        currentGimbalPitch = Mathf.Clamp(currentGimbalPitch, gimbalMinAngle, gimbalMaxAngle);
+
+        Quaternion localRotation = Quaternion.Euler(currentGimbalPitch, 0f, 0f);
+        gimbalCamera.localRotation = localRotation;
     }
 
     private void HandlePositionUpdate()

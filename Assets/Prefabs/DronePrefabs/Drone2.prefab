@@ -1,5 +1,37 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4979834197905212102
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4759666635922920011}
+  m_Layer: 0
+  m_Name: GimbalPivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4759666635922920011
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4979834197905212102}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2971227962647592846}
+  m_Father: {fileID: 7480575093500531649}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5299220936871594241
 GameObject:
   m_ObjectHideFlags: 0
@@ -27,12 +59,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5299220936871594241}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.08715578, y: 0, z: 0, w: 0.9961947}
-  m_LocalPosition: {x: 0.002, y: 0.035, z: 0.059}
+  m_LocalRotation: {x: 0.08715578, y: -0, z: -0, w: 0.9961947}
+  m_LocalPosition: {x: 0.002, y: 0.035, z: 0.059000004}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7480575093500531649}
+  m_Father: {fileID: 4759666635922920011}
   m_LocalEulerAnglesHint: {x: 10, y: 0, z: 0}
 --- !u!20 &7038058783514147673
 Camera:
@@ -355,7 +387,7 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 13cd8d407a67c9a4f84ecbf6a7ff0ab5, type: 3}
       insertIndex: 0
-      addedObject: {fileID: 2971227962647592846}
+      addedObject: {fileID: 4759666635922920011}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 13cd8d407a67c9a4f84ecbf6a7ff0ab5, type: 3}
       insertIndex: 1
       addedObject: {fileID: 1349866779391992674}
@@ -447,12 +479,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
-  verticalSpeed: 5
-  yawSpeed: 50
+  verticalSpeed: 3
+  yawSpeed: 90
   maxPitchAngle: 10
   maxRollAngle: 15
   tiltSmoothSpeed: 5
-  gimbalCamera: {fileID: 2971227962647592846}
+  gimbalCamera: {fileID: 4759666635922920011}
+  gimbalPitchSpeed: 30
+  gimbalMinAngle: -20
+  gimbalMaxAngle: 80
 --- !u!114 &7306659434905628287
 MonoBehaviour:
   m_ObjectHideFlags: 0

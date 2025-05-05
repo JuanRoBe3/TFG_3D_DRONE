@@ -97,6 +97,7 @@
     <Compile Include="Assets\Scripts\Pilot\IPConfigUI.cs" />
     <Compile Include="Assets\Scripts\Data_Pilot_to_Commander\TaskSharing\TaskSummaryListWrapper.cs" />
     <Compile Include="Assets\Scripts\Data_Pilot_to_Commander\TaskSharing\PendingTaskSummaryUI.cs" />
+    <Compile Include="Assets\Scripts\Drone\DroneObstacles\CollisionWarning\DroneHUDWarningManager.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneObstacles\CollisionWarning\CollisionDistanceUI.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneMinimap\SingleMinimapMarker.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />

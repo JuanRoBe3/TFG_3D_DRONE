@@ -60,12 +60,12 @@ public class DroneLoader : MonoBehaviour
         OnDroneInstantiated?.Invoke(droneInstance);
 
         ObstacleDetector detector = droneInstance.GetComponent<ObstacleDetector>();
-        DroneHUDWarning hud = Object.FindFirstObjectByType<DroneHUDWarning>();
+        DroneHUDWarningManager hudManager = Object.FindFirstObjectByType<DroneHUDWarningManager>();
         CollisionDistanceUI distanceUI = Object.FindFirstObjectByType<CollisionDistanceUI>();
 
         if (detector != null)
         {
-            detector.hudWarning = hud;
+            detector.hudWarningManager = hudManager;
             detector.distanceUI = distanceUI;
             detector.obstacleLayer = LayerMask.GetMask("Terrain");
 

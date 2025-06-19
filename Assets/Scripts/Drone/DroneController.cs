@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem; // NUEVO
+using UnityEngine.InputSystem.Controls;
 
 [RequireComponent(typeof(Rigidbody))]
 public class DroneController : MonoBehaviour
@@ -16,8 +18,8 @@ public class DroneController : MonoBehaviour
     [Header("Gimbal Camera")]
     public Transform gimbalCamera;
     public float gimbalPitchSpeed = 30f;
-    public float gimbalMinAngle = -20f; // mirar un poco hacia arriba
-    public float gimbalMaxAngle = 80f;  // mirar bien hacia el suelo
+    public float gimbalMinAngle = -20f;
+    public float gimbalMaxAngle = 80f;
 
     private float currentGimbalPitch = 0f;
 
@@ -57,32 +59,47 @@ public class DroneController : MonoBehaviour
         Debug.DrawRay(gimbalCamera.position, gimbalCamera.right * 2f, Color.red);
         Debug.DrawRay(gimbalCamera.position, gimbalCamera.up * 2f, Color.green);
         Debug.DrawRay(gimbalCamera.position, gimbalCamera.forward * 2f, Color.blue);
-
     }
 
     private void HandleMovement()
     {
+        var joystick = Joystick.current;
+
+        Vector2 stick = joystick != null ? joystick.stick.ReadValue() : Vector2.zero;
+        float twist = joystick != null ? joystick.twist.ReadValue() : 0f;
+
+        float joystickVertical = 0f;
+        if (joystick != null)
+        {
+            if (joystick.TryGetChildControl<ButtonControl>("button6")?.isPressed == true)
+                joystickVertical = 1f;
+            if (joystick.TryGetChildControl<ButtonControl>("button5")?.isPressed == true)
+                joystickVertical = -1f;
+        }
+
         float moveX = Input.GetAxis("Horizontal");
         float moveZ = Input.GetAxis("Vertical");
         float moveY = 0f;
-
         if (Input.GetKey(KeyCode.Space)) moveY = 1f;
         if (Input.GetKey(KeyCode.LeftShift)) moveY = -1f;
 
-        Vector3 input = new Vector3(moveX, moveY * (verticalSpeed / speed), moveZ);
+        float finalX = moveX + stick.x;
+        float finalZ = moveZ + stick.y;
+        float finalY = moveY + joystickVertical;
+
+        Vector3 input = new Vector3(finalX, finalY * (verticalSpeed / speed), finalZ);
         Vector3 moveDirection = transform.TransformDirection(input.normalized) * speed;
         rb.MovePosition(rb.position + moveDirection * Time.fixedDeltaTime);
 
         float yawInput = 0f;
         if (Input.GetKey(KeyCode.Q)) yawInput = -1f;
         if (Input.GetKey(KeyCode.E)) yawInput = 1f;
+        yawInput += twist;
+
         transform.Rotate(Vector3.up * yawInput * yawSpeed * Time.fixedDeltaTime, Space.Self);
 
-        // Inclinación lateral (roll)
-        targetRoll = Mathf.Abs(moveX) > 0.01f ? -moveX * maxRollAngle : 0f;
-
-        // Inclinación hacia delante/atrás (pitch)
-        targetPitch = Mathf.Abs(moveZ) > 0.01f ? moveZ * maxPitchAngle : 0f;
+        targetRoll = Mathf.Abs(finalX) > 0.01f ? -finalX * maxRollAngle : 0f;
+        targetPitch = Mathf.Abs(finalZ) > 0.01f ? finalZ * maxPitchAngle : 0f;
     }
 
     private void HandleVisualTilt()
@@ -98,10 +115,21 @@ public class DroneController : MonoBehaviour
     {
         if (gimbalCamera == null) return;
 
-        // Control del pitch de la cámara con teclas F (hacia abajo) y R (hacia arriba)
         float gimbalInput = 0f;
-        if (Input.GetKey(KeyCode.F)) gimbalInput = 1f;   // bajar cámara
-        if (Input.GetKey(KeyCode.R)) gimbalInput = -1f;  // subir cámara
+
+        // 🎮 Control con botones del joystick (13 = abajo, 11 = arriba)
+        var joystick = Joystick.current;
+        if (joystick != null)
+        {
+            if (joystick.TryGetChildControl<ButtonControl>("button13")?.isPressed == true)
+                gimbalInput = 1f; // mirar hacia abajo
+            if (joystick.TryGetChildControl<ButtonControl>("button11")?.isPressed == true)
+                gimbalInput = -1f; // mirar hacia arriba
+        }
+
+        // ⌨️ Control alternativo (F / R)
+        if (Input.GetKey(KeyCode.F)) gimbalInput = 1f;
+        if (Input.GetKey(KeyCode.R)) gimbalInput = -1f;
 
         currentGimbalPitch += gimbalInput * gimbalPitchSpeed * Time.fixedDeltaTime;
         currentGimbalPitch = Mathf.Clamp(currentGimbalPitch, gimbalMinAngle, gimbalMaxAngle);

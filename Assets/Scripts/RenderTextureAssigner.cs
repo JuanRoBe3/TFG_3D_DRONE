@@ -55,7 +55,7 @@ public class RenderTextureAssigner : MonoBehaviour
         }
 
         // ❌ OPCIONAL: descomenta esto si algún día quieres mostrar la PilotCamera en un RawImage
-        /*
+        
         if (fpCam != null)
         {
             Camera fpCameraComp = fpCam.GetComponent<Camera>();
@@ -65,7 +65,7 @@ public class RenderTextureAssigner : MonoBehaviour
                 Debug.Log("✅ RenderTexture asignada a PilotCamera.");
             }
         }
-        */
+        
     }
 
     /// <summary>

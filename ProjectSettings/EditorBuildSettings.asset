@@ -21,5 +21,10 @@ EditorBuildSettings:
     path: Assets/Scenes/Pilot/PilotDroneSelectionScene.unity
     guid: abbce1710b875ae4da77a4bd5896492c
   m_configObjects:
+    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 75d63a9aacf3c1442bbc3b2238c5b441, type: 2}
+    com.unity.input.settings: {fileID: 11400000, guid: db6d9b69e09fcc142ab8a8a1145ec97f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 3d72510a67aec7744a6366def5e1efe0, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 2bbee86b10798a34e96ca56583b521d3, type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 72a6cd2542a04a44fb6a7a071ee9bf6e, type: 2}
   m_UseUCBPForAssetBundles: 0

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,7 +6,8 @@ public class DroneCarouselController : MonoBehaviour
 {
     public Button leftButton;
     public Button rightButton;
-    public Button selectButton;
+    public Button flyInScreenButton;      // Botón para modo pantalla flotante
+    public Button flyInImmersiveButton;   // Botón para modo inmersivo (eres la cámara)
 
     private List<DroneData> drones;
     private int currentIndex = 0;
@@ -19,7 +20,7 @@ public class DroneCarouselController : MonoBehaviour
 
         if (drones == null || drones.Count == 0)
         {
-            Debug.LogError("No hay drones disponibles.");
+            Debug.LogError("❌ No hay drones disponibles.");
             return;
         }
 
@@ -27,7 +28,19 @@ public class DroneCarouselController : MonoBehaviour
 
         leftButton.onClick.AddListener(GoLeft);
         rightButton.onClick.AddListener(GoRight);
-        selectButton.onClick.AddListener(OnSelectClicked);
+
+        // ✅ Asigna modo y lanza escena
+        flyInScreenButton.onClick.AddListener(() =>
+        {
+            PilotViewConfig.SetMode(PilotViewMode.HUDScreen);
+            OnSelectClicked();
+        });
+
+        flyInImmersiveButton.onClick.AddListener(() =>
+        {
+            PilotViewConfig.SetMode(PilotViewMode.FirstPerson);
+            OnSelectClicked();
+        });
     }
 
     void GoLeft()
@@ -63,13 +76,8 @@ public class DroneCarouselController : MonoBehaviour
             $"{selected.storageCapacityMB};" +
             $"{selected.maxRange}";
 
-        /*
-        MQTTPublisher.Instance.PublishMessage(
-            MQTTConstants.SelectedDroneTopic,
-            message
-        );
-        */
+        // MQTTPublisher.Instance.PublishMessage(MQTTConstants.SelectedDroneTopic, message);
 
-        SceneLoader.LoadPilotUI();
+        SceneLoader.LoadPilotUI(); // La escena decide el modo según PilotViewConfig
     }
 }

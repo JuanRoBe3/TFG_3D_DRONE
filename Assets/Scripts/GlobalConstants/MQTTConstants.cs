@@ -16,8 +16,11 @@
     public const string SelectedDroneTopic = "droneselection/selected";
     public const string DroneCameraTopic= "drone/droneCamera";
 
-    // 🟨 NUEVOS TOPICS relacionados con tareas
+    // TOPICS relacionados con tareas
     public const string PendingTasksTopic = "drone/tasks/pending";       // ← Para publicar tareas pendientes
     public const string PendingTasksRequestTopic = "drone/tasks/request"; // ← (Opcional) Si quieres que el piloto pida tareas
+
+    // Commander add layers to map Topics
+    public const string Zone = "zone/area";
 
 }

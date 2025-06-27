@@ -63,8 +63,10 @@
     <Compile Include="Assets\Scripts\Drone\DroneLoader.cs" />
     <Compile Include="Assets\PilotViewMode.cs" />
     <Compile Include="Assets\Scripts\MetaGlasses\LaserPointer.cs" />
+    <Compile Include="Assets\Scripts\Commander\MinimapsManagement\TopDownView\MinimapZoomManager.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneSelection\DroneSelectionManager.cs" />
     <Compile Include="Assets\Scripts\Drone\MQTT\DroneSelectionMessage.cs" />
+    <Compile Include="Assets\Scripts\CommanderCameraConfigurator.cs" />
     <Compile Include="Assets\Scripts\Data_Pilot_to_Commander\DroneCameraSharing\DroneCameraReplicator.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneController.cs" />
     <Compile Include="Assets\Scripts\Commander\TaskManagement\TaskItemUI.cs" />
@@ -76,6 +78,7 @@
     <Compile Include="Assets\Scripts\Drone\DroneObstacles\CollisionWarning\DroneHUDWarning.cs" />
     <Compile Include="Assets\Scripts\Drone\UselessRightNow\AssignRenderTexture.cs" />
     <Compile Include="Assets\Scripts\Utils\TaskUtils.cs" />
+    <Compile Include="Assets\LandscapeHeightScanner.cs" />
     <Compile Include="Assets\Scripts\Commander\TaskManagement\TaskEditorUI.cs" />
     <Compile Include="Assets\Scripts\SerializablesJSON\SerializableVector3.cs" />
     <Compile Include="Assets\JoystickButtonScanner.cs" />
@@ -85,11 +88,13 @@
     <Compile Include="Assets\Scripts\SerializablesJSON\SerializableQuaternion.cs" />
     <Compile Include="Assets\Scripts\RenderTextureRegystry.cs" />
     <Compile Include="Assets\Scripts\DroneCameraFollower.cs" />
+    <Compile Include="Assets\SearchZoneReplica.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneSelection\DroneSelectionUI.cs" />
     <Compile Include="Assets\Scripts\Data_Pilot_to_Commander\DroneCameraSharing\DroneCameraPublisher.cs" />
     <Compile Include="Assets\Scripts\GlobalConstants\MQTTConstants.cs" />
     <Compile Include="Assets\DroneDetectionAutoBinder.cs" />
     <Compile Include="Assets\Scripts\Commander\TaskManagement\MultiSelectDropdown.cs" />
+    <Compile Include="Assets\Scripts\WorldBounds.cs" />
     <Compile Include="Assets\Scripts\Commander\TaskManagement\ResizeTasksListener.cs" />
     <Compile Include="Assets\Scripts\Commander\TaskManagement\Target.cs" />
     <Compile Include="Assets\Scripts\Commander\TaskManagement\TaskListManager.cs" />
@@ -122,6 +127,8 @@
     <Compile Include="Assets\Scripts\Drone\DroneMinimap\TopDownCameraFollow.cs" />
     <Compile Include="Assets\Scripts\DebugRawImageChecker.cs" />
     <Compile Include="Assets\Scripts\GlobalConstants\SceneConstants.cs" />
+    <Compile Include="Assets\ZoneReplicaSpawner.cs" />
+    <Compile Include="Assets\SearchZonePublisher.cs" />
     <Compile Include="Assets\Scripts\Drone\UselessRightNow\DroneCardUI.cs" />
     <Compile Include="Assets\Scripts\RenderTextureAssigner.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneObstacles\TargetObjects\TargetPopupUI.cs" />
@@ -129,8 +136,12 @@
     <Compile Include="Assets\Scripts\Commander\TaskManagement\DroneSelectionDropdownManager.cs" />
     <Compile Include="Assets\Scripts\GlobalConstants\PathConstants.cs" />
     <Compile Include="Assets\Scripts\DroneCameraManagement.cs" />
+    <Compile Include="Assets\Scripts\Commander\MinimapsManagement\ViewModeManager.cs" />
     <Compile Include="Assets\Scripts\Data_Pilot_to_Commander\DroneCameraSharing\CameraDataMessage.cs" />
+    <Compile Include="Assets\Scripts\Commander\MinimapsManagement\UIManager.cs" />
+    <Compile Include="Assets\Scripts\Commander\MinimapsManagement\TopDownView\SearchZoneSelector.cs" />
     <Compile Include="Assets\Scripts\Shared\MQTT\MQTTSubscriber.cs" />
+    <Compile Include="Assets\ZoneSyncManager.cs" />
     <Compile Include="Assets\Scripts\Shared\MQTT\MQTTConfig.cs" />
     <Compile Include="Assets\Scripts\Data_Pilot_to_Commander\TaskSharing\PendingTaskUI.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneSelection\DroneCarouselUI.cs" />

@@ -16,7 +16,8 @@ public static class MQTTTopicSubscriptions
         { "Pilot", new List<string>
             {
                 MQTTConstants.CommandTopic,
-                MQTTConstants.PendingTasksTopic
+                MQTTConstants.PendingTasksTopic,
+                MQTTConstants.Zone
             }
         }
     };

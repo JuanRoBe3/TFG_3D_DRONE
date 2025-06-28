@@ -17,7 +17,7 @@ public static class MQTTTopicSubscriptions
             {
                 MQTTConstants.CommandTopic,
                 MQTTConstants.PendingTasksTopic,
-                MQTTConstants.Zone
+                MQTTConstants.SearchingZone
             }
         }
     };

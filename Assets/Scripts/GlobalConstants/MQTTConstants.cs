@@ -21,6 +21,6 @@
     public const string PendingTasksRequestTopic = "drone/tasks/request"; // ← (Opcional) Si quieres que el piloto pida tareas
 
     // Commander add layers to map Topics
-    public const string Zone = "zone/area";
+    public const string SearchingZone = "zone/area";
 
 }

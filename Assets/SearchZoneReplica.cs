@@ -7,12 +7,12 @@ public class SearchZoneReplica : MonoBehaviour
 
     void OnEnable()
     {
-        MQTTClient.Instance.RegisterHandler(MQTTConstants.Zone, OnZoneReceived);
+        MQTTClient.Instance.RegisterHandler(MQTTConstants.SearchingZone, OnZoneReceived);
     }
 
     void OnDisable()
     {
-        MQTTClient.Instance.UnregisterHandler(MQTTConstants.Zone);
+        MQTTClient.Instance.UnregisterHandler(MQTTConstants.SearchingZone);
     }
 
     void OnZoneReceived(string payload)

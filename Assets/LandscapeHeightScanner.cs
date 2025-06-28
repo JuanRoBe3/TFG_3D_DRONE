@@ -6,6 +6,8 @@ public class LandscapeBoundsScanner : MonoBehaviour
 
     void Start()
     {
+        Debug.Log($"🌍 WorldBounds: {WorldBounds.Value.size}");
+
         if (landscapeRoot == null)
         {
             Debug.LogError("❌ No has asignado el landscapeRoot.");

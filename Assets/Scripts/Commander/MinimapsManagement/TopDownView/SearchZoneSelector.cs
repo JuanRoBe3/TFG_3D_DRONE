@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class SearchZoneSelector : MonoBehaviour
 {
@@ -8,14 +9,14 @@ public class SearchZoneSelector : MonoBehaviour
     [SerializeField] private GameObject zonePrefab;
     [SerializeField] private LineRenderer previewLine;
     [SerializeField] private SearchZonePublisher publisher;
+    [SerializeField] private RawImage minimapImage;
 
     [Header("Parámetros")]
-    [Tooltip("Metros que sobresalen por encima de la cima más alta")]
-    [SerializeField] private float extraHeight = 20f;
+    [Tooltip("Metros extra por encima de la cima más alta del terreno")]
+    [SerializeField] private float extraHeight = 10f;
     [Tooltip("Tamaño mínimo lateral (m)")]
     [SerializeField] private float minSizeMeters = 10f;
 
-    // Estado interno
     private bool dragging = false;
     private bool hasPending = false;
     private Vector3 startWorldPos;
@@ -50,7 +51,6 @@ public class SearchZoneSelector : MonoBehaviour
             return;
         }
 
-        // Calcular dimensiones de la selección
         Vector3 min = Vector3.Min(startWorldPos, endWorldPos);
         Vector3 max = Vector3.Max(startWorldPos, endWorldPos);
 
@@ -63,9 +63,11 @@ public class SearchZoneSelector : MonoBehaviour
             return;
         }
 
-        float yMax = WorldBounds.Value.max.y;
-        float height = yMax + extraHeight;
+        // ✅ Altura dinámica basada en la cima del terreno
+        float terrainMaxY = WorldBounds.Value.max.y;
+        float height = terrainMaxY + extraHeight;
 
+        // ✅ Centro en el eje Y (la mitad del cubo por encima del terreno)
         Vector3 center = new Vector3(
             (min.x + max.x) / 2f,
             height / 2f,
@@ -77,6 +79,9 @@ public class SearchZoneSelector : MonoBehaviour
         GameObject zone = Instantiate(zonePrefab, center, Quaternion.identity);
         zone.transform.localScale = size;
 
+        Debug.Log($"📏 Tamaño zona calculado: {size}");
+        Debug.Log($"📦 Escala aplicada: {zone.transform.localScale}");
+
         publisher.PublishZone(center, size);
 
         previewLine.enabled = false;
@@ -87,20 +92,34 @@ public class SearchZoneSelector : MonoBehaviour
 
     private bool RayToTerrain(out Vector3 hit)
     {
-        Ray ray = topDownCamera.ScreenPointToRay(Input.mousePosition);
+        hit = Vector3.zero;
+
+        RectTransform rt = minimapImage.rectTransform;
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, Input.mousePosition, null, out Vector2 local))
+            return false;
+
+        Vector2 uv = new Vector2(
+            Mathf.InverseLerp(-rt.rect.width * 0.5f, rt.rect.width * 0.5f, local.x),
+            Mathf.InverseLerp(-rt.rect.height * 0.5f, rt.rect.height * 0.5f, local.y));
+
+        if (uv.x < 0 || uv.x > 1 || uv.y < 0 || uv.y > 1)
+            return false;
+
+        Vector3 viewport = new Vector3(uv.x, uv.y, 0);
+        Ray ray = topDownCamera.ViewportPointToRay(viewport);
+
         if (Physics.Raycast(ray, out RaycastHit h, 1000f, terrainMask))
         {
             hit = h.point;
             return true;
         }
 
-        hit = Vector3.zero;
         return false;
     }
 
     private void DrawPreview(Vector3 a, Vector3 b)
     {
-        float y = WorldBounds.Value.max.y + extraHeight;
+        float y = WorldBounds.Value.max.y + extraHeight + 1f; // +1 solo para que flote y se vea bien
 
         Vector3 p0 = new Vector3(a.x, y, a.z);
         Vector3 p1 = new Vector3(a.x, y, b.z);

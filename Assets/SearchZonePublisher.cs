@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SearchZonePublisher : MonoBehaviour
 {
@@ -6,23 +6,33 @@ public class SearchZonePublisher : MonoBehaviour
 
     void Start()
     {
-        publisher = new MQTTPublisher(MQTTClient.Instance.GetClient());
+        publisher = GetComponent<MQTTPublisher>();
     }
 
     public void PublishZone(Vector3 center, Vector3 size)
     {
-        var payload = JsonUtility.ToJson(new ZonePayload(center, size));
-        publisher.PublishMessage(MQTTConstants.Zone, payload);
+        var payload = new ZonePayload
+        {
+            center = new Vector3Payload { x = center.x, y = center.y, z = center.z },
+            size = new Vector3Payload { x = size.x, y = size.y, z = size.z }
+        };
+
+        string json = JsonUtility.ToJson(payload);
+        publisher.PublishMessage(MQTTConstants.SearchingZone, json);
+
+        Debug.Log($"📤 Zona publicada en {MQTTConstants.SearchingZone}");
     }
 
     [System.Serializable]
-    private struct ZonePayload
+    private class ZonePayload
     {
-        public float x, y, z, sx, sy, sz;
-        public ZonePayload(Vector3 c, Vector3 s)
-        {
-            x = c.x; y = c.y; z = c.z;
-            sx = s.x; sy = s.y; sz = s.z;
-        }
+        public Vector3Payload center;
+        public Vector3Payload size;
+    }
+
+    [System.Serializable]
+    private class Vector3Payload
+    {
+        public float x, y, z;
     }
 }

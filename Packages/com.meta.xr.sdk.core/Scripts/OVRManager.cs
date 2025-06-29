@@ -2895,13 +2895,13 @@ public partial class OVRManager : MonoBehaviour, OVRMixedRealityCaptureConfigura
         {
             try
             {
-                Debug.Log("[OVRManager] AudioOutChanged event");
+                //Debug.Log("[OVRManager] AudioOutChanged event");
                 if (AudioOutChanged != null)
                     AudioOutChanged();
             }
             catch (Exception e)
             {
-                Debug.LogError("Caught Exception: " + e);
+                //Debug.LogError("Caught Exception: " + e);
             }
 
             prevAudioOutId = audioOutId;
@@ -2935,13 +2935,13 @@ public partial class OVRManager : MonoBehaviour, OVRMixedRealityCaptureConfigura
         {
             try
             {
-                Debug.Log("[OVRManager] TrackingLost event");
+                //Debug.Log("[OVRManager] TrackingLost event");
                 if (TrackingLost != null)
                     TrackingLost();
             }
             catch (Exception e)
             {
-                Debug.LogError("Caught Exception: " + e);
+                //Debug.LogError("Caught Exception: " + e);
             }
         }
 
@@ -2949,7 +2949,7 @@ public partial class OVRManager : MonoBehaviour, OVRMixedRealityCaptureConfigura
         {
             try
             {
-                Debug.Log("[OVRManager] TrackingAcquired event");
+                //Debug.Log("[OVRManager] TrackingAcquired event");
                 if (TrackingAcquired != null)
                     TrackingAcquired();
             }

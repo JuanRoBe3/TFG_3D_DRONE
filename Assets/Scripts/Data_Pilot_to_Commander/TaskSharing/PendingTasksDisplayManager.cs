@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
 using System.Collections.Generic;
 using System;
 
@@ -12,9 +10,50 @@ public class PendingTasksDisplayManager : MonoBehaviour
 
     private readonly List<GameObject> instantiatedItems = new();
     private readonly Queue<string> pendingJsonQueue = new();
-    private List<TaskSummary> lastReceivedTasks = new(); // 🔁 Almacena última tanda
+    private List<TaskSummary> lastReceivedTasks = new();
 
-    void Start()
+    private const string pendingTasksTopic = MQTTConstants.PendingTasksTopic;
+    private const string pendingRequestTopic = MQTTConstants.PendingTasksRequestTopic;
+
+    private Action<string> cachedHandler;
+
+    private void Awake()
+    {
+        cachedHandler = EnqueueJson;
+    }
+
+    private void OnEnable()
+    {
+        Debug.Log("🟢 PendingTasksDisplayManager habilitado.");
+
+        if (MQTTClient.Instance != null && MQTTClient.Instance.GetClient()?.IsConnected == true)
+        {
+            Debug.Log("✅ Cliente MQTT conectado. Suscribiendo y solicitando tareas...");
+            MQTTClient.Instance.RegisterHandler(pendingTasksTopic, cachedHandler);
+            RequestPendingTasks();
+        }
+        else
+        {
+            Debug.Log("⏳ Cliente MQTT no conectado. Se registrará OnConnected...");
+            MQTTClient.Instance.RegisterHandler(pendingTasksTopic, cachedHandler);
+            MQTTClient.Instance.OnConnected += HandleMQTTConnected;
+        }
+
+        DroneSelectionManager.OnDroneChanged += UpdateTaskDisplay;
+    }
+
+    private void OnDisable()
+    {
+        if (MQTTClient.Instance != null)
+        {
+            MQTTClient.Instance.UnregisterHandler(pendingTasksTopic);
+            MQTTClient.Instance.OnConnected -= HandleMQTTConnected;
+        }
+
+        DroneSelectionManager.OnDroneChanged -= UpdateTaskDisplay;
+    }
+
+    private void Start()
     {
         if (taskPrefab == null)
         {
@@ -22,30 +61,13 @@ public class PendingTasksDisplayManager : MonoBehaviour
             return;
         }
 
-        var summaryUI = taskPrefab.GetComponent<PendingTaskSummaryUI>();
-        if (summaryUI == null)
+        if (!taskPrefab.TryGetComponent(out PendingTaskSummaryUI _))
             Debug.LogError("❌ taskPrefab no tiene PendingTaskSummaryUI.");
         else
-            Debug.Log("✅ taskPrefab verificado correctamente.");
+            Debug.Log("✅ taskPrefab verificado.");
     }
 
-    void OnEnable()
-    {
-        DroneSelectionManager.OnDroneChanged += UpdateTaskDisplay;
-
-        MQTTClient.Instance.RegisterHandler(MQTTConstants.PendingTasksTopic, EnqueueJson);
-
-        new MQTTPublisher(MQTTClient.Instance.GetClient())
-            .PublishMessage(MQTTConstants.PendingTasksRequestTopic, "request_pending_tasks");
-    }
-
-    void OnDisable()
-    {
-        DroneSelectionManager.OnDroneChanged -= UpdateTaskDisplay;
-        MQTTClient.Instance.UnregisterHandler(MQTTConstants.PendingTasksTopic);
-    }
-
-    void EnqueueJson(string json)
+    private void EnqueueJson(string json)
     {
         lock (pendingJsonQueue)
         {
@@ -53,7 +75,7 @@ public class PendingTasksDisplayManager : MonoBehaviour
         }
     }
 
-    void Update()
+    private void Update()
     {
         while (pendingJsonQueue.Count > 0)
         {
@@ -66,9 +88,9 @@ public class PendingTasksDisplayManager : MonoBehaviour
         }
     }
 
-    void ProcessTasks(string json)
+    private void ProcessTasks(string json)
     {
-        Debug.Log("📥 Procesando JSON en main thread: " + json);
+        Debug.Log($"📥 Procesando JSON: {json}");
 
         TaskSummaryListWrapper wrapper;
         try
@@ -77,53 +99,61 @@ public class PendingTasksDisplayManager : MonoBehaviour
         }
         catch (Exception ex)
         {
-            Debug.LogError("❌ Error al deserializar: " + ex.Message);
+            Debug.LogError("❌ Deserialización fallida: " + ex.Message);
             return;
         }
 
         if (wrapper?.tasks == null || wrapper.tasks.Count == 0)
         {
-            Debug.Log("📭 No hay tareas recibidas.");
+            Debug.Log("📭 No hay tareas en el payload.");
             return;
         }
 
-        Debug.Log($"📦 {wrapper.tasks.Count} tareas recibidas.");
-        lastReceivedTasks = wrapper.tasks; // 💾 Guardamos tareas recibidas
-
+        lastReceivedTasks = wrapper.tasks;
         UpdateTaskDisplay(DroneSelectionManager.Instance.GetSelectedDrone());
     }
 
-    void UpdateTaskDisplay(DroneData selectedDrone)
+    private void UpdateTaskDisplay(DroneData selectedDrone)
     {
         if (selectedDrone == null)
         {
-            Debug.Log("⚠️ Ningún dron seleccionado.");
+            Debug.Log("⚠️ Piloto sin dron seleccionado.");
             return;
         }
 
-        string selectedDroneId = selectedDrone.droneName;
-
-        foreach (var go in instantiatedItems)
-            Destroy(go);
+        foreach (var go in instantiatedItems) Destroy(go);
         instantiatedItems.Clear();
 
-        var filtered = lastReceivedTasks.FindAll(task =>
-            task.status == "To be executed" &&
-            !string.IsNullOrEmpty(task.drone) &&
-            task.drone.StartsWith(selectedDroneId)
-        );
+        string droneId = selectedDrone.droneName;
 
-        Debug.Log($"🎯 Mostrando {filtered.Count} tareas para {selectedDroneId}");
+        var filtered = lastReceivedTasks.FindAll(t =>
+            t.status == "To be executed" &&
+            string.Equals(t.drone, droneId, StringComparison.OrdinalIgnoreCase));
+
+        Debug.Log($"🎯 {filtered.Count} tareas para dron «{droneId}»");
 
         foreach (var task in filtered)
         {
             GameObject go = Instantiate(taskPrefab, contentParent);
-            var summaryUI = go.GetComponent<PendingTaskSummaryUI>();
-
-            if (summaryUI != null)
-                summaryUI.Setup(task);
+            if (go.TryGetComponent(out PendingTaskSummaryUI ui))
+                ui.Setup(task);
 
             instantiatedItems.Add(go);
         }
+    }
+
+    private void RequestPendingTasks()
+    {
+        Debug.Log("📤 [Pilot] Enviando petición de tareas pendientes…");
+
+        var publisher = new MQTTPublisher(MQTTClient.Instance.GetClient());
+        publisher.PublishMessage(pendingRequestTopic, "request_pending_tasks");
+    }
+
+    private void HandleMQTTConnected()
+    {
+        Debug.Log("🔄 Cliente MQTT conectado tras espera. Solicitando tareas...");
+        MQTTClient.Instance.OnConnected -= HandleMQTTConnected;
+        RequestPendingTasks();
     }
 }

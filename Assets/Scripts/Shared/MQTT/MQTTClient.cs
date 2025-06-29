@@ -6,31 +6,27 @@ using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Options;
 using UnityEngine;
+using MQTTnet.Client.Connecting;
 
 public class MQTTClient : MonoBehaviour
 {
     public static MQTTClient Instance { get; private set; }
 
-    private IMqttClient client;
-    private IMqttClientOptions options;
-    private string uniqueClientId;
+    private IMqttClient mqttClient;
+    private IMqttClientOptions mqttOptions;
+    private string clientId;
 
-    /// <summary>
-    /// Evento antiguo para compatibilidad (aún puedes usarlo)
-    /// </summary>
     public event Action<string, string> OnMessageReceived;
+    public event Action OnConnected;
 
-    // 🔁 Nuevo: Diccionario de handlers específicos por topic
-    private Dictionary<string, Action<string>> topicHandlers = new Dictionary<string, Action<string>>();
-
-    // 🔁 Ya existente: tópicos por rol
+    private Dictionary<string, Action<string>> topicHandlers = new();
+    private HashSet<string> subscribedTopics = new();
     private readonly Dictionary<string, List<string>> roleTopicMap = MQTTTopicSubscriptions.RoleTopics;
 
     void Awake()
     {
         if (Instance != null && Instance != this)
         {
-            Debug.LogWarning("⚠ Duplicate MQTTClient detected and destroyed.");
             Destroy(gameObject);
             return;
         }
@@ -42,15 +38,22 @@ public class MQTTClient : MonoBehaviour
     async void Start()
     {
         var factory = new MqttFactory();
-        client = factory.CreateMqttClient();
+        mqttClient = factory.CreateMqttClient();
 
-        uniqueClientId = "Client-" + Guid.NewGuid().ToString();
+        clientId = "Client-" + Guid.NewGuid();
+        await Reconnect(MQTTConfig.GetBrokerIP());
+    }
 
-        options = new MqttClientOptionsBuilder()
-            .WithClientId(uniqueClientId)
-            .WithTcpServer(MQTTConfig.GetBrokerIP(), MQTTConstants.BrokerPort)
+    public async Task Reconnect(string newIP)
+    {
+        if (mqttClient.IsConnected)
+            await mqttClient.DisconnectAsync();
+
+        mqttOptions = new MqttClientOptionsBuilder()
+            .WithClientId(clientId)
+            .WithTcpServer(newIP, MQTTConstants.BrokerPort)
             .WithCredentials(MQTTConstants.Username, MQTTConstants.Password)
-            .WithCleanSession()
+            .WithCleanSession(false)
             .Build();
 
         await ConnectToMQTT();
@@ -60,45 +63,46 @@ public class MQTTClient : MonoBehaviour
     {
         try
         {
-            var result = await client.ConnectAsync(options);
-            Debug.Log($"🔌 MQTT Client '{uniqueClientId}' connected! Result: {result.ResultCode}");
+            var result = await mqttClient.ConnectAsync(mqttOptions);
+            Debug.Log($"🔌 MQTT conectado como {clientId}, result: {result.ResultCode}");
 
-            client.UseApplicationMessageReceivedHandler(e =>
+            if (result.ResultCode == MqttClientConnectResultCode.Success)
             {
-                if (e.ApplicationMessage == null)
-                {
-                    Debug.LogError("⚠️ Received a null MQTT message!");
-                    return;
-                }
+                ResubscribeAllTopics();
+                OnConnected?.Invoke();
+            }
 
+            mqttClient.UseApplicationMessageReceivedHandler(e =>
+            {
                 string topic = e.ApplicationMessage.Topic;
                 string payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
 
-                Debug.Log($"📩 MQTT received - Topic: '{topic}', Payload: {payload}");
+                Debug.Log($"📩 MQTT RX: {topic} → {payload}");
 
-                // ✅ Modular: redirige según el topic
-                if (topicHandlers.TryGetValue(topic, out Action<string> handler))
-                {
+                if (topicHandlers.TryGetValue(topic, out var handler))
                     handler.Invoke(payload);
-                }
                 else
-                {
-                    // Solo para debug: aún puedes mantener el evento global si quieres
                     OnMessageReceived?.Invoke(topic, payload);
-                }
+            });
+
+            mqttClient.UseDisconnectedHandler(async _ =>
+            {
+                Debug.LogWarning("⚠️ MQTT desconectado. Reintentando en 2s...");
+                await Task.Delay(2000);
+                await Reconnect(MQTTConfig.GetBrokerIP());
             });
         }
         catch (Exception ex)
         {
-            Debug.LogError(LogMessagesConstants.ErrorMQTTConnectionFailed + ex.Message);
+            Debug.LogError("❌ Error al conectar MQTT: " + ex.Message);
         }
     }
 
     public async void OnRoleSelected()
     {
-        if (client == null || !client.IsConnected)
+        if (!mqttClient.IsConnected)
         {
-            Debug.LogError("⚠️ Cannot subscribe, MQTT client is not connected.");
+            Debug.LogWarning("⚠️ MQTT no conectado para suscribir rol");
             return;
         }
 
@@ -106,62 +110,65 @@ public class MQTTClient : MonoBehaviour
 
         if (roleTopicMap.TryGetValue(role, out var topics))
         {
-            foreach (var topic in topics)
-            {
+            foreach (string topic in topics)
                 await SubscribeToTopic(topic);
-            }
         }
         else
         {
-            Debug.LogWarning($"⚠️ No topics configured for role: {role}");
+            Debug.LogWarning("⚠️ No hay topics para rol: " + role);
         }
     }
 
-    private async Task SubscribeToTopic(string topic)
+    public async Task SubscribeToTopic(string topic)
     {
-        if (client.IsConnected)
+        if (mqttClient.IsConnected)
         {
-            await client.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(topic).Build());
-            Debug.Log($"🔔 Subscribed to topic: {topic}");
+            await mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(topic).Build());
+            Debug.Log("🔔 Subscrito a: " + topic);
         }
         else
         {
-            Debug.LogError("⚠️ Cannot subscribe, the client is not connected.");
+            Debug.LogWarning("⏳ Topic pendiente de conexión: " + topic);
+        }
+
+        subscribedTopics.Add(topic);
+    }
+
+    private async void ResubscribeAllTopics()
+    {
+        foreach (string topic in subscribedTopics)
+        {
+            try
+            {
+                await mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(topic).Build());
+                Debug.Log("🔁 Re-subscrito a: " + topic);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("❌ Error al re-suscribir: " + topic + " → " + ex.Message);
+            }
         }
     }
 
     public void RegisterHandler(string topic, Action<string> handler)
     {
-        if (!topicHandlers.ContainsKey(topic))
-        {
-            topicHandlers.Add(topic, handler);
-            Debug.Log($"✅ Handler registrado para el topic: {topic}");
-        }
-        else
-        {
-            Debug.LogWarning($"⚠️ Ya hay un handler registrado para el topic: {topic}");
-        }
+        topicHandlers[topic] = handler;
+        Debug.Log($"✅ Handler registrado para: {topic}");
     }
 
     public void UnregisterHandler(string topic)
     {
-        if (topicHandlers.ContainsKey(topic))
-        {
-            topicHandlers.Remove(topic);
-            Debug.Log($"❌ Handler eliminado para el topic: {topic}");
-        }
+        if (topicHandlers.Remove(topic))
+            Debug.Log($"❌ Handler eliminado: {topic}");
     }
 
-    public IMqttClient GetClient()
-    {
-        return client;
-    }
+    public IMqttClient GetClient() => mqttClient;
 
     public static void EnsureExists()
     {
         if (Instance == null)
         {
-            GameObject obj = new GameObject("MQTTClient");
+            GameObject obj = new("MQTTClient");
             obj.AddComponent<MQTTClient>();
         }
     }

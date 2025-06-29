@@ -112,6 +112,7 @@
     <Compile Include="Assets\Scripts\Data_Pilot_to_Commander\TaskSharing\TaskSummaryListWrapper.cs" />
     <Compile Include="Assets\Scripts\Data_Pilot_to_Commander\TaskSharing\PendingTaskSummaryUI.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneObstacles\CollisionWarning\DroneHUDWarningManager.cs" />
+    <Compile Include="Assets\FullMapPanelManager.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneObstacles\CollisionWarning\CollisionDistanceUI.cs" />
     <Compile Include="Assets\Scripts\Drone\DroneMinimap\SingleMinimapMarker.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
@@ -139,6 +140,7 @@
     <Compile Include="Assets\Scripts\GlobalConstants\PathConstants.cs" />
     <Compile Include="Assets\Scripts\DroneCameraManagement.cs" />
     <Compile Include="Assets\Scripts\Commander\MinimapsManagement\ViewModeManager.cs" />
+    <Compile Include="Assets\TopDownPanelViewListener.cs" />
     <Compile Include="Assets\Scripts\Data_Pilot_to_Commander\DroneCameraSharing\CameraDataMessage.cs" />
     <Compile Include="Assets\Scripts\Commander\MinimapsManagement\UIManager.cs" />
     <Compile Include="Assets\Scripts\Commander\MinimapsManagement\TopDownView\SearchZoneSelector.cs" />

@@ -2,17 +2,33 @@
 
 public static class MQTTConfig
 {
-    private static string defaultIP = MQTTConstants.DefaultBrokerIP; // Default IP from constants
+    private const string pilotIPKey = "IPPilot";
+    private const string roleKey = "Role";
 
     public static string GetBrokerIP()
     {
-        return PlayerPrefs.GetString("IPCommander", defaultIP);
+        string ip;
+
+        string role = PlayerPrefs.GetString(roleKey, "");
+
+        if (role == "Commander")
+        {
+            ip = MQTTConstants.DefaultBrokerIP;
+            Debug.Log("📡 IP for Commander: " + ip);
+        }
+        else
+        {
+            ip = PlayerPrefs.GetString(pilotIPKey, "");
+            Debug.Log("📡 IP for Pilot: " + ip);
+        }
+
+        return ip;
     }
 
-    public static void SetBrokerIP(string ip)
+    public static void SetPilotIP(string ip)
     {
-        PlayerPrefs.SetString("IPCommander", ip);
+        PlayerPrefs.SetString(pilotIPKey, ip);
         PlayerPrefs.Save();
-        Debug.Log(LogMessagesConstants.DebugBrokerIPUpdated + ip);
+        Debug.Log("💾 IP del piloto guardada: " + ip);
     }
 }

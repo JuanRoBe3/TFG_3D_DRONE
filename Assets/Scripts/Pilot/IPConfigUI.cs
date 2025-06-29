@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
@@ -9,28 +9,29 @@ public class IPConfigUI : MonoBehaviour
 
     void Start()
     {
-        // Load the last saved broker IP, if available
-        ipInputField.text = MQTTConfig.GetBrokerIP();
-
-        // Ensure the button is clickable only when an IP is entered
+        // Mostramos la IP guardada del piloto (si existe)
+        ipInputField.text = PlayerPrefs.GetString("IPPilot", "");
         connectButton.interactable = !string.IsNullOrEmpty(ipInputField.text);
-
-        // Add listener for text changes to enable/disable the button dynamically
         ipInputField.onValueChanged.AddListener(delegate { ValidateInput(); });
     }
 
     private void ValidateInput()
     {
+        //Comprueba que no esté vacío
         connectButton.interactable = !string.IsNullOrEmpty(ipInputField.text);
     }
 
-    public void SaveIPAndConnect()
+    public async void SaveIPAndConnect()
     {
         string ip = ipInputField.text;
+
         if (!string.IsNullOrEmpty(ip))
         {
-            MQTTConfig.SetBrokerIP(ip); // Save the IP using MQTTConfig
-            SceneLoader.LoadPilotDroneSelectionUI(); // Move to the drone selection scene
+            MQTTConfig.SetPilotIP(ip);                           // 💾 Guardamos la IP del piloto
+            MQTTClient.EnsureExists();                           // ⚙️ Aseguramos que el cliente MQTT existe
+            await MQTTClient.Instance.Reconnect(ip);            // 🔁 Conectamos usando la IP introducida
+            MQTTClient.Instance.OnRoleSelected();               // 📡 Suscribimos a los topics correspondientes
+            SceneLoader.LoadPilotDroneSelectionUI();            // 🚀 Avanzamos a la siguiente escena
         }
     }
 }

@@ -19,6 +19,7 @@ public class RoleSelection : MonoBehaviour
 
     public void SelectCommander()
     {
+        // ⚠️ Nota: la IP usada luego dependerá del rol, ver MQTTConfig.GetBrokerIP()
         PlayerPrefs.SetString(RoleKey, CommanderRole);
         PlayerPrefs.Save();
         SceneLoader.LoadCommanderUI(); // Load Commander's main scene
@@ -27,6 +28,7 @@ public class RoleSelection : MonoBehaviour
 
     public void SelectPilot()
     {
+        // ⚠️ Nota: la IP usada luego dependerá del rol, ver MQTTConfig.GetBrokerIP()
         PlayerPrefs.SetString(RoleKey, PilotRole);
         PlayerPrefs.Save();
         SceneLoader.LoadPilotIPInput(); // Load screen where Pilot enters the broker IP

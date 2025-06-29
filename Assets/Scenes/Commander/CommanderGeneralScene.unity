@@ -533,7 +533,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 2000
+  far clip plane: 10000
   field of view: 60
   orthographic: 1
   orthographic size: 60
@@ -592,7 +592,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2129f9eaadef84c458681d2e6176c475, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  extraMargin: 0.05
   heightOffset: 50
 --- !u!1 &73270680
 GameObject:
@@ -1376,7 +1375,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1000
+  far clip plane: 10000
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -2697,6 +2696,8 @@ GameObject:
   m_Component:
   - component: {fileID: 409698302}
   - component: {fileID: 409698303}
+  - component: {fileID: 409698304}
+  - component: {fileID: 409698305}
   m_Layer: 5
   m_Name: Panel_TopDownView
   m_TagString: Untagged
@@ -2738,6 +2739,35 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &409698304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 409698301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4062a6907cc3724f8f1c0504ddb5be6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  camConfig: {fileID: 72734040}
+  panSpeed: 50
+  zoomStep: 0.1
+  zoomSmooth: 0.12
+--- !u!114 &409698305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 409698301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: deacbff786f57b440967b6acbd0346c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  camConfig: {fileID: 72734040}
 --- !u!1 &421636561
 GameObject:
   m_ObjectHideFlags: 0
@@ -5723,7 +5753,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 0
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -10932,6 +10962,22 @@ PrefabInstance:
     - target: {fileID: 500066283222798160, guid: 5f98a0e3f835b7240872e6118b193718, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3032120762604263787, guid: 5f98a0e3f835b7240872e6118b193718, type: 3}
+      propertyPath: m_IncludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3472185731378254730, guid: 5f98a0e3f835b7240872e6118b193718, type: 3}
+      propertyPath: m_IncludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3524488029997432327, guid: 5f98a0e3f835b7240872e6118b193718, type: 3}
+      propertyPath: m_IncludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6776274205073544820, guid: 5f98a0e3f835b7240872e6118b193718, type: 3}
+      propertyPath: m_IncludeLayers.m_Bits
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8316339223244147205, guid: 5f98a0e3f835b7240872e6118b193718, type: 3}
       propertyPath: m_LocalScale.x

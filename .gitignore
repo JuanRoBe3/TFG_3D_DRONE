@@ -1,14 +1,49 @@
-# Archivos de Unity a ignorar
+# Archivos Unity a ignorar
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
 [Bb]uild/
 [Bb]uilds/
 [Ll]ogs/
-UserSettings/
+MemoryCaptures/
+*.stacktrace
 
-# Archivos del sistema
+# Archivos VS/IDE
+.vscode/
+.vs/
+*.csproj
+*.sln
+*.user
+*.pidb
+*.suo
+*.unityproj
+
+# Archivos de sistema
 .DS_Store
 Thumbs.db
+*.bak
+*.swp
+*.tmp
 
-.vs/
+# Archivos de compilación
+*.exe
+*.apk
+*.dll
+*.pdb
+*.mdb
+*.zip
+*.tar.gz
+*.tar
+*.rar
+
+# Unity Asset Store
+*.unitypackage
+
+# Archivos de configuración personales
+*.local
+*.log
+*.cache
+*.tgz
+
+# XR/Meta si no los controlas tú
+Packages/com.meta.xr.sdk.core/Plugins/

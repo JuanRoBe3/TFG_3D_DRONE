@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using MQTTnet;
 using Newtonsoft.Json;
+using System.Collections;
 
 public class DroneCameraPublisher : MonoBehaviour
 {
@@ -8,26 +9,28 @@ public class DroneCameraPublisher : MonoBehaviour
     private Transform firstPersonCameraTransform;
     private Transform topDownCameraTransform;
 
-    private void Start()
+    const float publishRate = 0.1f;
+
+    void Start()
     {
+        if (!RoleSelection.IsPilot) { enabled = false; return; }    // ⬅️ filtro
+
         var client = MQTTClient.Instance.GetClient();
-        if (client == null)
-        {
-            Debug.LogError("❌ No MQTT client found.");
-            return;
-        }
+        if (client == null) { Debug.LogError("❌ MQTT client null"); return; }
 
         publisher = new MQTTPublisher(client);
-        InvokeRepeating(nameof(PublishCameraData), 0f, 0.1f);
+        StartCoroutine(PublishLoop());
     }
 
-    private void PublishCameraData()
+    IEnumerator PublishLoop()
     {
-        if (firstPersonCameraTransform == null || topDownCameraTransform == null)
-        {
-            Debug.LogWarning("⚠️ Cámaras no asignadas todavía.");
-            return;
-        }
+        var wait = new WaitForSeconds(publishRate);
+        while (true) { PublishCameraData(); yield return wait; }
+    }
+
+    void PublishCameraData()
+    {
+        if (!firstPersonCameraTransform || !topDownCameraTransform) return;
 
         var msg = new CameraDataMessage
         {
@@ -37,16 +40,13 @@ public class DroneCameraPublisher : MonoBehaviour
             topDownRot = new SerializableQuaternion(topDownCameraTransform.rotation)
         };
 
-
-        string json = JsonConvert.SerializeObject(msg);
-        Debug.Log($"📤 Enviando cámaras: {json}");
-        publisher.PublishMessage(MQTTConstants.DroneCameraTopic, json);
+        publisher.PublishMessage(MQTTConstants.DroneCameraTopic,
+                                 JsonConvert.SerializeObject(msg));
     }
 
-    public void SetCameras(Transform fpCam, Transform tdCam)
+    public void SetCameras(Transform fp, Transform td)
     {
-        firstPersonCameraTransform = fpCam;
-        topDownCameraTransform = tdCam;
-        Debug.Log("📸 Cámaras asignadas al DroneCameraPublisher.");
+        firstPersonCameraTransform = fp;
+        topDownCameraTransform = td;
     }
 }

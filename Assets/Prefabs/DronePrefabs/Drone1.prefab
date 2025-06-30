@@ -347,7 +347,7 @@ Camera:
     serializedVersion: 2
     m_Bits: 983
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 8400000, guid: 7a97441537055514fb557ce1f84c7f69, type: 2}
+  m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
@@ -490,7 +490,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6076863384378008526
 Transform:
   m_ObjectHideFlags: 0

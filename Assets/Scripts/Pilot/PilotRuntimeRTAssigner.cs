@@ -4,11 +4,18 @@ using UnityEngine.UI;
 public class PilotRuntimeRTAssigner : MonoBehaviour
 {
     [Header("RawImages")]
-    [SerializeField] RawImage fpRaw;
-    [SerializeField] RawImage mapRaw;
+    [SerializeField] private RawImage fpRaw;
+    [SerializeField] private RawImage mapRaw;
 
     [Header("Scene Map Camera")]
-    [SerializeField] Camera mapCam;   // arrastra SceneMapTopDownCamera aquí
+    [SerializeField] private Camera mapCam;
+
+    [Header("Opciones")]
+    [SerializeField] private int mapRTSize = 1024;
+    [SerializeField] private int fpRTSize = 1024;
+
+    private bool fpvAssigned = false;
+    private bool dronePending = false;
 
     void Awake()
     {
@@ -18,27 +25,44 @@ public class PilotRuntimeRTAssigner : MonoBehaviour
             return;
         }
 
-        Debug.Log("🎮 [PilotRuntimeRTAssigner] Activado como piloto");
+        if (!fpRaw)
+            fpRaw = GameObject.Find("FPVRawImage")?.GetComponent<RawImage>();
 
-        // Crear RenderTexture para el minimapa si no está asignada
-        if (mapCam.targetTexture == null || mapRaw.texture == null)
+        if (!mapRaw)
+            mapRaw = GameObject.Find("MapRawImage")?.GetComponent<RawImage>();
+
+        if (!fpRaw) Debug.LogError("❌ fpRaw no asignado");
+        if (!mapRaw) Debug.LogError("❌ mapRaw no asignado");
+        if (!mapCam) Debug.LogError("❌ mapCam no asignado");
+
+        if (mapCam && mapRaw && mapRaw.texture == null)
         {
-            Debug.Log("🖼️ Creando nueva RenderTexture para minimapa...");
-            RenderTexture mapRT = RTFactory.New(512, 512, 16);
+            var mapRT = new RenderTexture(mapRTSize, mapRTSize, 16, RenderTextureFormat.Default);
+            mapRT.name = "MapRT";
+            mapRT.Create();
             mapCam.targetTexture = mapRT;
             mapRaw.texture = mapRT;
-        }
-        else
-        {
-            Debug.Log("🧠 Ya hay RenderTexture asignada al minimapa");
+            Debug.Log("🗺️ RenderTexture para el minimapa creada y asignada");
         }
 
-        // Suscribirse al evento de dron instanciado
         DroneLoader.OnDroneInstantiated += OnDrone;
 
-        // Por si el evento ya ocurrió antes de que se activara este script
-        var drone = GameObject.FindWithTag("Drone");
-        if (drone) OnDrone(drone);
+        // Marcar si hay que buscar el dron más adelante
+        if (GameObject.FindWithTag("Drone") == null)
+            dronePending = true;
+    }
+
+    void Start()
+    {
+        if (dronePending && !fpvAssigned)
+        {
+            GameObject drone = GameObject.FindWithTag("Drone");
+            if (drone)
+            {
+                Debug.Log("🔁 Dron detectado en Start(), llamando a OnDrone");
+                OnDrone(drone);
+            }
+        }
     }
 
     void OnDestroy()
@@ -48,42 +72,37 @@ public class PilotRuntimeRTAssigner : MonoBehaviour
 
     void OnDrone(GameObject drone)
     {
-        Debug.Log("🛰️ OnDrone recibido: " + drone.name);
+        if (fpvAssigned) return;
+        if (!fpRaw) { Debug.LogError("❌ No se puede asignar FPV, fpRaw es null"); return; }
 
-        // Buscar el objeto contenedor llamado "PilotCamera"
         Transform pilotRoot = drone.transform.Find("PilotCamera");
         if (!pilotRoot)
         {
-            Debug.LogError("❌ No se encontró el objeto PilotCamera");
+            Debug.LogError("❌ No se encontró 'PilotCamera' como hijo del dron instanciado");
             return;
         }
 
-        // Buscar una cámara ACTIVA dentro de ese objeto
-        Camera fpCam = pilotRoot.GetComponentInChildren<Camera>(false);  // ⬅️ solo activa
+        Camera fpCam = pilotRoot.GetComponentInChildren<Camera>(false);
         if (!fpCam)
         {
-            Debug.LogError("❌ No se encontró ninguna cámara ACTIVA dentro de PilotCamera");
+            Debug.LogError("❌ No se encontró cámara activa dentro de 'PilotCamera'");
             return;
         }
 
-        Debug.Log($"📷 Cámara FPV encontrada: {fpCam.name}");
+        RenderTexture fpRT = new RenderTexture(fpRTSize, fpRTSize, 24, RenderTextureFormat.Default);
+        fpRT.name = "FPVRT";
+        fpRT.Create();
 
-        // Crear RenderTexture y asignarla a la cámara y RawImage
-        RenderTexture fpRT = RTFactory.New();  // por defecto: 1024×1024×24
         fpCam.targetTexture = fpRT;
         fpRaw.texture = fpRT;
-        Debug.Log($"✅ RenderTexture asignada a fpCam '{fpCam.name}' y RawImage '{fpRaw.name}'");
+        fpvAssigned = true;
 
-        // Asignar referencias a DroneCameraPublisher
+        Debug.Log($"✅ FPV RenderTexture asignada correctamente ({fpRT.width}x{fpRT.height}) a '{fpCam.name}' y RawImage '{fpRaw.name}'");
+
         var pub = FindObjectOfType<DroneCameraPublisher>();
         if (pub)
         {
-            pub.SetCameras(fpCam.transform, mapCam.transform);
-            Debug.Log("📡 Cámaras asignadas al DroneCameraPublisher");
-        }
-        else
-        {
-            Debug.LogWarning("⚠️ No se encontró DroneCameraPublisher");
+            pub.SetCameras(fpCam.transform, mapCam ? mapCam.transform : null);
         }
     }
 }

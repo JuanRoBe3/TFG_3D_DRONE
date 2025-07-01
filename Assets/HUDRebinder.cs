@@ -29,7 +29,7 @@ public class HUDRebinder : MonoBehaviour
 
         // Re-parent y reseteo local
         canvasHUD.transform.SetParent(eye, worldPositionStays: false);
-        canvasHUD.transform.localPosition = new Vector3(0, 0, 2f);
+        canvasHUD.transform.localPosition = new Vector3(0, 0, 4f);
         canvasHUD.transform.localRotation = Quaternion.identity;
         canvasHUD.transform.localScale = Vector3.one * 0.002f;
 

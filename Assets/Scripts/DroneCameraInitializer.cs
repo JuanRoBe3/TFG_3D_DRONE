@@ -4,24 +4,23 @@ public class DroneCameraInitializer : MonoBehaviour
 {
     private void OnEnable()
     {
-        DroneLoader.OnDroneInstantiated += AssignCameras;
+        DroneLoader.OnDroneInstantiated += AssignCamera;
     }
 
     private void OnDisable()
     {
-        DroneLoader.OnDroneInstantiated -= AssignCameras;
+        DroneLoader.OnDroneInstantiated -= AssignCamera;
     }
 
-    private void AssignCameras(GameObject droneInstance)
+    private void AssignCamera(GameObject droneInstance)
     {
-        Debug.Log("🔍 Drone instanciado, buscando cámaras...");
+        Debug.Log("🔍 Drone instanciado, buscando cámara del piloto...");
 
-        Transform firstPersonCam = FindChildRecursive(droneInstance.transform, "PilotCamera");
-        Transform topDownCam = FindChildRecursive(droneInstance.transform, "TopDownCamera");
+        Transform pilotCam = FindChildRecursive(droneInstance.transform, "PilotCamera");
 
-        if (firstPersonCam == null || topDownCam == null)
+        if (pilotCam == null)
         {
-            Debug.LogError("❌ No se encontraron las cámaras 'PilotCamera' o 'TopDownCamera' dentro del dron.");
+            Debug.LogError("❌ No se encontró la cámara 'PilotCamera' dentro del dron.");
             return;
         }
 
@@ -32,8 +31,8 @@ public class DroneCameraInitializer : MonoBehaviour
             return;
         }
 
-        publisher.SetCameras(firstPersonCam, topDownCam);
-        Debug.Log("✅ Cámaras asignadas al DroneCameraPublisher correctamente.");
+        publisher.SetCamera(pilotCam);
+        Debug.Log("✅ Cámara del dron asignada correctamente al publisher.");
     }
 
     private Transform FindChildRecursive(Transform parent, string name)

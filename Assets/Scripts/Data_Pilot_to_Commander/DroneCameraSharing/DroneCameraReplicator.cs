@@ -3,23 +3,21 @@ using Newtonsoft.Json;
 
 public class DroneCameraReplicator : MonoBehaviour
 {
-    [Header("Referencias a las cámaras del comandante")]
-    public Transform commanderFirstPersonCamera;
-    public Transform commanderTopDownCamera;
+    [Header("Transform que se moverá en el comandante")]
+    public Transform targetToMove; // Puede ser la cámara o una esfera
 
-    // ✅ Almacenamos el último mensaje recibido
-    private CameraDataMessage pendingData = null;
+    private DroneCameraTransform pendingData;
     private bool hasNewData = false;
 
     private void OnEnable()
     {
         if (MQTTClient.Instance == null)
         {
-            Debug.LogError("❌ MQTTClient.Instance es null en DroneCameraReplicator.OnEnable");
+            Debug.LogError("❌ MQTTClient.Instance es null");
             return;
         }
 
-        MQTTClient.Instance.RegisterHandler(MQTTConstants.DroneCameraTopic, HandleCameraPayload);
+        MQTTClient.Instance.RegisterHandler(MQTTConstants.DroneCameraTopic, HandlePayload);
         Debug.Log("📡 DroneCameraReplicator ACTIVADO");
     }
 
@@ -28,68 +26,38 @@ public class DroneCameraReplicator : MonoBehaviour
         if (MQTTClient.Instance != null)
         {
             MQTTClient.Instance.UnregisterHandler(MQTTConstants.DroneCameraTopic);
-            Debug.Log("📴 DroneCameraReplicator DESACTIVADO y handler limpiado");
+            Debug.Log("📴 DroneCameraReplicator DESACTIVADO");
         }
     }
 
-    // ⚙️ Maneja el mensaje desde el hilo MQTT, pero solo almacena los datos
-    private void HandleCameraPayload(string payload)
+    private void HandlePayload(string payload)
     {
-        if (string.IsNullOrEmpty(payload))
-        {
-            Debug.LogWarning("⚠️ Payload vacío en DroneCameraReplicator.");
-            return;
-        }
+        if (string.IsNullOrEmpty(payload)) return;
 
         try
         {
-            Debug.Log("📨 Payload recibido para deserializar:\n" + payload);
-            pendingData = JsonConvert.DeserializeObject<CameraDataMessage>(payload);
+            pendingData = JsonConvert.DeserializeObject<DroneCameraTransform>(payload);
             hasNewData = true;
         }
         catch (System.Exception ex)
         {
-            Debug.LogError("❌ Error al deserializar con Newtonsoft: " + ex.Message);
+            Debug.LogError("❌ Error al deserializar: " + ex.Message);
         }
     }
 
-    // ✅ Aplicamos transformaciones en el hilo principal
     private void Update()
     {
         if (!hasNewData || pendingData == null) return;
 
-        if (commanderFirstPersonCamera == null || commanderTopDownCamera == null)
+        if (targetToMove == null)
         {
-            Debug.LogError("❌ Cámaras del comandante no asignadas.");
+            Debug.LogError("❌ targetToMove no asignado");
             hasNewData = false;
             return;
         }
 
-        // Aplicar transformaciones
-        commanderFirstPersonCamera.position = pendingData.firstPersonPos.ToUnityVector3();
-        commanderFirstPersonCamera.rotation = pendingData.firstPersonRot.ToUnityQuaternion();
-        commanderTopDownCamera.position = pendingData.topDownPos.ToUnityVector3();
-        commanderTopDownCamera.rotation = pendingData.topDownRot.ToUnityQuaternion();
-
-        // Activar cámaras si estaban desactivadas
-        Camera fpCam = commanderFirstPersonCamera.GetComponent<Camera>();
-        Camera tdCam = commanderTopDownCamera.GetComponent<Camera>();
-
-        if (fpCam != null && !fpCam.enabled)
-        {
-            fpCam.enabled = true;
-            Debug.Log("🎥 Cámara FP activada");
-        }
-
-        if (tdCam != null && !tdCam.enabled)
-        {
-            tdCam.enabled = true;
-            Debug.Log("🎥 Cámara TD activada");
-        }
-
-        Debug.Log("📥 Info de cámara aplicada con éxito");
-        Debug.Log("📍 FP Pos: " + pendingData.firstPersonPos.ToUnityVector3() + " | Rot: " + pendingData.firstPersonRot.ToUnityQuaternion().eulerAngles);
-        Debug.Log("📍 TD Pos: " + pendingData.topDownPos.ToUnityVector3() + " | Rot: " + pendingData.topDownRot.ToUnityQuaternion().eulerAngles);
+        targetToMove.position = pendingData.pos.ToUnityVector3();
+        targetToMove.rotation = pendingData.rot.ToUnityQuaternion();
 
         hasNewData = false;
     }

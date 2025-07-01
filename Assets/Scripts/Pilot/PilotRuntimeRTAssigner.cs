@@ -102,7 +102,7 @@ public class PilotRuntimeRTAssigner : MonoBehaviour
         var pub = FindObjectOfType<DroneCameraPublisher>();
         if (pub)
         {
-            pub.SetCameras(fpCam.transform, mapCam ? mapCam.transform : null);
+            pub.SetCamera(fpCam.transform);  // ✅ corregido
         }
     }
 }

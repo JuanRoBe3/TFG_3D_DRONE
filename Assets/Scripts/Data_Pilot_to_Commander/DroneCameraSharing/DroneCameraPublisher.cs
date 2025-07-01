@@ -6,17 +6,24 @@ using System.Collections;
 public class DroneCameraPublisher : MonoBehaviour
 {
     private MQTTPublisher publisher;
-    private Transform firstPersonCameraTransform;
-    private Transform topDownCameraTransform;
+    private Transform cameraTransform;
 
     const float publishRate = 0.1f;
 
     void Start()
     {
-        if (!RoleSelection.IsPilot) { enabled = false; return; }    // ⬅️ filtro
+        if (!RoleSelection.IsPilot)
+        {
+            enabled = false;
+            return;
+        }
 
         var client = MQTTClient.Instance.GetClient();
-        if (client == null) { Debug.LogError("❌ MQTT client null"); return; }
+        if (client == null)
+        {
+            Debug.LogError("❌ MQTT client null");
+            return;
+        }
 
         publisher = new MQTTPublisher(client);
         StartCoroutine(PublishLoop());
@@ -25,28 +32,29 @@ public class DroneCameraPublisher : MonoBehaviour
     IEnumerator PublishLoop()
     {
         var wait = new WaitForSeconds(publishRate);
-        while (true) { PublishCameraData(); yield return wait; }
+        while (true)
+        {
+            PublishCameraData();
+            yield return wait;
+        }
     }
 
     void PublishCameraData()
     {
-        if (!firstPersonCameraTransform || !topDownCameraTransform) return;
+        if (cameraTransform == null) return;
 
-        var msg = new CameraDataMessage
+        var msg = new DroneCameraTransform
         {
-            firstPersonPos = new SerializableVector3(firstPersonCameraTransform.position),
-            firstPersonRot = new SerializableQuaternion(firstPersonCameraTransform.rotation),
-            topDownPos = new SerializableVector3(topDownCameraTransform.position),
-            topDownRot = new SerializableQuaternion(topDownCameraTransform.rotation)
+            pos = new SerializableVector3(cameraTransform.position),
+            rot = new SerializableQuaternion(cameraTransform.rotation)
         };
 
-        publisher.PublishMessage(MQTTConstants.DroneCameraTopic,
-                                 JsonConvert.SerializeObject(msg));
+        string json = JsonConvert.SerializeObject(msg);
+        publisher.PublishMessage(MQTTConstants.DroneCameraTopic, json);
     }
 
-    public void SetCameras(Transform fp, Transform td)
+    public void SetCamera(Transform cam)
     {
-        firstPersonCameraTransform = fp;
-        topDownCameraTransform = td;
+        cameraTransform = cam;
     }
 }

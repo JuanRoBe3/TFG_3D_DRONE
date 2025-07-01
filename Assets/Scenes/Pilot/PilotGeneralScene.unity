@@ -2162,7 +2162,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 526039500}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0b60365394863454f91c422edf53f790, type: 3}
   m_Name: 
@@ -2239,7 +2239,7 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 2
   m_Camera: {fileID: 197068559}
-  m_PlaneDistance: 2
+  m_PlaneDistance: 4
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -2259,7 +2259,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 530268100}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 2}
+  m_LocalPosition: {x: 0, y: 0, z: 4}
   m_LocalScale: {x: 0.025037557, y: 0.025037557, z: 0.025037557}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3506,7 +3506,7 @@ GameObject:
   - component: {fileID: 883321469}
   - component: {fileID: 883321468}
   m_Layer: 0
-  m_Name: GameObject (1)
+  m_Name: HUDRebinderManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

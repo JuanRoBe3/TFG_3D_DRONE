@@ -1,52 +1,39 @@
 ﻿using UnityEngine;
 
+[RequireComponent(typeof(Camera))]
 public class CommanderDroneReplica : MonoBehaviour
 {
-    [Header("Componentes asignados desde el prefab")]
-    [SerializeField] private Camera fpvCam;                    // arrastra FPVCamera
-    [SerializeField] private DroneCameraReplicator replicator; // arrastra replicator
+    [Header("Prefab references")]
+    [SerializeField] private Camera fpvCam;
+    [SerializeField] private DroneCameraReplicator replicator;
+    [SerializeField] private ClickableDrone clicker;
 
     private string droneId;
 
     public void Init(string id)
     {
-        Debug.Log($"🛠️ Init() llamado en {gameObject.name} con ID: {id}");
-
         droneId = id;
+        if (fpvCam == null) { Debug.LogError("❌ FPVCamera missing"); return; }
 
-        if (fpvCam == null)
-        {
-            Debug.LogError("❌ FPVCamera no está asignada en el prefab.");
-        }
-        else
-        {
-            Debug.Log("✅ FPVCamera asignada correctamente.");
-        }
+        // 1. RenderTexture centralizada
+        var rt = RenderTextureRegistry.GetOrCreate(droneId);   // ← ya usa RTFactory
+        fpvCam.targetTexture = rt;
+        DroneViewPanelManager.Register(droneId, rt);
 
-        if (replicator == null)
+        // 2. Replicador (solo para drones “vivos”)
+        if (replicator != null)
         {
-            Debug.LogError("❌ DroneCameraReplicator no está asignado en el prefab.");
-        }
-        else
-        {
-            Debug.Log("✅ DroneCameraReplicator asignado correctamente.");
-
-            // Conectar replicador
             replicator.SetCamera(fpvCam.transform);
             replicator.SetDroneId(droneId);
         }
 
-        var handler = GetComponentInChildren<DroneMarkerClickHandler>();
-        if (handler == null)
-        {
-            Debug.LogWarning("⚠️ No se encontró DroneMarkerClickHandler en hijos.");
-        }
-        else
-        {
-            handler.Configure(droneId);
-            Debug.Log("✅ DroneMarkerClickHandler configurado.");
-        }
+        // 3. Clickable
+        if (clicker == null) clicker = GetComponentInChildren<ClickableDrone>();
+        if (clicker != null) clicker.SetId(droneId);
     }
 
-    public Camera GetCamera() => fpvCam;   // lo usa el manager
+    public Camera GetCamera()
+    {
+        return fpvCam;
+    }
 }

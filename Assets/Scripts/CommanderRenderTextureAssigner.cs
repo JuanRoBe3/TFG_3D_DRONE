@@ -6,6 +6,7 @@
 /// </summary>
 public class CommanderRenderTextureAssigner : MonoBehaviour
 {
+    /*
     [Header("Manual override (opcional)")]
     public Camera commanderFirstPersonCamera;
     public Camera commanderTopDownCamera;
@@ -42,4 +43,5 @@ public class CommanderRenderTextureAssigner : MonoBehaviour
 
         Debug.Log("✅ RenderTextures asignadas a cámaras del comandante correctamente.");
     }
+    */
 }

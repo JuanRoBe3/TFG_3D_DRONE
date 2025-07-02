@@ -6,6 +6,7 @@
 /// </summary>
 public class RenderTextureAssigner : MonoBehaviour
 {
+    /*
     private void OnEnable()
     {
         DroneLoader.OnDroneInstantiated += AssignRenderTextures;
@@ -81,5 +82,6 @@ public class RenderTextureAssigner : MonoBehaviour
             if (result != null) return result;
         }
         return null;
-    }
+    } 
+    */
 }

@@ -4,8 +4,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Camera))]
 public class MinimapRTManager : MonoBehaviour
 {
-    [SerializeField] RawImage mapRaw;
-    [SerializeField] int size = 1024;
+    [SerializeField] private RawImage mapRaw;
 
     void Awake()
     {
@@ -14,17 +13,14 @@ public class MinimapRTManager : MonoBehaviour
         Camera cam = GetComponent<Camera>();
         if (!mapRaw)
         {
-            Debug.LogError("MinimapRTInitializer: asigna el RawImage del minimapa");
+            Debug.LogError("MinimapRTManager: asigna el RawImage del minimapa");
             return;
         }
 
         // Crear RT solo si falta
         if (cam.targetTexture == null || mapRaw.texture == null)
         {
-            RenderTexture rt = new RenderTexture(size, size, 16);
-            rt.name = "MinimapRT";
-            rt.Create();
-
+            RenderTexture rt = RTFactory.New();  // Usa los valores por defecto: 1024x1024
             cam.targetTexture = rt;
             mapRaw.texture = rt;
         }

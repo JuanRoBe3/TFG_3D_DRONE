@@ -19,7 +19,7 @@ public class CommanderUI1 : MonoBehaviour
         if (MQTTClient.Instance != null)
         {
             publisher = new MQTTPublisher(MQTTClient.Instance.GetClient());
-            MQTTClient.Instance.RegisterHandler(MQTTConstants.DronePositionTopic, HandlePositionPayload);
+            MQTTClient.Instance.RegisterHandler(MQTTConstants.DroneCameraTopic, HandlePositionPayload);
         }
         else
         {
@@ -31,7 +31,7 @@ public class CommanderUI1 : MonoBehaviour
     {
         if (MQTTClient.Instance != null)
         {
-            MQTTClient.Instance.UnregisterHandler(MQTTConstants.DronePositionTopic);
+            MQTTClient.Instance.UnregisterHandler(MQTTConstants.DroneCameraTopic);
             Debug.Log("📴 CommanderUI1 DESACTIVADO y handler limpiado");
         }
     }

@@ -4,12 +4,13 @@ using Newtonsoft.Json;
 public class DroneCameraReplicator : MonoBehaviour
 {
     [Header("Transform que se moverá en el comandante")]
-    public Transform targetToMove; // Puede ser la cámara o una esfera
+    public Transform targetToMove;
 
+    private string droneId;                     // 🔸 NUEVO
     private DroneCameraTransform pendingData;
     private bool hasNewData = false;
 
-    private void OnEnable()
+    void OnEnable()
     {
         if (MQTTClient.Instance == null)
         {
@@ -18,16 +19,12 @@ public class DroneCameraReplicator : MonoBehaviour
         }
 
         MQTTClient.Instance.RegisterHandler(MQTTConstants.DroneCameraTopic, HandlePayload);
-        Debug.Log("📡 DroneCameraReplicator ACTIVADO");
     }
 
-    private void OnDisable()
+    void OnDisable()
     {
         if (MQTTClient.Instance != null)
-        {
             MQTTClient.Instance.UnregisterHandler(MQTTConstants.DroneCameraTopic);
-            Debug.Log("📴 DroneCameraReplicator DESACTIVADO");
-        }
     }
 
     private void HandlePayload(string payload)
@@ -36,7 +33,10 @@ public class DroneCameraReplicator : MonoBehaviour
 
         try
         {
-            pendingData = JsonConvert.DeserializeObject<DroneCameraTransform>(payload);
+            var data = JsonConvert.DeserializeObject<DroneCameraTransform>(payload);
+            if (data == null || data.id != droneId) return;   // 🔸 filtrado
+
+            pendingData = data;
             hasNewData = true;
         }
         catch (System.Exception ex)
@@ -45,20 +45,16 @@ public class DroneCameraReplicator : MonoBehaviour
         }
     }
 
-    private void Update()
+    void Update()
     {
-        if (!hasNewData || pendingData == null) return;
-
-        if (targetToMove == null)
-        {
-            Debug.LogError("❌ targetToMove no asignado");
-            hasNewData = false;
-            return;
-        }
+        if (!hasNewData || pendingData == null || targetToMove == null) return;
 
         targetToMove.position = pendingData.pos.ToUnityVector3();
         targetToMove.rotation = pendingData.rot.ToUnityQuaternion();
-
         hasNewData = false;
     }
+
+    // llamados desde CommanderDroneReplica.Init(...)
+    public void SetCamera(Transform cam) => targetToMove = cam;
+    public void SetDroneId(string id) => droneId = id;   // 🔸
 }

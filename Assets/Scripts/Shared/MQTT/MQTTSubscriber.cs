@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class MQTTSubscriber
 {
+    /*
     private readonly MQTTClient mqttClient;
 
     public MQTTSubscriber()
@@ -56,5 +57,6 @@ public class MQTTSubscriber
     {
         if (mqttClient != null)
             mqttClient.OnMessageReceived -= HandleMessageReceived;
-    }
+    } 
+    */
 }

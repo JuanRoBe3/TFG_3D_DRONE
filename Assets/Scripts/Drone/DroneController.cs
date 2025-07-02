@@ -23,7 +23,7 @@ public class DroneController : MonoBehaviour
 
     private float currentGimbalPitch = 0f;
 
-    private float positionUpdateTimer = 0f;
+    //private float positionUpdateTimer = 0f; //NO SIRVE YA CREO
     private Rigidbody rb;
 
     private float currentPitch = 0f;
@@ -54,7 +54,7 @@ public class DroneController : MonoBehaviour
 
     private void Update()
     {
-        HandlePositionUpdate();
+        //HandlePositionUpdate();
         Debug.Log("Pitch: " + gimbalCamera.localRotation.eulerAngles.x);
         Debug.DrawRay(gimbalCamera.position, gimbalCamera.right * 2f, Color.red);
         Debug.DrawRay(gimbalCamera.position, gimbalCamera.up * 2f, Color.green);
@@ -138,6 +138,8 @@ public class DroneController : MonoBehaviour
         gimbalCamera.localRotation = localRotation;
     }
 
+    // CREO QUE YA NO SIRVE LA VERDAD
+    /*
     private void HandlePositionUpdate()
     {
         positionUpdateTimer += Time.deltaTime;
@@ -154,7 +156,8 @@ public class DroneController : MonoBehaviour
         {
             Vector3 position = transform.position;
             string message = $"{{\"x\": {position.x}, \"y\": {position.y}, \"z\": {position.z}}}";
-            publisher.PublishMessage(MQTTConstants.DronePositionTopic, message);
+            //publisher.PublishMessage(MQTTConstants.DroneCameraTopic, message);
         }
     }
+    */
 }

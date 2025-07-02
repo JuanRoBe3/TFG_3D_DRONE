@@ -5,10 +5,13 @@ using System.Collections;
 
 public class DroneCameraPublisher : MonoBehaviour
 {
+    [Header("Identificador único del dron / piloto")]
+    [SerializeField] private string droneId = "Pilot_01";   // ⚠️ pon aquí tu ID único
+
     private MQTTPublisher publisher;
     private Transform cameraTransform;
 
-    const float publishRate = 0.1f;
+    private const float publishRate = 0.1f;                 // 10 Hz
 
     void Start()
     {
@@ -43,8 +46,10 @@ public class DroneCameraPublisher : MonoBehaviour
     {
         if (cameraTransform == null) return;
 
+        // 🔸 Incluimos el ID en el payload
         var msg = new DroneCameraTransform
         {
+            id = droneId,
             pos = new SerializableVector3(cameraTransform.position),
             rot = new SerializableQuaternion(cameraTransform.rotation)
         };
@@ -53,8 +58,6 @@ public class DroneCameraPublisher : MonoBehaviour
         publisher.PublishMessage(MQTTConstants.DroneCameraTopic, json);
     }
 
-    public void SetCamera(Transform cam)
-    {
-        cameraTransform = cam;
-    }
+    /// <summary>El Manager de escena llama a esto para decir qué cámara publicar.</summary>
+    public void SetCamera(Transform cam) => cameraTransform = cam;
 }

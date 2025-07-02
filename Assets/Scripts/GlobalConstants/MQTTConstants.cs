@@ -10,7 +10,7 @@
     public const string ClientId = "UnityClient"; // Added this constant
 
     // MQTT Topics (centralized for easy updates)
-    public const string DronePositionTopic = "drone/position";
+    //public const string DronePositionTopic = "drone/position"; //CREO QUE YA NO SE USA
     public const string DroneStatusTopic = "drone/status";
     public const string CommandTopic = "drone/commands";
     public const string SelectedDroneTopic = "droneselection/selected";

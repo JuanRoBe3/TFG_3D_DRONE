@@ -1,52 +1,63 @@
 ﻿using UnityEngine;
 using MQTTnet;
 using Newtonsoft.Json;
+using System.Collections;
 
 public class DroneCameraPublisher : MonoBehaviour
 {
-    private MQTTPublisher publisher;
-    private Transform firstPersonCameraTransform;
-    private Transform topDownCameraTransform;
+    [Header("Identificador único del dron / piloto")]
+    [SerializeField] private string droneId = "Pilot_01";   // ⚠️ pon aquí tu ID único
 
-    private void Start()
+    private MQTTPublisher publisher;
+    private Transform cameraTransform;
+
+    private const float publishRate = 0.1f;                 // 10 Hz
+
+    void Start()
     {
+        if (!RoleSelection.IsPilot)
+        {
+            enabled = false;
+            return;
+        }
+
         var client = MQTTClient.Instance.GetClient();
         if (client == null)
         {
-            Debug.LogError("❌ No MQTT client found.");
+            Debug.LogError("❌ MQTT client null");
             return;
         }
 
         publisher = new MQTTPublisher(client);
-        InvokeRepeating(nameof(PublishCameraData), 0f, 0.1f);
+        StartCoroutine(PublishLoop());
     }
 
-    private void PublishCameraData()
+    IEnumerator PublishLoop()
     {
-        if (firstPersonCameraTransform == null || topDownCameraTransform == null)
+        var wait = new WaitForSeconds(publishRate);
+        while (true)
         {
-            Debug.LogWarning("⚠️ Cámaras no asignadas todavía.");
-            return;
+            PublishCameraData();
+            yield return wait;
         }
+    }
 
-        var msg = new CameraDataMessage
+    void PublishCameraData()
+    {
+        if (cameraTransform == null) return;
+
+        // 🔸 Incluimos el ID en el payload
+        var msg = new DroneCameraTransform
         {
-            firstPersonPos = new SerializableVector3(firstPersonCameraTransform.position),
-            firstPersonRot = new SerializableQuaternion(firstPersonCameraTransform.rotation),
-            topDownPos = new SerializableVector3(topDownCameraTransform.position),
-            topDownRot = new SerializableQuaternion(topDownCameraTransform.rotation)
+            id = droneId,
+            pos = new SerializableVector3(cameraTransform.position),
+            rot = new SerializableQuaternion(cameraTransform.rotation)
         };
 
-
         string json = JsonConvert.SerializeObject(msg);
-        Debug.Log($"📤 Enviando cámaras: {json}");
         publisher.PublishMessage(MQTTConstants.DroneCameraTopic, json);
     }
 
-    public void SetCameras(Transform fpCam, Transform tdCam)
-    {
-        firstPersonCameraTransform = fpCam;
-        topDownCameraTransform = tdCam;
-        Debug.Log("📸 Cámaras asignadas al DroneCameraPublisher.");
-    }
+    /// <summary>El Manager de escena llama a esto para decir qué cámara publicar.</summary>
+    public void SetCamera(Transform cam) => cameraTransform = cam;
 }

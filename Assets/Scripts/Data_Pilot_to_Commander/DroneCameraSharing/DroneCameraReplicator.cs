@@ -3,94 +3,80 @@ using Newtonsoft.Json;
 
 public class DroneCameraReplicator : MonoBehaviour
 {
-    [Header("Referencias a las cámaras del comandante")]
-    public Transform commanderFirstPersonCamera;
-    public Transform commanderTopDownCamera;
+    [Header("Transformaciones asignadas por CommanderDroneReplica")]
+    [SerializeField] private Transform droneRootTransform;        // Posición completa del dron
+    [SerializeField] private Transform visualYawOnlyTransform;    // Rotación solo en eje Y (visual)
+    [SerializeField] private Transform fpvCameraTransform;        // Rotación completa (cámara del piloto)
 
-    // ✅ Almacenamos el último mensaje recibido
-    private CameraDataMessage pendingData = null;
+    private string droneId;
+    private DroneCameraTransform pendingData;
     private bool hasNewData = false;
 
-    private void OnEnable()
+    void OnEnable()
     {
         if (MQTTClient.Instance == null)
         {
-            Debug.LogError("❌ MQTTClient.Instance es null en DroneCameraReplicator.OnEnable");
+            Debug.LogError("❌ MQTTClient.Instance es null");
             return;
         }
 
-        MQTTClient.Instance.RegisterHandler(MQTTConstants.DroneCameraTopic, HandleCameraPayload);
-        Debug.Log("📡 DroneCameraReplicator ACTIVADO");
+        MQTTClient.Instance.RegisterHandler(MQTTConstants.DroneCameraTopic, HandlePayload);
     }
 
-    private void OnDisable()
+    void OnDisable()
     {
         if (MQTTClient.Instance != null)
-        {
             MQTTClient.Instance.UnregisterHandler(MQTTConstants.DroneCameraTopic);
-            Debug.Log("📴 DroneCameraReplicator DESACTIVADO y handler limpiado");
-        }
     }
 
-    // ⚙️ Maneja el mensaje desde el hilo MQTT, pero solo almacena los datos
-    private void HandleCameraPayload(string payload)
+    private void HandlePayload(string payload)
     {
-        if (string.IsNullOrEmpty(payload))
-        {
-            Debug.LogWarning("⚠️ Payload vacío en DroneCameraReplicator.");
-            return;
-        }
+        if (string.IsNullOrEmpty(payload)) return;
 
         try
         {
-            Debug.Log("📨 Payload recibido para deserializar:\n" + payload);
-            pendingData = JsonConvert.DeserializeObject<CameraDataMessage>(payload);
+            var data = JsonConvert.DeserializeObject<DroneCameraTransform>(payload);
+            if (data == null) return;
+
+            if (data.id != droneId) return; // Ignorar si no es para este dron
+
+            pendingData = data;
             hasNewData = true;
         }
         catch (System.Exception ex)
         {
-            Debug.LogError("❌ Error al deserializar con Newtonsoft: " + ex.Message);
+            Debug.LogError("❌ Error al deserializar: " + ex.Message);
         }
     }
 
-    // ✅ Aplicamos transformaciones en el hilo principal
-    private void Update()
+    void Update()
     {
-        if (!hasNewData || pendingData == null) return;
+        if (!hasNewData) return;
 
-        if (commanderFirstPersonCamera == null || commanderTopDownCamera == null)
+        Vector3 position = pendingData.pos.ToUnityVector3();
+        Quaternion fullRotation = pendingData.rot.ToUnityQuaternion();
+
+        // 1. Posición general
+        if (droneRootTransform != null)
+            droneRootTransform.position = position;
+
+        // 2. Rotación solo yaw para la esfera visual
+        if (visualYawOnlyTransform != null)
         {
-            Debug.LogError("❌ Cámaras del comandante no asignadas.");
-            hasNewData = false;
-            return;
+            float yaw = fullRotation.eulerAngles.y;
+            visualYawOnlyTransform.rotation = Quaternion.Euler(0, yaw, 0);
         }
 
-        // Aplicar transformaciones
-        commanderFirstPersonCamera.position = pendingData.firstPersonPos.ToUnityVector3();
-        commanderFirstPersonCamera.rotation = pendingData.firstPersonRot.ToUnityQuaternion();
-        commanderTopDownCamera.position = pendingData.topDownPos.ToUnityVector3();
-        commanderTopDownCamera.rotation = pendingData.topDownRot.ToUnityQuaternion();
-
-        // Activar cámaras si estaban desactivadas
-        Camera fpCam = commanderFirstPersonCamera.GetComponent<Camera>();
-        Camera tdCam = commanderTopDownCamera.GetComponent<Camera>();
-
-        if (fpCam != null && !fpCam.enabled)
-        {
-            fpCam.enabled = true;
-            Debug.Log("🎥 Cámara FP activada");
-        }
-
-        if (tdCam != null && !tdCam.enabled)
-        {
-            tdCam.enabled = true;
-            Debug.Log("🎥 Cámara TD activada");
-        }
-
-        Debug.Log("📥 Info de cámara aplicada con éxito");
-        Debug.Log("📍 FP Pos: " + pendingData.firstPersonPos.ToUnityVector3() + " | Rot: " + pendingData.firstPersonRot.ToUnityQuaternion().eulerAngles);
-        Debug.Log("📍 TD Pos: " + pendingData.topDownPos.ToUnityVector3() + " | Rot: " + pendingData.topDownRot.ToUnityQuaternion().eulerAngles);
+        // 3. Rotación completa para la cámara
+        if (fpvCameraTransform != null)
+            fpvCameraTransform.rotation = fullRotation;
 
         hasNewData = false;
     }
+
+    // Métodos públicos para configuración
+    public void SetDroneId(string id) => droneId = id;
+    public void SetRoot(Transform t) => droneRootTransform = t;
+    public void SetVisual(Transform t) => visualYawOnlyTransform = t;
+    public void SetFPVCamera(Transform t) => fpvCameraTransform = t;
 }

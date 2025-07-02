@@ -5,6 +5,7 @@
 [Bb]uild/
 [Bb]uilds/
 [Ll]ogs/
+UserSettings/
 MemoryCaptures/
 *.stacktrace
 
@@ -24,8 +25,19 @@ Thumbs.db
 *.bak
 *.swp
 *.tmp
+*.local
+*.log
+*.cache
 
-# Archivos de compilación
+# Unity Asset Store
+*.unitypackage
+
+# Meta/XR/Oculus (si no los gestionas tú directamente)
+Packages/com.meta.xr.sdk.core/
+Assets/Oculus/
+Meta.XR.*
+
+# Builds y ejecutables
 *.exe
 *.apk
 *.dll
@@ -36,14 +48,8 @@ Thumbs.db
 *.tar
 *.rar
 
-# Unity Asset Store
-*.unitypackage
+# Archivos ocultos de entorno o config
+.env
 
-# Archivos de configuración personales
-*.local
-*.log
-*.cache
-*.tgz
-
-# XR/Meta si no los controlas tú
-Packages/com.meta.xr.sdk.core/Plugins/
+# Archivos específicos añadidos tras limpieza
+UpgradeLog.htm

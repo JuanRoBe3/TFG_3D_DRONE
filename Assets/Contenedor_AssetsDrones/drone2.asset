@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07606113d05f4424a848c32b239fbc04, type: 3}
+  m_Name: drone2
+  m_EditorClassIdentifier: 
+  droneName: drone2phantomX
+  assetBundleName: drone2bundle
+  icon: {fileID: 21300000, guid: aeef8adecc8a01c4a836d3e0989f0bf2, type: 3}
+  maxBattery: 100
+  maxRange: 200
+  storageCapacityMB: 200
+  estimatedFlightDurationMinutes: 8
+  prefab: {fileID: 7825998059561257339, guid: 6c47fbe301bef3b40a59176bea69e1c2, type: 3}

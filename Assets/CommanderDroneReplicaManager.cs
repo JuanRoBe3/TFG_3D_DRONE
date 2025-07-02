@@ -78,6 +78,7 @@ public class CommanderDroneReplicaManager : MonoBehaviour
 
         // RenderTexture y RawImage
         var rt = RTFactory.New();
+        Debug.Log($"🧪 RenderTexture creada: {rt?.width}x{rt?.height} para dron {data.id}");
         replica.GetCamera().targetTexture = rt;
         DroneViewPanelManager.Register(data.id, rt);   //  ← REGISTRO OBLIGATORIO
 

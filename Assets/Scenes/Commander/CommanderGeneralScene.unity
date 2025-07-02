@@ -362,7 +362,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 8400000, guid: 666e40407d461ec43becd45a75e2725f, type: 2}
+  m_Texture: {fileID: 0}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -7797,7 +7797,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 8400000, guid: 42aa2144d6feb5f4b81e3e5e5479b39f, type: 2}
+  m_Texture: {fileID: 0}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -11216,6 +11216,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2027902658}
   m_CullTransparentMesh: 1
+--- !u!1 &2044613509
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2044613511}
+  - component: {fileID: 2044613510}
+  m_Layer: 0
+  m_Name: TopDownCameraRTConfigurator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2044613510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2044613509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ebe27bd10ec10e04186bb67cd9c72965, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topDownCamera: {fileID: 72734037}
+  minimapRawImage: {fileID: 54937065}
+  bigmapRawImage: {fileID: 1520588123}
+--- !u!4 &2044613511
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2044613509}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 118.0736, y: 245.01198, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2048879307
 GameObject:
   m_ObjectHideFlags: 0
@@ -12063,7 +12110,6 @@ SceneRoots:
   - {fileID: 1909338526}
   - {fileID: 715714920}
   - {fileID: 84076180}
-  - {fileID: 72734038}
   - {fileID: 1526994359}
   - {fileID: 1877900260}
   - {fileID: 7802640}
@@ -12074,3 +12120,5 @@ SceneRoots:
   - {fileID: 1357099777}
   - {fileID: 675249013}
   - {fileID: 2087832002}
+  - {fileID: 2044613511}
+  - {fileID: 72734038}

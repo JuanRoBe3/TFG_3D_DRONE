@@ -12,9 +12,9 @@ public class DroneViewPanelManager : MonoBehaviour
 {
     public enum DisplayTarget
     {
-        MainMini,    // minimap_mainUI_droneView
-        MainBigger,  // bigmap_droneView
-        MinimapTop   // minimap_topDownCameraUI_droneView
+        MainMini,
+        MainBigger,
+        MinimapTop
     }
 
     [Header("Paneles y RawImages")]
@@ -29,6 +29,9 @@ public class DroneViewPanelManager : MonoBehaviour
 
     private static Dictionary<string, RenderTexture> lookup = new();
     private static DroneViewPanelManager instance;
+
+    private static string lastDroneId = null;
+    private static DisplayTarget? currentDisplay = null;
 
     void Awake()
     {
@@ -49,6 +52,8 @@ public class DroneViewPanelManager : MonoBehaviour
             return;
         }
 
+        lastDroneId = droneId;
+        currentDisplay = target;
         instance.HideAll();
 
         switch (target)
@@ -65,10 +70,57 @@ public class DroneViewPanelManager : MonoBehaviour
         }
     }
 
+    public static void ShowLastSelected(DisplayTarget target)
+    {
+        if (string.IsNullOrEmpty(lastDroneId))
+        {
+            Debug.LogWarning("⚠️ No hay dron seleccionado previamente");
+            return;
+        }
+
+        ShowDrone(lastDroneId, target);
+    }
+
+    public static void ShowAllViews(string droneId)
+    {
+        if (!lookup.TryGetValue(droneId, out var rt))
+        {
+            Debug.LogWarning($"❌ No se encontró RenderTexture para '{droneId}'");
+            return;
+        }
+
+        lastDroneId = droneId;
+        currentDisplay = null;
+
+        instance.Show(instance.miniGroup, instance.miniImage, rt);
+        instance.Show(instance.bigGroup, instance.bigImage, rt);
+        instance.Show(instance.minimapGroup, instance.minimapImage, rt);
+    }
+
+    public static void CloseCurrent()
+    {
+        if (currentDisplay == null) return;
+
+        switch (currentDisplay)
+        {
+            case DisplayTarget.MainMini:
+                instance.Hide(instance.miniGroup);
+                break;
+            case DisplayTarget.MainBigger:
+                instance.Hide(instance.bigGroup);
+                break;
+            case DisplayTarget.MinimapTop:
+                instance.Hide(instance.minimapGroup);
+                break;
+        }
+
+        currentDisplay = null;
+    }
+
     private void Show(CanvasGroup group, RawImage image, RenderTexture rt)
     {
         image.texture = rt;
-        group.alpha = 1;
+        group.alpha = 1f;
         group.interactable = true;
         group.blocksRaycasts = true;
     }
@@ -82,7 +134,7 @@ public class DroneViewPanelManager : MonoBehaviour
 
     private void Hide(CanvasGroup group)
     {
-        group.alpha = 0;
+        group.alpha = 0f;
         group.interactable = false;
         group.blocksRaycasts = false;
     }

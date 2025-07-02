@@ -6,27 +6,18 @@ public class ClickableDrone : MonoBehaviour
 
     public void SetId(string id) => droneId = id;
 
-    /*
-    void OnMouseDown()   // para escritorio
-    {
-        if (string.IsNullOrEmpty(droneId))
-        {
-            Debug.LogWarning("⚠️ DroneId vacío en ClickableDrone");
-            return;
-        }
-        DroneViewPanelManager.ShowDrone(droneId);
-    } 
-    */
-    public string GetDroneId() => droneId;          // para log/debug
+    public string GetDroneId() => droneId;
 
-    public void TriggerSelection()                 // llamado desde el selector
+    public void TriggerSelection()
     {
         if (string.IsNullOrEmpty(droneId))
         {
             Debug.LogWarning("ClickableDrone sin droneId asignado");
             return;
         }
-        Debug.Log($"🟢 TriggerSelection llamado para '{droneId}'");
-    }
 
+        Debug.Log($"🟢 TriggerSelection llamado para '{droneId}'");
+
+        DroneViewPanelManager.ShowAllViews(droneId);
+    }
 }

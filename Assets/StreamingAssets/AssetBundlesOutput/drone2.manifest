@@ -1,0 +1,30 @@
+ManifestFileVersion: 0
+UnityVersion: 6000.0.28f1
+CRC: 2693645793
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: cb448c2fda48f14ac2edb87cd8515a93
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 70b08c8fd84760c264d7fdd1e03170b2
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 9240096e20b216a405725523a36752c3
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 07606113d05f4424a848c32b239fbc04, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Contenedor_AssetsDrones/drone2.asset
+Dependencies:
+- C:/UnityProjects/TFG_3D_DRONE/Assets/StreamingAssets/AssetBundlesOutput/drone2bundle

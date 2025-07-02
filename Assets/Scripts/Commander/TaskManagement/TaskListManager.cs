@@ -21,12 +21,15 @@ public class TaskListManager : MonoBehaviour
     private void OnEnable()
     {
         MQTTClient.Instance.RegisterHandler(MQTTConstants.PendingTasksRequestTopic, OnPendingTasksRequestReceived);
+        MQTTClient.Instance.RegisterHandler(MQTTConstants.SelectedTaskTopic, OnTaskSelectedReceived); // 👈
     }
 
     private void OnDisable()
     {
         MQTTClient.Instance.UnregisterHandler(MQTTConstants.PendingTasksRequestTopic);
+        MQTTClient.Instance.UnregisterHandler(MQTTConstants.SelectedTaskTopic); // 👈
     }
+
 
     private void OnPendingTasksRequestReceived(string _)
     {
@@ -194,4 +197,32 @@ public class TaskListManager : MonoBehaviour
             Debug.Log("ℹ️ Tarea seleccionada sin dron asignado o sin estado ejecutando.");
         }
     }
+
+    private void OnTaskSelectedReceived(string json)
+    {
+        TaskSelectionMessage msg = JsonUtility.FromJson<TaskSelectionMessage>(json);
+        if (msg == null) { Debug.LogWarning("❌ JSON de selección malformado"); return; }
+
+        // 1️⃣ Buscar la TaskData en el listado local
+        foreach (Transform child in contentParent)
+        {
+            TaskItemUI ui = child.GetComponent<TaskItemUI>();
+            if (ui != null && ui.TaskData != null && ui.TaskData.id == msg.taskId)
+            {
+                // 2️⃣ Actualizar estado y refrescar UI
+                ui.TaskData.status = msg.newStatus;
+                ui.Setup(ui.TaskData, this);
+
+                // 3️⃣ Auto-selección para que se abra la cámara
+                SelectTask(ui);
+
+                Debug.Log($"✅ Tarea {ui.TaskData.title} → estado '{msg.newStatus}'");
+                break;
+            }
+        }
+
+        // 4️⃣ Re-publicar snapshot si quieres sincronizar con otros comandantes
+        PublishPendingTasks();
+    }
+
 }

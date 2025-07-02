@@ -23,4 +23,7 @@
     // Commander add layers to map Topics
     public const string SearchingZone = "zone/area";
 
+    public const string SelectedTaskTopic = "task/selected";   // → mensaje piloto → comandante
+    public const string TaskStatusChangedTopic = "task/status"; // (opcional) notificar cualquier cambio de estado  
+
 }

@@ -1,16 +1,16 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.0.28f1
-CRC: 1930614664
+CRC: 282249265
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 4cb18175e28e5d5064e037decddd573a
+    Hash: ca8fd7b9fd32b62544204e6d2457b5a6
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 41c54c7b050e6999d6cae8df927c1882
+    Hash: 18f975faa6c49bc3be272e2bd08414cd
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: 768ae01574b2c64080432730d359da8d
+    Hash: 99d321dbaea16e3593f6c47d9738e0bd
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -20,8 +20,6 @@ ClassTypes:
 - Class: 20
   Script: {instanceID: 0}
 - Class: 21
-  Script: {instanceID: 0}
-- Class: 28
   Script: {instanceID: 0}
 - Class: 43
   Script: {instanceID: 0}
@@ -36,25 +34,26 @@ ClassTypes:
 - Class: 114
   Script: {fileID: 11500000, guid: 115a507339b3aa54fad841aa7c93e365, type: 3}
 - Class: 114
+  Script: {fileID: 11500000, guid: 5178bc8574ce2bf4388e787a2e2af326, type: 3}
+- Class: 114
   Script: {fileID: 11500000, guid: a3fc544df65133243bd87807fa479ff1, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 3679f6cc1f2ac34419b95945444e94b0, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: df9f338034892c44ebb62d97894772f1, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 5c3a84e1657c7f94aadc723733dfd08a, type: 3}
 - Class: 114
-  Script: {fileID: 11500000, guid: 07606113d05f4424a848c32b239fbc04, type: 3}
+  Script: {fileID: 11500000, guid: 7e933e81d3c20c74ea6fdc708a67e3a5, type: 3}
 - Class: 115
   Script: {instanceID: 0}
 - Class: 137
-  Script: {instanceID: 0}
-- Class: 213
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers:
 - AssemblyName: Unity.RenderPipelines.Universal.Runtime
   ClassName: UnityEngine.Rendering.Universal.TemporalAA/Settings
 Assets:
 - Assets/Prefabs/DronePrefabs/Drone2.prefab
-- Assets/Prueba/drone2.asset
 Dependencies: []

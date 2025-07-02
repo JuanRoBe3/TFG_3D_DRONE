@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class PendingTaskSummaryUI : MonoBehaviour
+public class PendingTaskSummaryUI : MonoBehaviour, IPointerClickHandler
 {
     [Header("Referencias UI")]
     public TextMeshProUGUI taskNameText;
@@ -12,12 +13,12 @@ public class PendingTaskSummaryUI : MonoBehaviour
     public Image statusColorImage;
     public Image droneIconImage;
 
-    /// <summary>
-    /// Rellena el UI con los datos de una tarea recibida por MQTT
-    /// </summary>
-    /// <param name="summary">Resumen de la tarea</param>
+    private TaskSummary summary;
+
     public void Setup(TaskSummary summary)
     {
+        this.summary = summary;
+
         Debug.Log($"🛠 Configurando tarea: {summary.title}");
 
         if (summary == null)
@@ -34,7 +35,6 @@ public class PendingTaskSummaryUI : MonoBehaviour
         if (statusColorImage != null)
             statusColorImage.color = TaskStatusColor.GetColorForStatus(summary.status);
 
-        // Buscar el icono del dron por su nombre
         var droneData = DroneSelectionManager.Instance.availableDrones
             .Find(d => d.droneName == summary.drone);
 
@@ -45,6 +45,15 @@ public class PendingTaskSummaryUI : MonoBehaviour
         else
         {
             Debug.LogWarning($"⚠️ No se encontró el icono del dron '{summary.drone}'");
+        }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (summary != null)
+        {
+            Debug.Log($"🖱️ Tarea seleccionada: {summary.title}");
+            PendingTasksDisplayManager.SelectTaskExternally(summary);
         }
     }
 }

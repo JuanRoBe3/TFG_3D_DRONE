@@ -26,7 +26,7 @@ public class ClickableDrone : MonoBehaviour
             Debug.LogWarning("ClickableDrone sin droneId asignado");
             return;
         }
-        DroneViewPanelManager.ShowDrone(droneId);
+        Debug.Log($"🟢 TriggerSelection llamado para '{droneId}'");
     }
 
 }

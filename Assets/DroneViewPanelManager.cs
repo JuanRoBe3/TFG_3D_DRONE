@@ -1,12 +1,31 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
+/// <summary>
+/// Gestiona los 3 paneles donde se muestra la vista del dron:
+/// - Mini en UI principal
+/// - Versión ampliada
+/// - Minimap de vista top-down
+/// </summary>
 public class DroneViewPanelManager : MonoBehaviour
 {
-    [Header("UI Elements")]
-    [SerializeField] private RawImage droneRawImage;
-    [SerializeField] private CanvasGroup panelGroup;
+    public enum DisplayTarget
+    {
+        MainMini,    // minimap_mainUI_droneView
+        MainBigger,  // bigmap_droneView
+        MinimapTop   // minimap_topDownCameraUI_droneView
+    }
+
+    [Header("Paneles y RawImages")]
+    [SerializeField] private CanvasGroup miniGroup;
+    [SerializeField] private RawImage miniImage;
+
+    [SerializeField] private CanvasGroup bigGroup;
+    [SerializeField] private RawImage bigImage;
+
+    [SerializeField] private CanvasGroup minimapGroup;
+    [SerializeField] private RawImage minimapImage;
 
     private static Dictionary<string, RenderTexture> lookup = new();
     private static DroneViewPanelManager instance;
@@ -14,7 +33,7 @@ public class DroneViewPanelManager : MonoBehaviour
     void Awake()
     {
         instance = this;
-        Hide();  // Ocultar el panel al empezar
+        HideAll();
     }
 
     public static void Register(string droneId, RenderTexture rt)
@@ -22,29 +41,49 @@ public class DroneViewPanelManager : MonoBehaviour
         lookup[droneId] = rt;
     }
 
-    public static void ShowDrone(string droneId)
+    public static void ShowDrone(string droneId, DisplayTarget target)
     {
         if (!lookup.TryGetValue(droneId, out var rt))
         {
-            Debug.LogWarning($"❌ No se encontró RenderTexture para {droneId}");
+            Debug.LogWarning($"❌ No se encontró RenderTexture para '{droneId}'");
             return;
         }
 
-        instance.droneRawImage.texture = rt;
-        instance.Show();
+        instance.HideAll();
+
+        switch (target)
+        {
+            case DisplayTarget.MainMini:
+                instance.Show(instance.miniGroup, instance.miniImage, rt);
+                break;
+            case DisplayTarget.MainBigger:
+                instance.Show(instance.bigGroup, instance.bigImage, rt);
+                break;
+            case DisplayTarget.MinimapTop:
+                instance.Show(instance.minimapGroup, instance.minimapImage, rt);
+                break;
+        }
     }
 
-    public void Hide()
+    private void Show(CanvasGroup group, RawImage image, RenderTexture rt)
     {
-        panelGroup.alpha = 0;
-        panelGroup.interactable = false;
-        panelGroup.blocksRaycasts = false;
+        image.texture = rt;
+        group.alpha = 1;
+        group.interactable = true;
+        group.blocksRaycasts = true;
     }
 
-    private void Show()
+    private void HideAll()
     {
-        panelGroup.alpha = 1;
-        panelGroup.interactable = true;
-        panelGroup.blocksRaycasts = true;
+        Hide(miniGroup);
+        Hide(bigGroup);
+        Hide(minimapGroup);
+    }
+
+    private void Hide(CanvasGroup group)
+    {
+        group.alpha = 0;
+        group.interactable = false;
+        group.blocksRaycasts = false;
     }
 }

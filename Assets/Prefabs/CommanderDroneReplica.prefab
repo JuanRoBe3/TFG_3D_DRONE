@@ -187,7 +187,7 @@ MonoBehaviour:
   fpvCam: {fileID: 5658788852035194219}
   replicator: {fileID: 272766171766393576}
   clicker: {fileID: 665606773792797486}
-  visualTransform: {fileID: 0}
+  visualTransform: {fileID: 6166349770009533404}
 --- !u!1 &6736544041386365771
 GameObject:
   m_ObjectHideFlags: 0

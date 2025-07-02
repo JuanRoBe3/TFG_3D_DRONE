@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using System.Collections.Concurrent;   // 👈
+using System.Collections.Concurrent;
 using Newtonsoft.Json;
 
 public class CommanderDroneReplicaManager : MonoBehaviour
@@ -9,11 +9,11 @@ public class CommanderDroneReplicaManager : MonoBehaviour
     [Header("Prefab del dron réplica")]
     [SerializeField] private GameObject commanderDroneReplicaPrefab;
 
-    [Header("UI donde se verá la cámara")]
+    [Header("UI donde se verá la cámara (opcional)")]
     [SerializeField] private RawImage droneViewRawImage;
 
     private readonly Dictionary<string, CommanderDroneReplica> replicas = new();
-    private readonly ConcurrentQueue<string> payloadQueue = new();      // 👈 cola segura
+    private readonly ConcurrentQueue<string> payloadQueue = new();
 
     void OnEnable()
     {
@@ -23,7 +23,6 @@ public class CommanderDroneReplicaManager : MonoBehaviour
             return;
         }
 
-        // Suscripción sigue igual
         MQTTClient.Instance.RegisterHandler(MQTTConstants.DroneCameraTopic,
                                             payload => payloadQueue.Enqueue(payload));
         Debug.Log("📡 Suscrito a DroneCameraTopic");
@@ -35,7 +34,6 @@ public class CommanderDroneReplicaManager : MonoBehaviour
             MQTTClient.Instance.UnregisterHandler(MQTTConstants.DroneCameraTopic);
     }
 
-    // Procesamos la cola EN EL HILO PRINCIPAL
     void Update()
     {
         while (payloadQueue.TryDequeue(out var payload))
@@ -44,11 +42,9 @@ public class CommanderDroneReplicaManager : MonoBehaviour
         }
     }
 
-    // ---------- Lógica original, sin cambios salvo que ahora se llama desde Update ----------
     private void ProcessPayload(string payload)
     {
-        // Logs de depuración
-        Debug.Log($"📨 [Comandante] Payload recibido (main thread): {payload}");
+        Debug.Log($"📨 [Comandante] Payload recibido: {payload}");
 
         DroneCameraTransform data;
         try
@@ -64,25 +60,29 @@ public class CommanderDroneReplicaManager : MonoBehaviour
         if (data == null || string.IsNullOrEmpty(data.id)) return;
         if (replicas.ContainsKey(data.id)) return;
 
-        // Instanciar réplica en hilo principal
-        var obj = Instantiate(commanderDroneReplicaPrefab, Vector3.zero, Quaternion.identity);
-        var replica = obj.GetComponent<CommanderDroneReplica>();
-
-        if (replica == null)
+        // 🧠 Buscar el DroneData desde el registro central
+        DroneData droneData = DroneRegistry.Get(data.id);
+        if (droneData == null)
         {
-            Debug.LogError("❌ Prefab sin CommanderDroneReplica.");
+            Debug.LogError($"❌ No se encontró DroneData para el ID: {data.id}");
             return;
         }
 
-        replica.Init(data.id);
+        // 🧱 Instanciar réplica
+        GameObject obj = Instantiate(commanderDroneReplicaPrefab, Vector3.zero, Quaternion.identity);
+        var replica = obj.GetComponent<CommanderDroneReplica>();
+        if (replica == null)
+        {
+            Debug.LogError("❌ Prefab no tiene CommanderDroneReplica.");
+            return;
+        }
 
-        // RenderTexture y RawImage
-        var rt = RTFactory.New();
-        Debug.Log($"🧪 RenderTexture creada: {rt?.width}x{rt?.height} para dron {data.id}");
-        replica.GetCamera().targetTexture = rt;
-        DroneViewPanelManager.Register(data.id, rt);   //  ← REGISTRO OBLIGATORIO
+        // 🎯 Inicializar con datos
+        replica.Init(droneData);
 
+        // 🧩 Guardar instancia
         replicas[data.id] = replica;
-        Debug.Log($"✅ Réplica FINALIZADA para dron «{data.id}»");
+
+        Debug.Log($"✅ Réplica del dron «{data.id}» creada correctamente");
     }
 }

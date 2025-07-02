@@ -3,10 +3,10 @@ using Newtonsoft.Json;
 
 public class DroneCameraReplicator : MonoBehaviour
 {
-    [Header("Referencias de movimiento y rotación")]
-    public Transform rootToMove;       // Mueve todo el dron (posición)
-    public Transform visualToRotate;   // Solo gira en Y (esfera)
-    public Transform fpvCam;           // Aplica rotación completa
+    [Header("Transformaciones asignadas por CommanderDroneReplica")]
+    [SerializeField] private Transform droneRootTransform;        // Posición completa del dron
+    [SerializeField] private Transform visualYawOnlyTransform;    // Rotación solo en eje Y (visual)
+    [SerializeField] private Transform fpvCameraTransform;        // Rotación completa (cámara del piloto)
 
     private string droneId;
     private DroneCameraTransform pendingData;
@@ -36,7 +36,9 @@ public class DroneCameraReplicator : MonoBehaviour
         try
         {
             var data = JsonConvert.DeserializeObject<DroneCameraTransform>(payload);
-            if (data == null || data.id != droneId) return;
+            if (data == null) return;
+
+            if (data.id != droneId) return; // Ignorar si no es para este dron
 
             pendingData = data;
             hasNewData = true;
@@ -49,32 +51,32 @@ public class DroneCameraReplicator : MonoBehaviour
 
     void Update()
     {
-        if (!hasNewData || pendingData == null) return;
+        if (!hasNewData) return;
 
-        Vector3 pos = pendingData.pos.ToUnityVector3();
-        Quaternion fullRot = pendingData.rot.ToUnityQuaternion();
+        Vector3 position = pendingData.pos.ToUnityVector3();
+        Quaternion fullRotation = pendingData.rot.ToUnityQuaternion();
 
-        // 1. Posición real
-        if (rootToMove != null)
-            rootToMove.position = pos;
+        // 1. Posición general
+        if (droneRootTransform != null)
+            droneRootTransform.position = position;
 
-        // 2. Solo yaw (rotación en Y) para el visual
-        if (visualToRotate != null)
+        // 2. Rotación solo yaw para la esfera visual
+        if (visualYawOnlyTransform != null)
         {
-            Vector3 euler = fullRot.eulerAngles;
-            visualToRotate.rotation = Quaternion.Euler(0, euler.y, 0);
+            float yaw = fullRotation.eulerAngles.y;
+            visualYawOnlyTransform.rotation = Quaternion.Euler(0, yaw, 0);
         }
 
         // 3. Rotación completa para la cámara
-        if (fpvCam != null)
-            fpvCam.rotation = fullRot;
+        if (fpvCameraTransform != null)
+            fpvCameraTransform.rotation = fullRotation;
 
         hasNewData = false;
     }
 
-    // Llamados desde CommanderDroneReplica
+    // Métodos públicos para configuración
     public void SetDroneId(string id) => droneId = id;
-    public void SetRoot(Transform t) => rootToMove = t;
-    public void SetVisual(Transform t) => visualToRotate = t;
-    public void SetFPVCamera(Transform t) => fpvCam = t;
+    public void SetRoot(Transform t) => droneRootTransform = t;
+    public void SetVisual(Transform t) => visualYawOnlyTransform = t;
+    public void SetFPVCamera(Transform t) => fpvCameraTransform = t;
 }

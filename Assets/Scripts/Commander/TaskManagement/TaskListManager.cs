@@ -16,22 +16,22 @@ public class TaskListManager : MonoBehaviour
     [Range(0.1f, 1f)]
     public float taskHeightPercentage = 0.3f;
 
+    private static TaskItemUI selectedTaskUI = null;
+
     private void OnEnable()
     {
-        // 📥 El comandante escucha peticiones de tareas del piloto
         MQTTClient.Instance.RegisterHandler(MQTTConstants.PendingTasksRequestTopic, OnPendingTasksRequestReceived);
     }
 
     private void OnDisable()
     {
-        // 🔇 Se desuscribe al salir de escena
         MQTTClient.Instance.UnregisterHandler(MQTTConstants.PendingTasksRequestTopic);
     }
 
     private void OnPendingTasksRequestReceived(string _)
     {
         Debug.Log("📨 Petición de tareas recibida por MQTT desde el piloto.");
-        PublishPendingTasks(); // Reutilizamos tu método
+        PublishPendingTasks();
     }
 
     private void Start()
@@ -40,25 +40,35 @@ public class TaskListManager : MonoBehaviour
 
         foreach (TaskItemUI taskUI in contentParent.GetComponentsInChildren<TaskItemUI>())
         {
+            if (taskUI == null) continue;
+
             var data = taskUI.TaskData;
 
-            if (data != null)
-            {
-                if (string.IsNullOrEmpty(data.id))
-                {
-                    data.id = Guid.NewGuid().ToString();
-                    Debug.Log($"🆕 ID generado para tarea: {data.title} => {data.id}");
-                }
-
-                taskUI.Setup(data, this);
-            }
-            else
+            // Si no hay datos, se ignora
+            if (data == null)
             {
                 Debug.LogWarning("⚠️ Tarea sin datos. No será incluida.");
+                continue;
             }
+
+            // Si es tarea demo con datos válidos, se respeta
+            if (taskUI.isDemoTask && data.assignedDrone != null)
+            {
+                Debug.Log($"🛡️ Tarea demo con datos preasignados en el Inspector: {data.title} ({data.status})");
+            }
+
+            if (string.IsNullOrEmpty(data.id))
+            {
+                data.id = Guid.NewGuid().ToString();
+                Debug.Log($"🆕 ID generado para tarea: {data.title} => {data.id}");
+            }
+
+            Debug.Log($"🧪 Hash de instancia TASKLISTMANAGER: {data.title} => {data.GetHashCode()}");
+
+            taskUI.Setup(data, this);
         }
 
-        PublishPendingTasks(); // Primera publicación al cargar
+        PublishPendingTasks();
     }
 
     private void OnRectTransformDimensionsChange()
@@ -159,5 +169,29 @@ public class TaskListManager : MonoBehaviour
             .PublishMessage(MQTTConstants.PendingTasksTopic, json);
 
         Debug.Log($"📤 Publicadas {pending.Count} tareas pendientes");
+    }
+
+    public static void SelectTask(TaskItemUI taskUI)
+    {
+        if (selectedTaskUI != null && selectedTaskUI != taskUI)
+            selectedTaskUI.SetHighlight(false);
+
+        selectedTaskUI = taskUI;
+        selectedTaskUI.SetHighlight(true);
+
+        var taskData = selectedTaskUI.TaskData;
+        Debug.Log($"📋 Status de la tarea: {taskData?.status}");
+        Debug.Log($"📌 HashCode de TaskData: {taskData.GetHashCode()}");
+
+        if (taskData != null && taskData.assignedDrone != null && taskData.status.Trim().ToLowerInvariant().StartsWith("executing"))
+        {
+            string droneId = taskData.assignedDrone.droneName;
+            Debug.Log($"🔁 Mostrando vista para dron asignado: {droneId}");
+            DroneViewPanelManager.ShowAllViews(droneId);
+        }
+        else
+        {
+            Debug.Log("ℹ️ Tarea seleccionada sin dron asignado o sin estado ejecutando.");
+        }
     }
 }

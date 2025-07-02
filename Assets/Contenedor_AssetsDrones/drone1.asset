@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07606113d05f4424a848c32b239fbc04, type: 3}
   m_Name: drone1
   m_EditorClassIdentifier: 
-  droneName: drone1 rescueR3000
+  droneName: drone1rescueR3000
   assetBundleName: drone1bundle
   icon: {fileID: 21300000, guid: 3a633bb178810dc48a08d9d725e7e83f, type: 3}
   maxBattery: 100

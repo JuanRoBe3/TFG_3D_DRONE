@@ -64,6 +64,9 @@ public class CommanderDroneManager : MonoBehaviour
                 Debug.Log($"✅ Dron añadido: {drone.droneName} (bundle: {Path.GetFileName(bundlePath)})");
             }
         }
+        // ✅ Validar que no hay nombres duplicados ni nulls
+        DroneDataValidator.Validate(availableDrones);
+        DroneRegistry.RegisterAll(availableDrones);
     }
 
 

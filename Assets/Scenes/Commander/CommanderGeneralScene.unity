@@ -720,9 +720,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a89155539376f94ea77391db4ce0cf3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rootToMove: {fileID: 0}
-  visualToRotate: {fileID: 0}
-  fpvCam: {fileID: 0}
+  droneRootTransform: {fileID: 0}
+  visualYawOnlyTransform: {fileID: 0}
+  fpvCameraTransform: {fileID: 0}
 --- !u!4 &90098134
 Transform:
   m_ObjectHideFlags: 0
@@ -991,21 +991,45 @@ PrefabInstance:
       propertyPath: m_fontSize
       value: 9.25
       objectReference: {fileID: 0}
+    - target: {fileID: 2781580888393385381, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3066851095918283899, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_text
-      value: Example description Task1 Drone2
+      value: Example description Task DroneB
       objectReference: {fileID: 0}
     - target: {fileID: 3066851095918283899, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_fontSize
       value: 8.75
       objectReference: {fileID: 0}
+    - target: {fileID: 3749760232683678904, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
+      propertyPath: m_Color.b
+      value: 0.9882353
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749760232683678904, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
+      propertyPath: m_Color.g
+      value: 0.827451
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749760232683678904, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
+      propertyPath: m_Color.r
+      value: 0.49019608
+      objectReference: {fileID: 0}
     - target: {fileID: 3784146337421916783, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_text
-      value: Example Drone 2
+      value: Example Drone B
       objectReference: {fileID: 0}
     - target: {fileID: 3784146337421916783, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_fontSize
       value: 8.95
+      objectReference: {fileID: 0}
+    - target: {fileID: 3866017262353317491, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5045267841999136589, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5844571371443942210, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_Pivot.x
@@ -1089,39 +1113,47 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5963759388913701315, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_text
-      value: To be executed
+      value: Executing...
       objectReference: {fileID: 0}
     - target: {fileID: 5963759388913701315, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_fontSize
-      value: 6.35
+      value: 7.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 7801818760046543447, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7801818760046543447, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
+      propertyPath: isDemoTask
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7801818760046543447, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: taskData.id
-      value: id2
+      value: DummyDroneB
       objectReference: {fileID: 0}
     - target: {fileID: 7801818760046543447, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: taskData.title
-      value: task2
+      value: Tittle DummyDroneB
       objectReference: {fileID: 0}
     - target: {fileID: 7801818760046543447, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: taskData.status
-      value: To be executed
+      value: Executing...
       objectReference: {fileID: 0}
     - target: {fileID: 7801818760046543447, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: taskData.description
-      value: description 22
+      value: Description DummyDroneB
       objectReference: {fileID: 0}
     - target: {fileID: 7801818760046543447, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: taskData.assignedDrone
       value: 
-      objectReference: {fileID: 11400000, guid: 05500f89f8453d04fa33fd86d136afc5, type: 2}
+      objectReference: {fileID: 11400000, guid: c4072841c39c8d04b94ac8cf662f588d, type: 2}
     - target: {fileID: 8021621019237836962, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_text
-      value: Drone2
+      value: DroneB
       objectReference: {fileID: 0}
     - target: {fileID: 8021621019237836962, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_fontSize
-      value: 9.8
+      value: 8.65
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2295,7 +2327,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 19.3
+  m_fontSize: 17.8
   m_fontSizeBase: 14
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -2649,7 +2681,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 14.45
+  m_fontSize: 12.5
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -3220,7 +3252,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 19.35
+  m_fontSize: 15.85
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -5654,7 +5686,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 665606773792797486, guid: 0499f58622200304cbf69411ef8039cc, type: 3}
       propertyPath: droneId
-      value: DummyDrone2
+      value: DummyDroneB
       objectReference: {fileID: 0}
     - target: {fileID: 1420442117879734759, guid: 0499f58622200304cbf69411ef8039cc, type: 3}
       propertyPath: m_Enabled
@@ -6471,7 +6503,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 9.5
+  m_fontSize: 8.75
   m_fontSizeBase: 14
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -6923,7 +6955,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 16.45
+  m_fontSize: 14.25
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -6997,7 +7029,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 695022e48ed86dd4e8b4d2289d17d6c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  droneId: DummyDrone2
+  droneData: {fileID: 11400000, guid: c4072841c39c8d04b94ac8cf662f588d, type: 2}
   fpvCam: {fileID: 1620944700}
 --- !u!114 &1127567757
 MonoBehaviour:
@@ -7006,7 +7038,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1127567747}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0b60365394863454f91c422edf53f790, type: 3}
   m_Name: 
@@ -7691,7 +7723,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1333633249}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0b60365394863454f91c422edf53f790, type: 3}
   m_Name: 
@@ -7708,7 +7740,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 695022e48ed86dd4e8b4d2289d17d6c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  droneId: DummyDrone1
+  droneData: {fileID: 11400000, guid: c7d71a8ff47cf3648af16c006f73a374, type: 2}
   fpvCam: {fileID: 38500383}
 --- !u!1 &1343653920
 GameObject:
@@ -8342,7 +8374,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 19.3
+  m_fontSize: 17.8
   m_fontSizeBase: 14
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -9306,7 +9338,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 13.9
+  m_fontSize: 10.9
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -10028,7 +10060,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 665606773792797486, guid: 0499f58622200304cbf69411ef8039cc, type: 3}
       propertyPath: droneId
-      value: DummyDrone1
+      value: DummyDroneA
       objectReference: {fileID: 0}
     - target: {fileID: 1420442117879734759, guid: 0499f58622200304cbf69411ef8039cc, type: 3}
       propertyPath: m_Enabled
@@ -10418,28 +10450,52 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1810844740081549083, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_fontSize
-      value: 9.25
+      value: 7.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 2781580888393385381, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3066851095918283899, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_text
-      value: Example description Task1 Drone1
+      value: Example description Task DroneA
       objectReference: {fileID: 0}
     - target: {fileID: 3066851095918283899, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_fontSize
-      value: 8.75
+      value: 6.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749760232683678904, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
+      propertyPath: m_Color.b
+      value: 0.9882353
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749760232683678904, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
+      propertyPath: m_Color.g
+      value: 0.827451
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749760232683678904, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
+      propertyPath: m_Color.r
+      value: 0.49019608
       objectReference: {fileID: 0}
     - target: {fileID: 3784146337421916783, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_text
-      value: Example Drone 1
+      value: Example Drone A
       objectReference: {fileID: 0}
     - target: {fileID: 3784146337421916783, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_fontSize
-      value: 8.95
+      value: 6.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 3866017262353317491, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4523632542209642919, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 14d5d9871f1429244881be7fdb92d271, type: 3}
+    - target: {fileID: 5045267841999136589, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5844571371443942210, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -10522,39 +10578,51 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5963759388913701315, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_text
-      value: To be executed
+      value: Executing...
       objectReference: {fileID: 0}
     - target: {fileID: 5963759388913701315, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_fontSize
-      value: 6.35
+      value: 4.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 7801818760046543447, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7801818760046543447, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
+      propertyPath: isDemoTask
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7801818760046543447, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: taskData.id
-      value: id1
+      value: DummyDroneA
       objectReference: {fileID: 0}
     - target: {fileID: 7801818760046543447, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: taskData.title
-      value: task1
+      value: Title DummyDroneA
       objectReference: {fileID: 0}
     - target: {fileID: 7801818760046543447, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: taskData.status
-      value: To be executed
+      value: Executing...
       objectReference: {fileID: 0}
     - target: {fileID: 7801818760046543447, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: taskData.description
-      value: description 1
+      value: Description DummyDroneA
       objectReference: {fileID: 0}
     - target: {fileID: 7801818760046543447, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: taskData.assignedDrone
       value: 
-      objectReference: {fileID: 11400000, guid: 05500f89f8453d04fa33fd86d136afc5, type: 2}
+      objectReference: {fileID: 11400000, guid: c7d71a8ff47cf3648af16c006f73a374, type: 2}
     - target: {fileID: 8021621019237836962, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_text
-      value: Drone1
+      value: DroneA
       objectReference: {fileID: 0}
     - target: {fileID: 8021621019237836962, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
       propertyPath: m_fontSize
-      value: 9.8
+      value: 5.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 8590272150831202884, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11316,7 +11384,7 @@ GameObject:
   - component: {fileID: 2021173625}
   - component: {fileID: 2021173623}
   m_Layer: 5
-  m_Name: Panel_NO_DroneView
+  m_Name: Panel_Warning_NoDroneView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11361,7 +11429,7 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2021173621}
-  m_CullTransparentMesh: 1
+  m_CullTransparentMesh: 0
 --- !u!114 &2021173625
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11655,7 +11723,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20.85
+  m_fontSize: 16.3
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -12000,7 +12068,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 14.4
+  m_fontSize: 11.75
   m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 1

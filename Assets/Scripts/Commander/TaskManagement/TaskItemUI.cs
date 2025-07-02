@@ -5,20 +5,36 @@ using System;
 
 public class TaskItemUI : MonoBehaviour
 {
+    [SerializeField] public bool isDemoTask = false;
+    [SerializeField] public GameObject selectionHighlight;
     public TextMeshProUGUI taskNameText;
     public TextMeshProUGUI taskDescription;
     public TextMeshProUGUI statusText;
-    public Image taskStatusColor; // Asignado desde el Inspector
+    public Image taskStatusColor;
     public TextMeshProUGUI droneNameText;
     public Image droneIcon;
     public Button editButton;
 
-    [SerializeField] private TaskData taskData; // 🔐 Ahora privado pero serializable
+    [SerializeField] private TaskData taskData;
     public TaskData TaskData => taskData;
 
     private TaskListManager taskListManager;
 
-    // ✅ Método principal para instancias nuevas
+    private void Awake()
+    {
+        // 🧠 Auto-generar TaskData si es demo y no se asignó manualmente
+        if (isDemoTask && taskData == null)
+        {
+            taskData = new TaskData(
+                title: taskNameText != null ? taskNameText.text : "Demo",
+                description: taskDescription != null ? taskDescription.text : "Tarea demo sin descripción",
+                status: statusText != null ? statusText.text : "To be executed"
+            );
+
+            Debug.Log($"📦 TaskData auto-generado en escena: {taskData}");
+        }
+    }
+
     public void Setup(TaskData data, TaskListManager managerRef)
     {
         if (string.IsNullOrEmpty(data.id))
@@ -32,15 +48,6 @@ public class TaskItemUI : MonoBehaviour
         UpdateVisual();
         BindEditButton();
     }
-
-    // ✅ Método auxiliar para tareas ya existentes //ya no esnecesario porque se actualiza todo
-    /*
-    public void BindManager(TaskListManager managerRef)
-    {
-        taskListManager = managerRef;
-        BindEditButton(); // Solo el botón
-    } 
-     */
 
     private void BindEditButton()
     {
@@ -86,5 +93,16 @@ public class TaskItemUI : MonoBehaviour
             droneNameText.text = "Sin dron";
             droneIcon.enabled = false;
         }
+    }
+
+    public void OnClickOnDroneIcon()
+    {
+        TaskListManager.SelectTask(this);
+    }
+
+    public void SetHighlight(bool active)
+    {
+        if (selectionHighlight != null)
+            selectionHighlight.SetActive(active);
     }
 }

@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 07606113d05f4424a848c32b239fbc04, type: 3}
-  m_Name: drone2
+  m_Name: droneDummyB
   m_EditorClassIdentifier: 
-  droneName: drone2 phantomX
-  assetBundleName: drone2bundle
+  droneName: DummyDroneB
+  assetBundleName: DummyDroneBbundle
   icon: {fileID: 21300000, guid: aeef8adecc8a01c4a836d3e0989f0bf2, type: 3}
   maxBattery: 100
   maxRange: 200
   storageCapacityMB: 200
   estimatedFlightDurationMinutes: 8
-  prefab: {fileID: 7825998059561257339, guid: 6c47fbe301bef3b40a59176bea69e1c2, type: 3}
+  prefab: {fileID: 890787958731609147, guid: 2272e50db78d0db459aca6e7027d0557, type: 3}

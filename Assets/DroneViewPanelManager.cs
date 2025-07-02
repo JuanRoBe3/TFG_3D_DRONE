@@ -21,6 +21,9 @@ public class DroneViewPanelManager : MonoBehaviour
     [SerializeField] private CanvasGroup miniGroup;
     [SerializeField] private RawImage miniImage;
 
+    [Header("Mensaje sin dron seleccionado")]
+    [SerializeField] private CanvasGroup noDroneSelectedPanel;
+
     [SerializeField] private CanvasGroup bigGroup;
     [SerializeField] private RawImage bigImage;
 
@@ -36,6 +39,7 @@ public class DroneViewPanelManager : MonoBehaviour
     void Awake()
     {
         instance = this;
+        ShowNoDroneSelectedMessage();
         HideAll();
     }
 
@@ -55,6 +59,7 @@ public class DroneViewPanelManager : MonoBehaviour
         lastDroneId = droneId;
         currentDisplay = target;
         instance.HideAll();
+        instance.HideNoDroneSelectedMessage();  // ✅ OCULTA el mensaje
 
         switch (target)
         {
@@ -91,6 +96,7 @@ public class DroneViewPanelManager : MonoBehaviour
 
         lastDroneId = droneId;
         currentDisplay = null;
+        instance.HideNoDroneSelectedMessage();  // ✅ OCULTA el mensaje
 
         instance.Show(instance.miniGroup, instance.miniImage, rt);
         instance.Show(instance.bigGroup, instance.bigImage, rt);
@@ -137,5 +143,19 @@ public class DroneViewPanelManager : MonoBehaviour
         group.alpha = 0f;
         group.interactable = false;
         group.blocksRaycasts = false;
+    }
+
+    private void ShowNoDroneSelectedMessage()
+    {
+        noDroneSelectedPanel.alpha = 1;
+        noDroneSelectedPanel.interactable = false;
+        noDroneSelectedPanel.blocksRaycasts = false;
+    }
+
+    private void HideNoDroneSelectedMessage()
+    {
+        noDroneSelectedPanel.alpha = 0;
+        noDroneSelectedPanel.interactable = false;
+        noDroneSelectedPanel.blocksRaycasts = false;
     }
 }

@@ -14,16 +14,22 @@ public class PendingTaskSummaryUI : MonoBehaviour, IPointerClickHandler
     public Image droneIconImage;
 
     private TaskSummary summary;
+    private SelectableTaskItem selectableItem;
+
+    void Awake()
+    {
+        selectableItem = GetComponent<SelectableTaskItem>();
+        if (selectableItem == null)
+            Debug.LogError("❌ No se encontró SelectableTaskItem.");
+    }
 
     public void Setup(TaskSummary summary)
     {
         this.summary = summary;
 
-        Debug.Log($"🛠 Configurando tarea: {summary.title}");
-
         if (summary == null)
         {
-            Debug.LogWarning("⚠️ No se puede configurar la UI: TaskSummary es null.");
+            Debug.LogWarning("⚠️ TaskSummary es null en Setup.");
             return;
         }
 
@@ -39,21 +45,18 @@ public class PendingTaskSummaryUI : MonoBehaviour, IPointerClickHandler
             .Find(d => d.droneName == summary.drone);
 
         if (droneData != null && droneIconImage != null)
-        {
             droneIconImage.sprite = droneData.icon;
-        }
-        else
-        {
-            Debug.LogWarning($"⚠️ No se encontró el icono del dron '{summary.drone}'");
-        }
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (summary != null)
+        if (summary == null)
         {
-            Debug.Log($"🖱️ Tarea seleccionada: {summary.title}");
-            PendingTasksDisplayManager.SelectTaskExternally(summary);
+            Debug.LogWarning("⚠️ Click sin tarea.");
+            return;
         }
+
+        Debug.Log($"🖱️ Tarea seleccionada: {summary.title}");
+        PendingTasksDisplayManager.SelectTaskExternally(summary, selectableItem);
     }
 }

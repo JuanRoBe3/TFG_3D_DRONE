@@ -1,62 +1,52 @@
 ﻿using System;
 using UnityEngine;
 
-//DE MOMENTO NO SIRVE DE UN CAGAO ASÍ QUE TOCARÁ BORRAR
-
-public class MQTTSubscriber
+public class MQTTSubscriber : MonoBehaviour
 {
-    /*
-    private readonly MQTTClient mqttClient;
-
-    public MQTTSubscriber()
+    private void Start()
     {
-        mqttClient = MQTTClient.Instance;
-
-        if (mqttClient == null)
-        {
-            Debug.LogError("❌ MQTTSubscriber: MQTTClient.Instance is null.");
-            return;
-        }
-
-        mqttClient.OnMessageReceived += HandleMessageReceived;
+        MQTTClient.Instance.OnMessageReceived += HandleMessageReceived;
     }
 
     private void HandleMessageReceived(string topic, string payload)
     {
-        Debug.Log($"📨 MQTTSubscriber received - Topic: {topic}, Payload: {payload}");
+        Debug.Log($"📨 MQTTSubscriber recibió: {topic}");
 
-        // Aquí puedes filtrar por topic y ejecutar acciones según el contenido
         switch (topic)
         {
-            case MQTTConstants.DronePositionTopic:
-                HandleDronePosition(payload);
-                break;
-
-            case MQTTConstants.DroneStatusTopic:
-                HandleDroneStatus(payload);
+            case MQTTConstants.SelectedTaskTopic:
+                HandleSelectedTask(payload);
                 break;
 
             default:
-                Debug.Log($"⚠️ Unhandled topic: {topic}");
+                Debug.LogWarning($"⚠️ Tópico sin handler: {topic}");
                 break;
         }
     }
 
-    private void HandleDronePosition(string payload)
+    private void HandleSelectedTask(string payload)
     {
-        // Ejemplo: parsear JSON, actualizar UI, etc.
-        Debug.Log($"📍 New drone position: {payload}");
+        var msg = JsonUtility.FromJson<TaskStatusUpdateMessage>(payload);
+
+        var task = TaskRegistry.GetTaskById(msg.taskId);
+        if (task == null)
+        {
+            Debug.LogWarning($"❌ Tarea no encontrada en TaskRegistry: {msg.taskId}");
+            return;
+        }
+
+        task.status = msg.newStatus;
+        task.assignedDrone = DroneRegistry.GetDroneById(msg.droneId);
+
+        Debug.Log($"✅ Estado actualizado en TaskRegistry: {task.title} → {task.status}");
+
+        // ❌ No tocamos UI ni usamos .Instance
+        // TaskListManager.Instance?.RefreshTaskList();
     }
 
-    private void HandleDroneStatus(string payload)
+    private void OnDestroy()
     {
-        Debug.Log($"📡 Drone status: {payload}");
+        if (MQTTClient.Instance != null)
+            MQTTClient.Instance.OnMessageReceived -= HandleMessageReceived;
     }
-
-    public void Unsubscribe()
-    {
-        if (mqttClient != null)
-            mqttClient.OnMessageReceived -= HandleMessageReceived;
-    } 
-    */
 }

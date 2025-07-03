@@ -2140,6 +2140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62e3be8c3d65c724fad5c93e058b8a0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  droneId: 
 --- !u!4 &526039502
 Transform:
   m_ObjectHideFlags: 0

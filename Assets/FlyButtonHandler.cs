@@ -15,50 +15,45 @@ public class FlyButtonHandler : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
         Instance = this;
     }
 
     public void OnFlyButtonPressed()
     {
-        // Obtener la tarea y el dron seleccionados
+        // 1. Obtener selección
         TaskSummary selectedTask = tasksManager.GetSelectedTask();
         DroneData selectedDrone = DroneSelectionManager.Instance.GetSelectedDrone();
 
-        // Validaciones
         if (selectedTask == null)
         {
             Debug.LogWarning("⚠️ No se ha seleccionado ninguna tarea.");
             return;
         }
-
         if (selectedDrone == null)
         {
             Debug.LogWarning("⚠️ No se ha seleccionado ningún dron.");
             return;
         }
 
-        // Construir mensaje MQTT
+        // 2. Publicar MQTT (task/selected)
         var msg = new TaskSelectionMessage
         {
             taskId = selectedTask.id,
             droneId = selectedDrone.droneName,
             newStatus = "Executing"
         };
-
         string json = JsonUtility.ToJson(msg);
-
-        // Enviar por MQTT
         new MQTTPublisher(MQTTClient.Instance.GetClient())
             .PublishMessage(MQTTConstants.SelectedTaskTopic, json);
 
         Debug.Log($"📤 MQTT publicado desde botón Fly: {json}");
 
-        // Guardar contexto para siguiente escena
-        SelectedTaskContext.Instance?.SetTask(selectedTask);
-        SelectedDroneHolder.SetDrone(selectedDrone);
+        // 3. Guardar datos para la escena de vuelo (PlayerPrefs)
+        PlayerPrefs.SetString("SelectedTaskId", selectedTask.id);
+        PlayerPrefs.SetString("SelectedDroneId", selectedDrone.droneName);
+        PlayerPrefs.Save();
 
-        // Cambiar de escena
+        // 4. Cambiar de escena
         SceneLoader.LoadPilotUI();
     }
 }

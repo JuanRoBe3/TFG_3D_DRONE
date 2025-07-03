@@ -14,13 +14,9 @@ public static class DroneRegistry
             if (drone != null && !string.IsNullOrEmpty(drone.droneName))
             {
                 if (!dronesByName.ContainsKey(drone.droneName))
-                {
                     dronesByName.Add(drone.droneName, drone);
-                }
                 else
-                {
                     Debug.LogWarning($"⚠️ Dron duplicado no registrado: {drone.droneName}");
-                }
             }
         }
 
@@ -34,6 +30,12 @@ public static class DroneRegistry
 
         Debug.LogWarning($"🔍 Dron no encontrado en DroneRegistry: {droneName}");
         return null;
+    }
+
+    public static DroneData GetDroneById(string droneId)
+    {
+        // ✅ El droneId es realmente el droneName
+        return Get(droneId);
     }
 
     public static IEnumerable<DroneData> GetAll()

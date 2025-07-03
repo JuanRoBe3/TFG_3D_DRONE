@@ -1,26 +1,24 @@
 ﻿using UnityEngine;
 
-public class SelectedTaskContext : MonoBehaviour
+public static class SelectedTaskContext
 {
-    public static SelectedTaskContext Instance { get; private set; }
+    /*
+    private static TaskSummary selectedTask;
 
-    public TaskSummary CurrentTask { get; private set; }
-
-    private void Awake()
+    public static void SetTask(TaskSummary task)
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
+        selectedTask = task;
+        UnityEngine.Debug.Log($"📌 Tarea guardada en SelectedTaskContext: {task?.title} ({task?.status})");
     }
 
-    public void SetTask(TaskSummary summary)
+    public static TaskSummary GetTask()
     {
-        CurrentTask = summary;
-        Debug.Log($"📌 Tarea guardada en SelectedTaskContext: {summary.title}");
+        return selectedTask;
     }
+
+    public static void Clear()
+    {
+        selectedTask = null;
+    } 
+    */
 }

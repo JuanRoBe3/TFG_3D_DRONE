@@ -18,7 +18,7 @@ public class PendingTasksDisplayManager : MonoBehaviour
 
     private Action<string> cachedHandler;
 
-    private static PendingTasksDisplayManager Instance;
+    public static PendingTasksDisplayManager Instance { get; private set; }
 
     private void Awake()
     {
@@ -186,15 +186,17 @@ public class PendingTasksDisplayManager : MonoBehaviour
 
     // ⬇️ Lógica para selección manual
 
-    public static void SelectTaskExternally(TaskSummary summary)
+    public static void SelectTaskExternally(TaskSummary summary, SelectableTaskItem visual)
     {
-        Debug.Log("🖱️ SelectTaskExternally llamada.");
-        Instance?.HandleTaskChosen(summary);
+        Debug.Log("🖱️ SelectTaskExternally con imagen visual.");
+        Instance?.HandleTaskChosen(summary, visual);
     }
 
     private TaskSummary selectedTask;
 
-    private void HandleTaskChosen(TaskSummary summary)
+    private SelectableTaskItem selectedVisual;
+
+    private void HandleTaskChosen(TaskSummary summary, SelectableTaskItem visual = null)
     {
         if (summary == null)
         {
@@ -203,8 +205,19 @@ public class PendingTasksDisplayManager : MonoBehaviour
         }
 
         selectedTask = summary;
-        Debug.Log($"✅ Tarea seleccionada localmente: {summary.title}");
+
+        // 🔁 Actualiza visualmente
+        if (selectedVisual != null)
+            selectedVisual.Deselect();
+
+        selectedVisual = visual;
+
+        if (selectedVisual != null)
+            selectedVisual.Select();
+
+        Debug.Log($"✅ Tarea seleccionada visual y lógicamente: {summary.title}");
     }
+
 
     public TaskSummary GetSelectedTask()
     {

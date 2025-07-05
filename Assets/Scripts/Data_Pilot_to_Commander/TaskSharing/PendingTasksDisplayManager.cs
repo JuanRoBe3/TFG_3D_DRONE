@@ -53,7 +53,7 @@ public class PendingTasksDisplayManager : MonoBehaviour
 
         if (MQTTClient.Instance != null)
         {
-            MQTTClient.Instance.UnregisterHandler(pendingTasksTopic);
+            MQTTClient.Instance.UnregisterHandler(pendingTasksTopic, cachedHandler); // ✅ FIX
             MQTTClient.Instance.OnConnected -= HandleMQTTConnected;
         }
 

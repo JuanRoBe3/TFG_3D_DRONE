@@ -33,4 +33,14 @@ public class PilotReadyListener : MonoBehaviour
         }
         Debug.Log($"📤 Reenviadas {SearchZoneRegistry.Instance.GetAll().Count} zonas al piloto");
     }
+
+    void OnDestroy()
+    {
+        //— Limpieza de delegados —
+        if (MQTTClient.Instance != null)
+        {
+            MQTTClient.Instance.UnregisterHandler(MQTTConstants.PilotReadyForSearchingZone, OnPilotReady);
+            MQTTClient.Instance.OnConnected -= Register;
+        }
+    }
 }

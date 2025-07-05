@@ -4,6 +4,10 @@ using TMPro;
 using System.Collections.Generic;
 using System;
 
+/// <summary>
+/// Controla la lista de tareas pendientes del comandante.
+/// Muestra, edita y publica tareas según el estado actual y recibe mensajes por MQTT.
+/// </summary>
 public class TaskListManager : MonoBehaviour
 {
     [Header("Prefabs y referencias")]
@@ -20,16 +24,17 @@ public class TaskListManager : MonoBehaviour
 
     private void OnEnable()
     {
+        // ✅ Registramos los handlers nombrados
         MQTTClient.Instance.RegisterHandler(MQTTConstants.PendingTasksRequestTopic, OnPendingTasksRequestReceived);
-        MQTTClient.Instance.RegisterHandler(MQTTConstants.SelectedTaskTopic, OnTaskSelectedReceived); // 👈
+        MQTTClient.Instance.RegisterHandler(MQTTConstants.SelectedTaskTopic, OnTaskSelectedReceived);
     }
 
     private void OnDisable()
     {
-        MQTTClient.Instance.UnregisterHandler(MQTTConstants.PendingTasksRequestTopic);
-        MQTTClient.Instance.UnregisterHandler(MQTTConstants.SelectedTaskTopic); // 👈
+        // ✅ CORREGIDO: usamos la misma función como segundo argumento para desregistrar correctamente
+        MQTTClient.Instance.UnregisterHandler(MQTTConstants.PendingTasksRequestTopic, OnPendingTasksRequestReceived);
+        MQTTClient.Instance.UnregisterHandler(MQTTConstants.SelectedTaskTopic, OnTaskSelectedReceived);
     }
-
 
     private void OnPendingTasksRequestReceived(string _)
     {
@@ -47,14 +52,12 @@ public class TaskListManager : MonoBehaviour
 
             var data = taskUI.TaskData;
 
-            // Si no hay datos, se ignora
             if (data == null)
             {
                 Debug.LogWarning("⚠️ Tarea sin datos. No será incluida.");
                 continue;
             }
 
-            // Si es tarea demo con datos válidos, se respeta
             if (taskUI.isDemoTask && data.assignedDrone != null)
             {
                 Debug.Log($"🛡️ Tarea demo con datos preasignados en el Inspector: {data.title} ({data.status})");
@@ -201,19 +204,19 @@ public class TaskListManager : MonoBehaviour
     private void OnTaskSelectedReceived(string json)
     {
         TaskSelectionMessage msg = JsonUtility.FromJson<TaskSelectionMessage>(json);
-        if (msg == null) { Debug.LogWarning("❌ JSON de selección malformado"); return; }
+        if (msg == null)
+        {
+            Debug.LogWarning("❌ JSON de selección malformado");
+            return;
+        }
 
-        // 1️⃣ Buscar la TaskData en el listado local
         foreach (Transform child in contentParent)
         {
             TaskItemUI ui = child.GetComponent<TaskItemUI>();
             if (ui != null && ui.TaskData != null && ui.TaskData.id == msg.taskId)
             {
-                // 2️⃣ Actualizar estado y refrescar UI
                 ui.TaskData.status = msg.newStatus;
                 ui.Setup(ui.TaskData, this);
-
-                // 3️⃣ Auto-selección para que se abra la cámara
                 SelectTask(ui);
 
                 Debug.Log($"✅ Tarea {ui.TaskData.title} → estado '{msg.newStatus}'");
@@ -221,8 +224,6 @@ public class TaskListManager : MonoBehaviour
             }
         }
 
-        // 4️⃣ Re-publicar snapshot si quieres sincronizar con otros comandantes
         PublishPendingTasks();
     }
-
 }

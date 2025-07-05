@@ -5,9 +5,13 @@ using System.Collections.Generic;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Options;
+using MQTTnet.Protocol;
 using UnityEngine;
-using MQTTnet.Client.Connecting;
 
+/// <summary>
+/// Cliente MQTT centralizado para Unity. Maneja conexión, reconexión y distribución de mensajes.
+/// Ahora con soporte para múltiples handlers por topic.
+/// </summary>
 public class MQTTClient : MonoBehaviour
 {
     public static MQTTClient Instance { get; private set; }
@@ -19,7 +23,9 @@ public class MQTTClient : MonoBehaviour
     public event Action<string, string> OnMessageReceived;
     public event Action OnConnected;
 
-    private Dictionary<string, Action<string>> topicHandlers = new();
+    // ✅ Nuevo: múltiples handlers por topic
+    private Dictionary<string, List<Action<string>>> topicHandlers = new();
+
     private HashSet<string> subscribedTopics = new();
     private readonly Dictionary<string, List<string>> roleTopicMap = MQTTTopicSubscriptions.RoleTopics;
 
@@ -41,6 +47,7 @@ public class MQTTClient : MonoBehaviour
         mqttClient = factory.CreateMqttClient();
 
         clientId = "Client-" + Guid.NewGuid();
+
         await Reconnect(MQTTConfig.GetBrokerIP());
     }
 
@@ -64,9 +71,11 @@ public class MQTTClient : MonoBehaviour
         try
         {
             var result = await mqttClient.ConnectAsync(mqttOptions);
-            Debug.Log($"🔌 MQTT conectado como {clientId}, result: {result.ResultCode}");
 
-            if (result.ResultCode == MqttClientConnectResultCode.Success)
+            Debug.Log($"🔌 MQTT conectado como {clientId}, result: {result?.ResultCode ?? (object)"(sin ResultCode)"}");
+
+            // ✅ Versión segura: asumimos que si no lanza excepción, se ha conectado
+            if (mqttClient.IsConnected)
             {
                 ResubscribeAllTopics();
                 OnConnected?.Invoke();
@@ -74,27 +83,31 @@ public class MQTTClient : MonoBehaviour
 
             mqttClient.UseApplicationMessageReceivedHandler(e =>
             {
-                string topic = e.ApplicationMessage.Topic;
+                string topic = e.ApplicationMessage.Topic.Trim();
                 string payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
 
-                Debug.Log($"📥 [MQTT RX] Topic recibido: «{topic}» (len: {topic.Length})");
+                Debug.Log($"📥 [MQTT RX] Topic recibido: «{topic}»");
 
-                foreach (var key in topicHandlers.Keys)
+                if (topicHandlers.TryGetValue(topic, out var handlers))
                 {
-                    Debug.Log($"🔍 Comparando con handler registrado: «{key}» (len: {key.Length})");
-                }
+                    Debug.Log($"✅ {handlers.Count} handler(s) registrados para: «{topic}»");
+                    foreach (var handler in handlers)
+                    {
+                        UnityMainThreadDispatcher.Enqueue(() =>
+                        {
+                            try { handler.Invoke(payload); }
+                            catch (Exception ex)
+                            {
+                                Debug.LogError($"❌ Error en handler de topic {topic}: {ex.Message}");
+                            }
+                        });
+                    }
 
-                string normalizedTopic = topic.Trim();
-
-                if (topicHandlers.TryGetValue(normalizedTopic, out var handler))
-                {
-                    Debug.Log($"✅ Handler encontrado para: «{normalizedTopic}»");
-                    handler.Invoke(payload);
                 }
                 else
                 {
-                    Debug.LogWarning($"⚠️ No se encontró handler para topic: «{normalizedTopic}»");
-                    OnMessageReceived?.Invoke(normalizedTopic, payload);
+                    Debug.LogWarning($"⚠️ No hay handler registrado para topic: «{topic}»");
+                    OnMessageReceived?.Invoke(topic, payload);
                 }
 
                 return Task.CompletedTask;
@@ -112,6 +125,7 @@ public class MQTTClient : MonoBehaviour
             Debug.LogError("❌ Error al conectar MQTT: " + ex.Message);
         }
     }
+
 
     public async void OnRoleSelected()
     {
@@ -165,17 +179,41 @@ public class MQTTClient : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Añade un handler adicional para un topic. No sobrescribe los existentes.
+    /// </summary>
     public void RegisterHandler(string topic, Action<string> handler)
     {
         string normalized = topic.Trim();
-        topicHandlers[normalized] = handler;
-        Debug.Log($"📌 [MQTT REGISTER] Registrado handler para: «{normalized}» (len: {normalized.Length})");
+
+        if (!topicHandlers.ContainsKey(normalized))
+            topicHandlers[normalized] = new List<Action<string>>();
+
+        if (!topicHandlers[normalized].Contains(handler))
+        {
+            topicHandlers[normalized].Add(handler);
+            Debug.Log($"📌 [MQTT REGISTER] Añadido handler para topic: «{normalized}»");
+        }
     }
 
-    public void UnregisterHandler(string topic)
+    /// <summary>
+    /// Elimina un handler específico para un topic. Limpia el topic si ya no quedan handlers.
+    /// </summary>
+    public void UnregisterHandler(string topic, Action<string> handler)
     {
-        if (topicHandlers.Remove(topic))
-            Debug.Log($"❌ Handler eliminado: {topic}");
+        string normalized = topic.Trim();
+
+        if (topicHandlers.ContainsKey(normalized))
+        {
+            topicHandlers[normalized].Remove(handler);
+            Debug.Log($"❌ [MQTT UNREGISTER] Handler eliminado de: «{normalized}»");
+
+            if (topicHandlers[normalized].Count == 0)
+            {
+                topicHandlers.Remove(normalized);
+                Debug.Log($"🧹 [MQTT UNREGISTER] Topic sin handlers → eliminado: «{normalized}»");
+            }
+        }
     }
 
     public IMqttClient GetClient() => mqttClient;
@@ -188,4 +226,6 @@ public class MQTTClient : MonoBehaviour
             obj.AddComponent<MQTTClient>();
         }
     }
+
+    public static bool HasInstance => Instance != null;
 }

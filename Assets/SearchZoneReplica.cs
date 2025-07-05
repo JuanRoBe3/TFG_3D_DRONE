@@ -5,14 +5,23 @@ public class SearchZoneReplica : MonoBehaviour
     [Tooltip("Prefab de zona de búsqueda")]
     [SerializeField] private GameObject zonePrefab;
 
+    private System.Action<string> handler;
+
+    void Awake()
+    {
+        handler = OnZoneReceived;
+    }
+
     void OnEnable()
     {
-        MQTTClient.Instance.RegisterHandler(MQTTConstants.SearchingZone, OnZoneReceived);
+        if (MQTTClient.Instance != null)
+            MQTTClient.Instance.RegisterHandler(MQTTConstants.SearchingZone, handler);
     }
 
     void OnDisable()
     {
-        MQTTClient.Instance.UnregisterHandler(MQTTConstants.SearchingZone);
+        if (MQTTClient.Instance != null)
+            MQTTClient.Instance.UnregisterHandler(MQTTConstants.SearchingZone, handler);
     }
 
     void OnZoneReceived(string payload)
@@ -46,5 +55,5 @@ public class SearchZoneReplica : MonoBehaviour
     private struct ZonePayload
     {
         public float x, y, z, sx, sy, sz;
-    } 
+    }
 }

@@ -3252,7 +3252,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20.65
+  m_fontSize: 16.3
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -8977,6 +8977,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1526994359}
   - component: {fileID: 1526994358}
+  - component: {fileID: 1526994362}
+  - component: {fileID: 1526994361}
   - component: {fileID: 1526994360}
   m_Layer: 0
   m_Name: SearchZoneManager
@@ -9003,7 +9005,7 @@ MonoBehaviour:
     m_Bits: 64
   zonePrefab: {fileID: 2208488596263204170, guid: 7e2b2be4985f6154e95c2b4e618fb1c7, type: 3}
   previewLine: {fileID: 1575628269}
-  publisher: {fileID: 1526994360}
+  publisher: {fileID: 1526994362}
   minimapImage: {fileID: 1520588123}
   extraHeight: 10
   minSizeMeters: 10
@@ -9015,7 +9017,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1526994357}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 476.14, y: 331.33, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -9032,9 +9034,34 @@ MonoBehaviour:
   m_GameObject: {fileID: 1526994357}
   m_Enabled: 1
   m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8974ec5b0a2fcd649b08566865f41ce9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1526994361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1526994357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b8c600c12864946b44c954ce6714a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1526994362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1526994357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 47b1aa01d1478794f8964e9a0114b34d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  zonePrefab: {fileID: 2208488596263204170, guid: 7e2b2be4985f6154e95c2b4e618fb1c7, type: 3}
 --- !u!1 &1575628268
 GameObject:
   m_ObjectHideFlags: 0
@@ -9338,7 +9365,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 13.3
+  m_fontSize: 11.15
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -10243,50 +10270,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5844571371443942210, guid: b414e526d889e264aa6f2ccb820cc294, type: 3}
   m_PrefabInstance: {fileID: 177660833}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1736494002
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1736494004}
-  - component: {fileID: 1736494005}
-  m_Layer: 0
-  m_Name: PublisherManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1736494004
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1736494002}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0021362305, y: 5.378746, z: 0.0005493164}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1736494005
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1736494002}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 47b1aa01d1478794f8964e9a0114b34d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1739387588
 GameObject:
   m_ObjectHideFlags: 0
@@ -11723,7 +11706,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 17.4
+  m_fontSize: 14.95
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -12068,7 +12051,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 15.35
+  m_fontSize: 12.1
   m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -12483,15 +12466,14 @@ SceneRoots:
   - {fileID: 1909338526}
   - {fileID: 715714920}
   - {fileID: 84076180}
-  - {fileID: 1526994359}
   - {fileID: 1877900260}
   - {fileID: 7802640}
   - {fileID: 1182903637}
   - {fileID: 2098638903}
   - {fileID: 1739387590}
-  - {fileID: 1736494004}
   - {fileID: 1357099777}
   - {fileID: 675249013}
   - {fileID: 2087832002}
   - {fileID: 2044613511}
   - {fileID: 72734038}
+  - {fileID: 1526994359}

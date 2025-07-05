@@ -77,12 +77,27 @@ public class MQTTClient : MonoBehaviour
                 string topic = e.ApplicationMessage.Topic;
                 string payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
 
-                Debug.Log($"📩 MQTT RX: {topic} → {payload}");
+                Debug.Log($"📥 [MQTT RX] Topic recibido: «{topic}» (len: {topic.Length})");
 
-                if (topicHandlers.TryGetValue(topic, out var handler))
+                foreach (var key in topicHandlers.Keys)
+                {
+                    Debug.Log($"🔍 Comparando con handler registrado: «{key}» (len: {key.Length})");
+                }
+
+                string normalizedTopic = topic.Trim();
+
+                if (topicHandlers.TryGetValue(normalizedTopic, out var handler))
+                {
+                    Debug.Log($"✅ Handler encontrado para: «{normalizedTopic}»");
                     handler.Invoke(payload);
+                }
                 else
-                    OnMessageReceived?.Invoke(topic, payload);
+                {
+                    Debug.LogWarning($"⚠️ No se encontró handler para topic: «{normalizedTopic}»");
+                    OnMessageReceived?.Invoke(normalizedTopic, payload);
+                }
+
+                return Task.CompletedTask;
             });
 
             mqttClient.UseDisconnectedHandler(async _ =>
@@ -152,8 +167,9 @@ public class MQTTClient : MonoBehaviour
 
     public void RegisterHandler(string topic, Action<string> handler)
     {
-        topicHandlers[topic] = handler;
-        Debug.Log($"✅ Handler registrado para: {topic}");
+        string normalized = topic.Trim();
+        topicHandlers[normalized] = handler;
+        Debug.Log($"📌 [MQTT REGISTER] Registrado handler para: «{normalized}» (len: {normalized.Length})");
     }
 
     public void UnregisterHandler(string topic)

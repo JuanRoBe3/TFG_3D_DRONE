@@ -95,6 +95,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3828797714380116271}
+  - component: {fileID: 2860796255171767807}
   m_Layer: 9
   m_Name: SearchingZone_Prefab
   m_TagString: Untagged
@@ -118,6 +119,18 @@ Transform:
   - {fileID: 4433467281943623140}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2860796255171767807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2208488596263204170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e76f70578da5a4c4e8b6efea47eff513, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4978682876258016119
 GameObject:
   m_ObjectHideFlags: 0

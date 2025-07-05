@@ -46,5 +46,5 @@ public class SearchZoneReplica : MonoBehaviour
     private struct ZonePayload
     {
         public float x, y, z, sx, sy, sz;
-    }
+    } 
 }

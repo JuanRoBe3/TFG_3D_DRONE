@@ -14,6 +14,7 @@ public class SearchZoneSelector : MonoBehaviour
     [Header("Parámetros")]
     [Tooltip("Metros extra por encima de la cima más alta del terreno")]
     [SerializeField] private float extraHeight = 10f;
+
     [Tooltip("Tamaño mínimo lateral (m)")]
     [SerializeField] private float minSizeMeters = 10f;
 
@@ -82,7 +83,14 @@ public class SearchZoneSelector : MonoBehaviour
         Debug.Log($"📏 Tamaño zona calculado: {size}");
         Debug.Log($"📦 Escala aplicada: {zone.transform.localScale}");
 
-        publisher.PublishZone(center, size);
+        if (publisher == null)
+        {
+            Debug.LogError("❌ No se puede publicar zona: publisher no asignado en el Inspector.");
+        }
+        else
+        {
+            publisher.PublishZone(center, size);
+        }
 
         previewLine.enabled = false;
         hasPending = false;

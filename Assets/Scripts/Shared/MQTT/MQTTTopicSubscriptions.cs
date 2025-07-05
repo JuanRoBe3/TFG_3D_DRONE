@@ -11,7 +11,9 @@ public static class MQTTTopicSubscriptions
                 MQTTConstants.DroneCameraTopic,
                 MQTTConstants.SelectedDroneTopic,
                 MQTTConstants.PendingTasksRequestTopic,
-                MQTTConstants.SelectedTaskTopic
+                MQTTConstants.SelectedTaskTopic,
+                MQTTConstants.PilotReadyForSearchingZone
+
             }
         },
         { "Pilot", new List<string>

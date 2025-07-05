@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class SearchZoneReplicaManager : MonoBehaviour
 {
-    [Header("Prefab visual (debe tener malla + opcionalmente SearchingZoneReplica)")]
+    [Header("Prefab visual (debe tener malla)")]
     [SerializeField] private GameObject zonePrefab;
 
     private readonly Dictionary<string, GameObject> zones = new();

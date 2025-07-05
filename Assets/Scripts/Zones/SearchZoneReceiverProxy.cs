@@ -4,9 +4,10 @@ public class SearchZoneReceiverProxy : MonoBehaviour
 {
     public static SearchZoneReceiverProxy Instance { get; private set; }
 
+    private bool hasProcessedPendingZones = false;
+
     void Awake()
     {
-        //— Singleton persistente —
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -15,19 +16,43 @@ public class SearchZoneReceiverProxy : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        //— Suscripción MQTT —
         MQTTClient.EnsureExists();
-        MQTTClient.Instance.RegisterHandler(MQTTConstants.SearchingZone, OnZoneReceived);
-        Debug.Log("✅ [ReceiverProxy] Suscrito a MQTTConstants.SearchingZone");
+
+        RegisterHandler();
+        MQTTClient.Instance.OnReconnectCompleted += RegisterHandler;
+
+        Debug.Log("✅ [ReceiverProxy] Listo con reconexión automática");
+    }
+
+    void Update()
+    {
+        if (!hasProcessedPendingZones && PendingZoneBuffer.Instance != null && PendingZoneBuffer.Instance.HasPendingZones())
+        {
+            var manager = FindObjectOfType<SearchZoneReplicaManager>();
+            if (manager != null)
+            {
+                Debug.Log("🕒 Manager encontrado en Update → procesando zonas pendientes");
+                PendingZoneBuffer.Instance.ConsumeAll(OnZoneReceived);
+                hasProcessedPendingZones = true;
+            }
+        }
     }
 
     void OnDestroy()
     {
-        //— Evita fugas de delegados —
         if (MQTTClient.Instance != null)
+        {
             MQTTClient.Instance.UnregisterHandler(MQTTConstants.SearchingZone, OnZoneReceived);
+            MQTTClient.Instance.OnReconnectCompleted -= RegisterHandler;
+        }
 
         if (Instance == this) Instance = null;
+    }
+
+    private void RegisterHandler()
+    {
+        MQTTClient.Instance.RegisterHandler(MQTTConstants.SearchingZone, OnZoneReceived);
+        Debug.Log("🔁 [ReceiverProxy] Handler registrado (o re-registrado) tras conexión/reconexión");
     }
 
     private void OnZoneReceived(string json)

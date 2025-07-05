@@ -22,10 +22,9 @@ public class MQTTClient : MonoBehaviour
 
     public event Action<string, string> OnMessageReceived;
     public event Action OnConnected;
+    public event Action OnReconnectCompleted; // ✅ NUEVO
 
-    // ✅ Nuevo: múltiples handlers por topic
     private Dictionary<string, List<Action<string>>> topicHandlers = new();
-
     private HashSet<string> subscribedTopics = new();
     private readonly Dictionary<string, List<string>> roleTopicMap = MQTTTopicSubscriptions.RoleTopics;
 
@@ -64,6 +63,9 @@ public class MQTTClient : MonoBehaviour
             .Build();
 
         await ConnectToMQTT();
+
+        // ✅ Notifica a quienes deban re-registrar handlers
+        OnReconnectCompleted?.Invoke();
     }
 
     private async Task ConnectToMQTT()
@@ -71,10 +73,8 @@ public class MQTTClient : MonoBehaviour
         try
         {
             var result = await mqttClient.ConnectAsync(mqttOptions);
-
             Debug.Log($"🔌 MQTT conectado como {clientId}, result: {result?.ResultCode ?? (object)"(sin ResultCode)"}");
 
-            // ✅ Versión segura: asumimos que si no lanza excepción, se ha conectado
             if (mqttClient.IsConnected)
             {
                 ResubscribeAllTopics();
@@ -85,7 +85,6 @@ public class MQTTClient : MonoBehaviour
             {
                 string topic = e.ApplicationMessage.Topic.Trim();
                 string payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
-
                 Debug.Log($"📥 [MQTT RX] Topic recibido: «{topic}»");
 
                 if (topicHandlers.TryGetValue(topic, out var handlers))
@@ -102,7 +101,6 @@ public class MQTTClient : MonoBehaviour
                             }
                         });
                     }
-
                 }
                 else
                 {
@@ -126,7 +124,6 @@ public class MQTTClient : MonoBehaviour
         }
     }
 
-
     public async void OnRoleSelected()
     {
         if (!mqttClient.IsConnected)
@@ -136,7 +133,6 @@ public class MQTTClient : MonoBehaviour
         }
 
         string role = PlayerPrefs.GetString("Role");
-
         if (roleTopicMap.TryGetValue(role, out var topics))
         {
             foreach (string topic in topics)
@@ -179,9 +175,6 @@ public class MQTTClient : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Añade un handler adicional para un topic. No sobrescribe los existentes.
-    /// </summary>
     public void RegisterHandler(string topic, Action<string> handler)
     {
         string normalized = topic.Trim();
@@ -196,9 +189,6 @@ public class MQTTClient : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Elimina un handler específico para un topic. Limpia el topic si ya no quedan handlers.
-    /// </summary>
     public void UnregisterHandler(string topic, Action<string> handler)
     {
         string normalized = topic.Trim();

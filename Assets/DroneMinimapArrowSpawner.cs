@@ -22,10 +22,26 @@ public class DroneMinimapArrowSpawner : MonoBehaviour
             return;
         }
 
+        // 1️⃣ Instanciar flecha
         GameObject arrow = Instantiate(arrowPrefab);
         arrow.name = $"DirectionArrow_{drone.name}";
 
+        // 2️⃣ Hacer que siga al dron
         var follow = arrow.GetComponent<FollowAndRotate>();
-        follow.SetTarget(drone.transform);
+        follow?.SetTarget(drone.transform);
+
+        // 3️⃣ Conectar visual warning del arrow al detector del dron
+        var warningManager = arrow.GetComponent<DroneVisualWarningManager>();
+        var detector = drone.GetComponent<ObstacleDetector>();
+
+        if (warningManager != null && detector != null)
+        {
+            detector.visualWarningManager = warningManager;
+            Debug.Log("🔗 VisualWarningManager asignado dinámicamente al ObstacleDetector.");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ No se pudo asignar el VisualWarningManager al detector.");
+        }
     }
 }

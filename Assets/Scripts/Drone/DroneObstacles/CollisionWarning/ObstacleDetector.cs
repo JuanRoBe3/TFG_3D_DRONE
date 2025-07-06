@@ -12,6 +12,9 @@ public class ObstacleDetector : MonoBehaviour
     [Header("UI Reference")]
     public CollisionDistanceUI distanceUI;
 
+    [Header("Visual Warning Manager")]
+    public DroneVisualWarningManager visualWarningManager;
+
     private static readonly Vector3[] directions = new Vector3[]
     {
         Vector3.forward, Vector3.back, Vector3.left, Vector3.right,
@@ -101,6 +104,9 @@ public class ObstacleDetector : MonoBehaviour
         float backIntensity = backFanDistance.HasValue ? 1f - Mathf.Clamp01(backFanDistance.Value / detectionRadius) : 0f;
 
         hudWarningManager?.UpdateWarnings(leftIntensity, rightIntensity, backIntensity);
+        // 🔴 Elementos visuales sobre el dron
+        visualWarningManager?.UpdateVisuals(leftIntensity, rightIntensity, backIntensity);
+
     }
 
     private Vector3[] GetBackFanDirections(int rayCount, float spreadAngle)

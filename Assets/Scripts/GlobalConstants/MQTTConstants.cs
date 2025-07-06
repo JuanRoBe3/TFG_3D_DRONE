@@ -26,4 +26,7 @@
     public const string SelectedTaskTopic = "task/selected";   // → mensaje piloto → comandante
     public const string TaskStatusChangedTopic = "task/status"; // (opcional) notificar cualquier cambio de estado  
     public const string PilotReadyForSearchingZone = "pilot/ready/searchzones";
+
+    public const string PendingSearchZonesTopic = "searchzones/pending";
+    public const string PendingSearchZonesRequestTopic = "searchzones/request";
 }

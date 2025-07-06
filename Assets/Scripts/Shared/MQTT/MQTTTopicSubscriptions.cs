@@ -12,7 +12,8 @@ public static class MQTTTopicSubscriptions
                 MQTTConstants.SelectedDroneTopic,
                 MQTTConstants.PendingTasksRequestTopic,
                 MQTTConstants.SelectedTaskTopic,
-                MQTTConstants.PilotReadyForSearchingZone
+                MQTTConstants.PendingSearchZonesRequestTopic
+                //MQTTConstants.PilotReadyForSearchingZone (ya lo hace aqui) PilotReadyListener.cs
 
             }
         },
@@ -20,7 +21,8 @@ public static class MQTTTopicSubscriptions
             {
                 MQTTConstants.CommandTopic,
                 MQTTConstants.PendingTasksTopic,
-                MQTTConstants.SearchingZone
+                MQTTConstants.PendingSearchZonesTopic
+                //MQTTConstants.SearchingZone
             }
         }
     };

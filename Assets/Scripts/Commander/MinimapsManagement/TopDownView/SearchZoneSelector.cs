@@ -8,7 +8,6 @@ public class SearchZoneSelector : MonoBehaviour
     [SerializeField] private LayerMask terrainMask;
     [SerializeField] private GameObject zonePrefab;
     [SerializeField] private LineRenderer previewLine;
-    [SerializeField] private SearchZonePublisher publisher;
     [SerializeField] private RawImage minimapImage;
 
     [Header("Parámetros")]
@@ -64,11 +63,9 @@ public class SearchZoneSelector : MonoBehaviour
             return;
         }
 
-        // ✅ Altura dinámica basada en la cima del terreno
         float terrainMaxY = WorldBounds.Value.max.y;
         float height = terrainMaxY + extraHeight;
 
-        // ✅ Centro en el eje Y (la mitad del cubo por encima del terreno)
         Vector3 center = new Vector3(
             (min.x + max.x) / 2f,
             height / 2f,
@@ -83,19 +80,24 @@ public class SearchZoneSelector : MonoBehaviour
         Debug.Log($"📏 Tamaño zona calculado: {size}");
         Debug.Log($"📦 Escala aplicada: {zone.transform.localScale}");
 
-        if (publisher == null)
+        var publisher = FindObjectOfType<SearchZonePublisherManager>();
+        if (publisher != null)
         {
-            Debug.LogError("❌ No se puede publicar zona: publisher no asignado en el Inspector.");
+            publisher.RegisterZone(new SearchZoneData
+            {
+                center = new SerializableVector3(center),
+                size = new SerializableVector3(size)
+            });
         }
         else
         {
-            publisher.PublishZone(center, size);
+            Debug.LogError("❌ No se encontró SearchZonePublisherManager en escena.");
         }
 
         previewLine.enabled = false;
         hasPending = false;
 
-        Debug.Log("✅ Zona creada y publicada.");
+        Debug.Log("✅ Zona creada y publicada por MQTT.");
     }
 
     private bool RayToTerrain(out Vector3 hit)
@@ -127,7 +129,7 @@ public class SearchZoneSelector : MonoBehaviour
 
     private void DrawPreview(Vector3 a, Vector3 b)
     {
-        float y = WorldBounds.Value.max.y + extraHeight + 1f; // +1 solo para que flote y se vea bien
+        float y = WorldBounds.Value.max.y + extraHeight + 1f;
 
         Vector3 p0 = new Vector3(a.x, y, a.z);
         Vector3 p1 = new Vector3(a.x, y, b.z);

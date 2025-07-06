@@ -3,39 +3,68 @@ using System.Collections;
 
 public class PilotReadyBroadcaster : MonoBehaviour
 {
-    private bool zonesReceived = false;
-    private Coroutine loop;   // ← guardamos la corrutina para poder pararla
+    private Coroutine loop;
 
     void Start()
     {
+        Debug.Log("🚀 [PilotReadyBroadcaster] Start → Inicializando");
+
         MQTTClient.EnsureExists();
-        loop = StartCoroutine(WaitAndPublishReady());
+
+        var client = MQTTClient.Instance.GetClient();
+        if (client != null && client.IsConnected)
+        {
+            Debug.Log("✅ [PilotReadyBroadcaster] Cliente ya conectado → empieza bucle de envío");
+            loop = StartCoroutine(SendReadyLoop());
+        }
+        else
+        {
+            Debug.Log("⏳ [PilotReadyBroadcaster] Cliente aún no conectado → espera evento OnConnected");
+            MQTTClient.Instance.OnConnected += () =>
+            {
+                Debug.Log("🔌 [PilotReadyBroadcaster] Cliente conectado → empieza bucle de envío");
+                loop = StartCoroutine(SendReadyLoop());
+            };
+        }
     }
 
-    IEnumerator WaitAndPublishReady()
+    IEnumerator SendReadyLoop()
     {
-        while (!zonesReceived)
+        while (true)
         {
             var client = MQTTClient.Instance.GetClient();
             if (client != null && client.IsConnected)
             {
-                new MQTTPublisher(client).PublishMessage(
-                    MQTTConstants.PilotReadyForSearchingZone, "true");
-                Debug.Log("📡 PilotReadyForSearchingZone reenviado");
+                new MQTTPublisher(client)
+                    .PublishMessage(MQTTConstants.PilotReadyForSearchingZone, "ready");
+
+                Debug.Log("📡 [PilotReadyBroadcaster] Mensaje 'ready' reenviado");
+            }
+            else
+            {
+                Debug.LogWarning("⚠️ [PilotReadyBroadcaster] Cliente MQTT no conectado. Reintentando...");
             }
 
             yield return new WaitForSeconds(1f);
         }
     }
 
-    public void NotifyZonesReceived()
+    // Podrás llamarlo en el futuro si el comandante confirma que recibió el "ready"
+    public void Stop()
     {
-        zonesReceived = true;
-        if (loop != null) StopCoroutine(loop);   // ← detiene el envío
+        if (loop != null)
+        {
+            StopCoroutine(loop);
+            Debug.Log("🛑 [PilotReadyBroadcaster] Bucle detenido → Comandante ha confirmado recepción");
+        }
     }
 
     void OnDestroy()
     {
-        if (loop != null) StopCoroutine(loop);   // ← por si la escena se descarga antes
+        if (loop != null)
+        {
+            StopCoroutine(loop);
+            Debug.Log("🧹 [PilotReadyBroadcaster] OnDestroy → Corrutina detenida");
+        }
     }
 }

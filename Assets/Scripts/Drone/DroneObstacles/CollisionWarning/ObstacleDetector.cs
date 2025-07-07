@@ -45,13 +45,14 @@ public class ObstacleDetector : MonoBehaviour
     {
         float? leftDistance = null;
         float? rightDistance = null;
-        float? backFanDistance = null; // ← nuevo sistema de colisión trasera
+        float? backFanDistance = null;
+        float? belowDistance = null; // 👈 nuevo
 
         distanceUI?.ClearLeftDistance();
         distanceUI?.ClearRightDistance();
         distanceUI?.ClearBackDistance();
 
-        // 👉 Análisis con múltiples rayos generales (solo para left y right)
+        // 🔍 Raycasts generales (solo afectan a left, right y abajo)
         foreach (var dir in directions)
         {
             Vector3 worldDir = transform.TransformDirection(dir);
@@ -60,12 +61,16 @@ public class ObstacleDetector : MonoBehaviour
             {
                 float dotLeft = Vector3.Dot(worldDir, transform.TransformDirection(Vector3.left));
                 float dotRight = Vector3.Dot(worldDir, transform.TransformDirection(Vector3.right));
+                float dotDown = Vector3.Dot(worldDir, transform.TransformDirection(Vector3.down));
 
                 if (dotLeft > 0.7f && (leftDistance == null || hit.distance < leftDistance.Value))
                     leftDistance = hit.distance;
 
                 if (dotRight > 0.7f && (rightDistance == null || hit.distance < rightDistance.Value))
                     rightDistance = hit.distance;
+
+                if (dotDown > 0.7f && (belowDistance == null || hit.distance < belowDistance.Value))
+                    belowDistance = hit.distance;
 
                 Debug.DrawRay(transform.position, worldDir * hit.distance, Color.red);
             }
@@ -75,8 +80,8 @@ public class ObstacleDetector : MonoBehaviour
             }
         }
 
-        // 🔙 Haz trasero: abanico de rayos hacia atrás
-        Vector3[] backRays = GetBackFanDirections(7, 30f); // 7 rayos, 30° spread
+        // 🔙 Haz trasero (solo back)
+        Vector3[] backRays = GetBackFanDirections(7, 30f);
 
         foreach (var ray in backRays)
         {
@@ -93,20 +98,33 @@ public class ObstacleDetector : MonoBehaviour
             }
         }
 
-        // 🖥️ Mostrar distancias
+        // 🖥️ UI de distancias (solo si hay datos)
         if (leftDistance != null) distanceUI?.UpdateLeftDistance(leftDistance.Value);
         if (rightDistance != null) distanceUI?.UpdateRightDistance(rightDistance.Value);
-        if (backFanDistance != null) distanceUI?.UpdateBackDistance(backFanDistance.Value);
 
-        // 🔴 Intensidades HUD
+        // ⬅️ ➡️ Intensidades izquierda y derecha
         float leftIntensity = leftDistance.HasValue ? 1f - Mathf.Clamp01(leftDistance.Value / detectionRadius) : 0f;
         float rightIntensity = rightDistance.HasValue ? 1f - Mathf.Clamp01(rightDistance.Value / detectionRadius) : 0f;
-        float backIntensity = backFanDistance.HasValue ? 1f - Mathf.Clamp01(backFanDistance.Value / detectionRadius) : 0f;
 
+        // 🔽 COMBINAR trasero + inferior en una sola lógica
+        float? combinedBackDistance = null;
+        if (backFanDistance.HasValue && belowDistance.HasValue)
+            combinedBackDistance = Mathf.Min(backFanDistance.Value, belowDistance.Value);
+        else if (backFanDistance.HasValue)
+            combinedBackDistance = backFanDistance.Value;
+        else if (belowDistance.HasValue)
+            combinedBackDistance = belowDistance.Value;
+
+        float backIntensity = combinedBackDistance.HasValue
+            ? 1f - Mathf.Clamp01(combinedBackDistance.Value / detectionRadius)
+            : 0f;
+
+        if (combinedBackDistance.HasValue)
+            distanceUI?.UpdateBackDistance(combinedBackDistance.Value);
+
+        // 📡 HUD y visuales del dron
         hudWarningManager?.UpdateWarnings(leftIntensity, rightIntensity, backIntensity);
-        // 🔴 Elementos visuales sobre el dron
         visualWarningManager?.UpdateVisuals(leftIntensity, rightIntensity, backIntensity);
-
     }
 
     private Vector3[] GetBackFanDirections(int rayCount, float spreadAngle)
@@ -127,7 +145,6 @@ public class ObstacleDetector : MonoBehaviour
     {
         if (!Application.isPlaying) return;
 
-        // Usa orientación del dron
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
         Vector3 back = transform.TransformDirection(Vector3.back);

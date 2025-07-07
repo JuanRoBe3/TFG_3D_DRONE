@@ -4,6 +4,10 @@ using TMPro;
 using System.Collections.Generic;
 using System;
 
+/// <summary>
+/// Controla la lista de tareas pendientes del comandante.
+/// Muestra, edita y publica tareas según el estado actual y recibe mensajes por MQTT.
+/// </summary>
 public class TaskListManager : MonoBehaviour
 {
     [Header("Prefabs y referencias")]
@@ -20,12 +24,16 @@ public class TaskListManager : MonoBehaviour
 
     private void OnEnable()
     {
+        // ✅ Registramos los handlers nombrados
         MQTTClient.Instance.RegisterHandler(MQTTConstants.PendingTasksRequestTopic, OnPendingTasksRequestReceived);
+        MQTTClient.Instance.RegisterHandler(MQTTConstants.SelectedTaskTopic, OnTaskSelectedReceived);
     }
 
     private void OnDisable()
     {
-        MQTTClient.Instance.UnregisterHandler(MQTTConstants.PendingTasksRequestTopic);
+        // ✅ CORREGIDO: usamos la misma función como segundo argumento para desregistrar correctamente
+        MQTTClient.Instance.UnregisterHandler(MQTTConstants.PendingTasksRequestTopic, OnPendingTasksRequestReceived);
+        MQTTClient.Instance.UnregisterHandler(MQTTConstants.SelectedTaskTopic, OnTaskSelectedReceived);
     }
 
     private void OnPendingTasksRequestReceived(string _)
@@ -44,14 +52,12 @@ public class TaskListManager : MonoBehaviour
 
             var data = taskUI.TaskData;
 
-            // Si no hay datos, se ignora
             if (data == null)
             {
                 Debug.LogWarning("⚠️ Tarea sin datos. No será incluida.");
                 continue;
             }
 
-            // Si es tarea demo con datos válidos, se respeta
             if (taskUI.isDemoTask && data.assignedDrone != null)
             {
                 Debug.Log($"🛡️ Tarea demo con datos preasignados en el Inspector: {data.title} ({data.status})");
@@ -193,5 +199,31 @@ public class TaskListManager : MonoBehaviour
         {
             Debug.Log("ℹ️ Tarea seleccionada sin dron asignado o sin estado ejecutando.");
         }
+    }
+
+    private void OnTaskSelectedReceived(string json)
+    {
+        TaskSelectionMessage msg = JsonUtility.FromJson<TaskSelectionMessage>(json);
+        if (msg == null)
+        {
+            Debug.LogWarning("❌ JSON de selección malformado");
+            return;
+        }
+
+        foreach (Transform child in contentParent)
+        {
+            TaskItemUI ui = child.GetComponent<TaskItemUI>();
+            if (ui != null && ui.TaskData != null && ui.TaskData.id == msg.taskId)
+            {
+                ui.TaskData.status = msg.newStatus;
+                ui.Setup(ui.TaskData, this);
+                SelectTask(ui);
+
+                Debug.Log($"✅ Tarea {ui.TaskData.title} → estado '{msg.newStatus}'");
+                break;
+            }
+        }
+
+        PublishPendingTasks();
     }
 }

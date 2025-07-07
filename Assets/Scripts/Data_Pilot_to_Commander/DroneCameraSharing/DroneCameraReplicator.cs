@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using Newtonsoft.Json;
 
+/// <summary>
+/// Recibe los datos de la cámara del dron por MQTT y los aplica a la réplica visual.
+/// </summary>
 public class DroneCameraReplicator : MonoBehaviour
 {
     [Header("Transformaciones asignadas por CommanderDroneReplica")]
@@ -20,15 +23,18 @@ public class DroneCameraReplicator : MonoBehaviour
             return;
         }
 
+        // ✅ Registramos handler nombrado
         MQTTClient.Instance.RegisterHandler(MQTTConstants.DroneCameraTopic, HandlePayload);
     }
 
     void OnDisable()
     {
+        // ✅ Corregido: usamos mismo handler nombrado al desregistrar
         if (MQTTClient.Instance != null)
-            MQTTClient.Instance.UnregisterHandler(MQTTConstants.DroneCameraTopic);
+            MQTTClient.Instance.UnregisterHandler(MQTTConstants.DroneCameraTopic, HandlePayload);
     }
 
+    // ✅ Handler nombrado para procesar el payload recibido
     private void HandlePayload(string payload)
     {
         if (string.IsNullOrEmpty(payload)) return;

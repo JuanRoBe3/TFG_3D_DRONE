@@ -1,82 +1,50 @@
 ﻿using UnityEngine;
-using TMPro;
-using System.Collections.Generic;
+using Newtonsoft.Json;
 
 public class CommanderUI1 : MonoBehaviour
 {
-    public TMP_Text positionText;       // Texto principal que muestra la última posición
-    public TMP_Text positionLogText;    // Texto de log con las últimas 10 posiciones
-
-    private string tempMessage = "";
-    private Queue<string> positionLog = new Queue<string>(10); // FIFO de 10 elementos
-
-    private MQTTPublisher publisher;
-
-    private void Start()
-    {
-        MQTTClient.EnsureExists();
-
-        if (MQTTClient.Instance != null)
-        {
-            publisher = new MQTTPublisher(MQTTClient.Instance.GetClient());
-            MQTTClient.Instance.RegisterHandler(MQTTConstants.DroneCameraTopic, HandlePositionPayload);
-        }
-        else
-        {
-            Debug.LogError(LogMessagesConstants.ErrorMQTTClientNotFound);
-        }
-    }
-
-    private void OnDestroy()
+    void OnEnable()
     {
         if (MQTTClient.Instance != null)
         {
-            MQTTClient.Instance.UnregisterHandler(MQTTConstants.DroneCameraTopic);
-            Debug.Log("📴 CommanderUI1 DESACTIVADO y handler limpiado");
+            // ✅ Registramos función nombrada como handler
+            MQTTClient.Instance.RegisterHandler(MQTTConstants.SelectedTaskTopic, OnSelectedTaskReceived);
         }
     }
 
-    private void Update()
+    void OnDisable()
     {
-        if (positionText != null)
+        if (MQTTClient.Instance != null)
         {
-            positionText.text = tempMessage;
-        }
-
-        if (positionLogText != null)
-        {
-            positionLogText.text = string.Join("\n", positionLog);
+            // ✅ Desregistramos la misma función nombrada
+            MQTTClient.Instance.UnregisterHandler(MQTTConstants.SelectedTaskTopic, OnSelectedTaskReceived);
         }
     }
 
-    private void HandlePositionPayload(string message)
+    // ✅ Esta es la función (handler) que se llama cuando llega el mensaje MQTT
+    private void OnSelectedTaskReceived(string payload)
     {
-        tempMessage = LogMessagesConstants.DronePositionPrefix + message;
+        Debug.Log($"📩 [CommanderUI1] Mensaje recibido en {MQTTConstants.SelectedTaskTopic}: {payload}");
 
-        if (positionLog.Count >= 10)
+        // Ejemplo: parsear el payload y actualizar algo
+        try
         {
-            positionLog.Dequeue();
+            var msg = JsonConvert.DeserializeObject<TaskStatusUpdateMessage>(payload);
+            if (msg == null) return;
+
+            // Lógica de actualización, por ejemplo:
+            var task = TaskRegistry.GetTaskById(msg.taskId);
+            if (task != null)
+            {
+                task.status = msg.newStatus;
+                task.assignedDrone = DroneRegistry.GetDroneById(msg.droneId);
+
+                Debug.Log($"✅ Estado actualizado: {task.title} → {task.status}");
+            }
         }
-
-        positionLog.Enqueue(tempMessage);
-
-        Debug.Log($"📍 Posición recibida: {tempMessage}");
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"❌ Error al procesar mensaje: {ex.Message}");
+        }
     }
-
-    /*
-    public void SendCommand()
-    {
-        string command = "{\"action\": \"move\", \"direction\": \"forward\"}";
-
-        if (publisher != null)
-        {
-            publisher.PublishMessage(MQTTConstants.CommandTopic, command);
-            Debug.Log(LogMessagesConstants.DebugMQTTPublished + command);
-        }
-        else
-        {
-            Debug.LogError(LogMessagesConstants.ErrorMessageNotSent);
-        }
-    } 
-    */
 }

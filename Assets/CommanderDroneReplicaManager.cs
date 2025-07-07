@@ -15,6 +15,12 @@ public class CommanderDroneReplicaManager : MonoBehaviour
     private readonly Dictionary<string, CommanderDroneReplica> replicas = new();
     private readonly ConcurrentQueue<string> payloadQueue = new();
 
+    // ✅ CAMBIO: hemos dado nombre al handler MQTT
+    private void OnDroneCameraMessageReceived(string payload)
+    {
+        payloadQueue.Enqueue(payload);
+    }
+
     void OnEnable()
     {
         if (MQTTClient.Instance == null)
@@ -23,15 +29,16 @@ public class CommanderDroneReplicaManager : MonoBehaviour
             return;
         }
 
-        MQTTClient.Instance.RegisterHandler(MQTTConstants.DroneCameraTopic,
-                                            payload => payloadQueue.Enqueue(payload));
+        // ✅ CAMBIO: usamos función nombrada en lugar de lambda anónima
+        MQTTClient.Instance.RegisterHandler(MQTTConstants.DroneCameraTopic, OnDroneCameraMessageReceived);
         Debug.Log("📡 Suscrito a DroneCameraTopic");
     }
 
     void OnDisable()
     {
+        // ✅ CAMBIO: usamos la misma función nombrada para desregistrar correctamente
         if (MQTTClient.Instance != null)
-            MQTTClient.Instance.UnregisterHandler(MQTTConstants.DroneCameraTopic);
+            MQTTClient.Instance.UnregisterHandler(MQTTConstants.DroneCameraTopic, OnDroneCameraMessageReceived);
     }
 
     void Update()

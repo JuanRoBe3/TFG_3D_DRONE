@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class PendingTaskSummaryUI : MonoBehaviour
+public class PendingTaskSummaryUI : MonoBehaviour, IPointerClickHandler
 {
     [Header("Referencias UI")]
     public TextMeshProUGUI taskNameText;
@@ -12,17 +13,23 @@ public class PendingTaskSummaryUI : MonoBehaviour
     public Image statusColorImage;
     public Image droneIconImage;
 
-    /// <summary>
-    /// Rellena el UI con los datos de una tarea recibida por MQTT
-    /// </summary>
-    /// <param name="summary">Resumen de la tarea</param>
+    private TaskSummary summary;
+    private SelectableTaskItem selectableItem;
+
+    void Awake()
+    {
+        selectableItem = GetComponent<SelectableTaskItem>();
+        if (selectableItem == null)
+            Debug.LogError("❌ No se encontró SelectableTaskItem.");
+    }
+
     public void Setup(TaskSummary summary)
     {
-        Debug.Log($"🛠 Configurando tarea: {summary.title}");
+        this.summary = summary;
 
         if (summary == null)
         {
-            Debug.LogWarning("⚠️ No se puede configurar la UI: TaskSummary es null.");
+            Debug.LogWarning("⚠️ TaskSummary es null en Setup.");
             return;
         }
 
@@ -34,17 +41,22 @@ public class PendingTaskSummaryUI : MonoBehaviour
         if (statusColorImage != null)
             statusColorImage.color = TaskStatusColor.GetColorForStatus(summary.status);
 
-        // Buscar el icono del dron por su nombre
         var droneData = DroneSelectionManager.Instance.availableDrones
             .Find(d => d.droneName == summary.drone);
 
         if (droneData != null && droneIconImage != null)
-        {
             droneIconImage.sprite = droneData.icon;
-        }
-        else
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (summary == null)
         {
-            Debug.LogWarning($"⚠️ No se encontró el icono del dron '{summary.drone}'");
+            Debug.LogWarning("⚠️ Click sin tarea.");
+            return;
         }
+
+        Debug.Log($"🖱️ Tarea seleccionada: {summary.title}");
+        PendingTasksDisplayManager.SelectTaskExternally(summary, selectableItem);
     }
 }

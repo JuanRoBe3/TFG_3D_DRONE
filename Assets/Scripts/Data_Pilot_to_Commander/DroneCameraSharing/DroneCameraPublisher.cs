@@ -1,35 +1,48 @@
 ﻿using UnityEngine;
-using MQTTnet;
+using MQTTnet.Client;
 using Newtonsoft.Json;
 using System.Collections;
 
 public class DroneCameraPublisher : MonoBehaviour
 {
     [Header("Identificador único del dron / piloto")]
-    [SerializeField] private string droneId = "Pilot_01";   // ⚠️ pon aquí tu ID único
+    [SerializeField] private string droneId = "";          // ← vacío por defecto
 
     private MQTTPublisher publisher;
     private Transform cameraTransform;
+    private bool isReady = false;
 
-    private const float publishRate = 0.1f;                 // 10 Hz
+    private const float publishRate = 0.1f;                // 10 Hz
 
+    /*  NO hacemos nada en Start; se arrancará con Initialize()  */
     void Start()
     {
-        if (!RoleSelection.IsPilot)
+        if (!RoleSelection.IsPilot) { enabled = false; return; }
+    }
+
+    public void Initialize(IMqttClient client, string id, Transform cam)
+    {
+        if (client == null || cam == null || string.IsNullOrEmpty(id))
         {
-            enabled = false;
+            Debug.LogError("❌ DroneCameraPublisher.Initialize: parámetros inválidos");
             return;
         }
 
-        var client = MQTTClient.Instance.GetClient();
-        if (client == null)
-        {
-            Debug.LogError("❌ MQTT client null");
-            return;
-        }
-
+        droneId = id;
+        cameraTransform = cam;
         publisher = new MQTTPublisher(client);
-        StartCoroutine(PublishLoop());
+
+        if (!isReady) StartCoroutine(PublishLoop());
+        isReady = true;
+
+        Debug.Log($"📡 DroneCameraPublisher listo. ID = {droneId}");
+    }
+
+    public void SetCamera(Transform cam)
+    {
+        cameraTransform = cam;
+        // Si el publisher ya estaba listo, no necesitas nada más.
+        // Si todavía no se había inicializado, 'Initialize' lo hará.
     }
 
     IEnumerator PublishLoop()
@@ -44,9 +57,8 @@ public class DroneCameraPublisher : MonoBehaviour
 
     void PublishCameraData()
     {
-        if (cameraTransform == null) return;
+        if (!isReady) return;
 
-        // 🔸 Incluimos el ID en el payload
         var msg = new DroneCameraTransform
         {
             id = droneId,
@@ -57,7 +69,4 @@ public class DroneCameraPublisher : MonoBehaviour
         string json = JsonConvert.SerializeObject(msg);
         publisher.PublishMessage(MQTTConstants.DroneCameraTopic, json);
     }
-
-    /// <summary>El Manager de escena llama a esto para decir qué cámara publicar.</summary>
-    public void SetCamera(Transform cam) => cameraTransform = cam;
 }

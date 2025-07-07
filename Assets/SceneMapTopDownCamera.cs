@@ -12,7 +12,7 @@ public class SceneMapCameraConfigurator : MonoBehaviour
         Camera cam = GetComponent<Camera>();
         float size = Mathf.Max(b.extents.z, b.extents.x / cam.aspect);
         cam.orthographicSize = size + padding;
-        cam.transform.position = new Vector3(b.center.x, b.max.y + 50f, b.center.z);
+        cam.transform.position = new Vector3(b.center.x, b.max.y + 500f, b.center.z);
         cam.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
     }
 }

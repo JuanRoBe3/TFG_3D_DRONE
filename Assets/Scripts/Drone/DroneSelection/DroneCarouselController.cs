@@ -6,8 +6,6 @@ public class DroneCarouselController : MonoBehaviour
 {
     public Button leftButton;
     public Button rightButton;
-    public Button flyInScreenButton;      // Botón para modo pantalla flotante
-    public Button flyInImmersiveButton;   // Botón para modo inmersivo (eres la cámara)
 
     private List<DroneData> drones;
     private int currentIndex = 0;
@@ -28,19 +26,6 @@ public class DroneCarouselController : MonoBehaviour
 
         leftButton.onClick.AddListener(GoLeft);
         rightButton.onClick.AddListener(GoRight);
-
-        // ✅ Asigna modo y lanza escena
-        flyInScreenButton.onClick.AddListener(() =>
-        {
-            PilotViewConfig.SetMode(PilotViewMode.HUDScreen);
-            OnSelectClicked();
-        });
-
-        flyInImmersiveButton.onClick.AddListener(() =>
-        {
-            PilotViewConfig.SetMode(PilotViewMode.FirstPerson);
-            OnSelectClicked();
-        });
     }
 
     void GoLeft()
@@ -60,24 +45,5 @@ public class DroneCarouselController : MonoBehaviour
         DroneData drone = drones[currentIndex];
         DroneSelectionManager.Instance.SetSelectedDrone(drone);
         uiUpdater?.DisplayDrone(drone);
-    }
-
-    void OnSelectClicked()
-    {
-        DroneData selected = DroneSelectionManager.Instance.GetSelectedDrone();
-        if (selected == null) return;
-
-        SelectedDroneHolder.SetDrone(selected);
-
-        string message =
-            $"{selected.name};" +
-            $"{selected.maxBattery};" +
-            $"{selected.estimatedFlightDurationMinutes};" +
-            $"{selected.storageCapacityMB};" +
-            $"{selected.maxRange}";
-
-        // MQTTPublisher.Instance.PublishMessage(MQTTConstants.SelectedDroneTopic, message);
-
-        SceneLoader.LoadPilotUI(); // La escena decide el modo según PilotViewConfig
     }
 }

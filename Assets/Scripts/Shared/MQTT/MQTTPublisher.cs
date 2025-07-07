@@ -1,45 +1,51 @@
 ﻿using System.Text;
+using System.Threading.Tasks;
 using MQTTnet;
 using MQTTnet.Client;
+using MQTTnet.Protocol;
 using UnityEngine;
 
 /// <summary>
 /// Encapsula la lógica de publicación de mensajes MQTT.
-/// Requiere una instancia de IMqttClient ya conectada.
+/// Pensado para publicar mensajes no-retained y con QoS 1.
 /// </summary>
 public class MQTTPublisher
 {
     private readonly IMqttClient client;
 
-    /// <summary>
-    /// Constructor del publisher. Requiere un cliente MQTT ya conectado.
-    /// </summary>
-    /// <param name="mqttClient">Cliente MQTT conectado</param>
     public MQTTPublisher(IMqttClient mqttClient)
     {
         client = mqttClient;
     }
 
     /// <summary>
-    /// Publica un mensaje MQTT en un topic determinado.
+    /// Publica un mensaje MQTT en el topic indicado (QoS 1, no retained).
     /// </summary>
-    /// <param name="topic">Topic al que se enviará el mensaje</param>
-    /// <param name="payload">Contenido del mensaje</param>
-    public async void PublishMessage(string topic, string payload)
+    /// <param name="topic">Nombre del topic</param>
+    /// <param name="payload">Contenido del mensaje en formato string (normalmente JSON)</param>
+    public async Task PublishMessage(string topic, string payload)
     {
         if (client == null || !client.IsConnected)
         {
-            Debug.LogError("❌ Cannot publish: MQTT client is null or not connected.");
+            Debug.LogError("❌ No se puede publicar: cliente MQTT nulo o no conectado.");
             return;
         }
 
         var message = new MqttApplicationMessageBuilder()
             .WithTopic(topic)
             .WithPayload(Encoding.UTF8.GetBytes(payload))
-            .WithQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.AtLeastOnce)
+            .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
+            .WithRetainFlag(false) // 🔒 desactivado para evitar errores con múltiples zonas
             .Build();
 
-        await client.PublishAsync(message);
-        Debug.Log($"📤 Published to {topic}: {payload}");
+        try
+        {
+            await client.PublishAsync(message);
+            Debug.Log($"📤 Publicado MQTT → Topic: {topic} | Payload: {payload}");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"❌ Error al publicar MQTT en topic {topic} → {ex.Message}");
+        }
     }
 }

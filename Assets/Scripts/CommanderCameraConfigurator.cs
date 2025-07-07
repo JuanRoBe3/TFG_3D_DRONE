@@ -7,7 +7,7 @@
 [RequireComponent(typeof(Camera))]
 public class CommanderCameraConfigurator : MonoBehaviour
 {
-    [SerializeField] private float heightOffset = 50f;   // Altura sobre el terreno
+    [SerializeField] private float heightOffset = 500f;   // Altura sobre el terreno
 
     private Vector3 initialPosition;
     private float initialOrthoSize;

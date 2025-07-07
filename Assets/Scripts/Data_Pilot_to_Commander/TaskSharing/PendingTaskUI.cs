@@ -1,35 +1,38 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 
-//ELIMINAR PORQUE YA NO SIRVE DE NADA EN TEOR�A
-
+/// <summary>
+/// Muestra una lista de tareas pendientes cuando llegan por MQTT.
+/// </summary>
 public class PendingTasksUI : MonoBehaviour
 {
     public TextMeshProUGUI tasksText;
 
     void OnEnable()
     {
-        // Suscribirse al topic de tareas pendientes
+        // ✅ Registramos el handler nombrado
         MQTTClient.Instance.RegisterHandler(MQTTConstants.PendingTasksTopic, OnTasksReceived);
 
-        // Publicar petici�n de tareas pendientes
+        // ✅ Publicamos petición de tareas pendientes
         new MQTTPublisher(MQTTClient.Instance.GetClient())
             .PublishMessage(MQTTConstants.PendingTasksRequestTopic, "request_pending_tasks");
     }
 
     void OnDisable()
     {
-        MQTTClient.Instance.UnregisterHandler(MQTTConstants.PendingTasksTopic);
+        // ✅ Desregistramos el handler correctamente
+        MQTTClient.Instance.UnregisterHandler(MQTTConstants.PendingTasksTopic, OnTasksReceived);
     }
 
-    void OnTasksReceived(string json)
+    // ✅ Handler nombrado para procesar tareas recibidas
+    private void OnTasksReceived(string json)
     {
         TaskSummaryListWrapper wrapper = JsonUtility.FromJson<TaskSummaryListWrapper>(json);
         Display(wrapper.tasks);
     }
 
-    void Display(List<TaskSummary> tasks)
+    private void Display(List<TaskSummary> tasks)
     {
         if (tasks == null || tasks.Count == 0)
         {

@@ -10,14 +10,19 @@ public static class MQTTTopicSubscriptions
                 //MQTTConstants.DronePositionTopic,
                 MQTTConstants.DroneCameraTopic,
                 MQTTConstants.SelectedDroneTopic,
-                MQTTConstants.PendingTasksRequestTopic
+                MQTTConstants.PendingTasksRequestTopic,
+                MQTTConstants.SelectedTaskTopic,
+                MQTTConstants.PendingSearchZonesRequestTopic
+                //MQTTConstants.PilotReadyForSearchingZone (ya lo hace aqui) PilotReadyListener.cs
+
             }
         },
         { "Pilot", new List<string>
             {
                 MQTTConstants.CommandTopic,
                 MQTTConstants.PendingTasksTopic,
-                MQTTConstants.SearchingZone
+                MQTTConstants.PendingSearchZonesTopic
+                //MQTTConstants.SearchingZone
             }
         }
     };

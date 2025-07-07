@@ -2,8 +2,7 @@
 
 public class ObstacleDetector : MonoBehaviour
 {
-    [Header("Detection Settings")]
-    public float detectionRadius = 15f;
+    private const float detectionRadius = 50f;
     public LayerMask obstacleLayer;
 
     [Header("HUD Warning Manager")]

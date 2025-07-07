@@ -8,6 +8,8 @@ TagManager:
   - FirstPersonCamera
   - TopDownCamera
   - TargetVisor
+  - MidZoomCamera
+  - VisorZoomImage
   layers:
   - Default
   - TransparentFX

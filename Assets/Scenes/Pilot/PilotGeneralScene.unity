@@ -723,8 +723,8 @@ GameObject:
   - component: {fileID: 129720252}
   - component: {fileID: 129720251}
   m_Layer: 5
-  m_Name: RawImage_ZoomedTerget
-  m_TagString: Untagged
+  m_Name: RawImage_ZoomedTarget
+  m_TagString: VisorZoomImage
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2748,6 +2748,7 @@ GameObject:
   m_Component:
   - component: {fileID: 639760846}
   - component: {fileID: 639760847}
+  - component: {fileID: 639760848}
   m_Layer: 5
   m_Name: Panel_ZoomedImage
   m_TagString: Untagged
@@ -2783,6 +2784,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 639760845}
   m_CullTransparentMesh: 1
+--- !u!114 &639760848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 639760845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ShowMaskGraphic: 1
 --- !u!1001 &640556575
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6697,7 +6711,6 @@ GameObject:
   - component: {fileID: 1877621122}
   - component: {fileID: 1877621124}
   - component: {fileID: 1877621123}
-  - component: {fileID: 1877621125}
   m_Layer: 5
   m_Name: PanelTargetZoom
   m_TagString: Untagged
@@ -6764,19 +6777,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1877621121}
   m_CullTransparentMesh: 1
---- !u!114 &1877621125
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1877621121}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ShowMaskGraphic: 1
 --- !u!1 &1883374768 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2673219970393755234, guid: 93a84963378b69946b84e9fdc5a667f4, type: 3}
@@ -7428,11 +7428,11 @@ GameObject:
   - component: {fileID: 2108202061}
   m_Layer: 0
   m_Name: ZoomCamera
-  m_TagString: Untagged
+  m_TagString: MidZoomCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &2108202061
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7524,7 +7524,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 727
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0

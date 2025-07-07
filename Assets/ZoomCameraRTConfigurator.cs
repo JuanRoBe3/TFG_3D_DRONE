@@ -20,17 +20,17 @@ public class ZoomCameraRTConfigurator : MonoBehaviour
         }
 
         // Obtiene o crea la RenderTexture centralizada
-        var rt = RenderTextureRegistry.GetOrCreate(RT_KEY, 512);
+        var rt = RenderTextureRegistry.GetOrCreate(RT_KEY, 1024);
 
         zoomCamera.targetTexture = rt;
 
         if (zoomRawImage != null)
         {
             zoomRawImage.texture = rt;
-            zoomRawImage.gameObject.SetActive(false); // Oculta por defecto
+            // ❌ NO se desactiva aquí
         }
 
-        zoomCamera.gameObject.SetActive(false); // También oculta por defecto
+        // ❌ NO se desactiva la cámara aquí
         Debug.Log("🔍 ZoomCamera configurada con RenderTexture.");
     }
 }

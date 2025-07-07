@@ -12,12 +12,11 @@ public class TargetDetector : MonoBehaviour
     private TargetData[] allTargets;
     private TargetData currentDetectedTarget;
 
-    [Header("Zoom dinámico (configurado externamente)")]
-    [SerializeField] private Camera zoomCamera;
-    [SerializeField] private RawImage zoomRawImage;
+    [Header("Modo automático (interno, no editable)")]
+    private bool automaticMode = false;
 
-    // 🔧 Cambia este valor directamente aquí para alternar modo automático/manual
-    private bool automaticMode = false; //si pones true, se activa de manera automatica
+    // Referencias asignadas dinámicamente
+    private Camera midZoomCamera;
 
     private void Start()
     {
@@ -31,7 +30,17 @@ public class TargetDetector : MonoBehaviour
         else
             Debug.LogError("❌ No se encontró ningún objeto con tag 'TargetVisor'.");
 
+        GameObject camGO = GameObject.FindWithTag("MidZoomCamera");
+        if (camGO != null)
+            midZoomCamera = camGO.GetComponent<Camera>();
+        else
+            Debug.LogError("❌ No se encontró ninguna cámara con tag 'MidZoomCamera'.");
+
         allTargets = FindObjectsOfType<TargetData>();
+
+        // Activar la cámara de zoom desde el principio
+        if (midZoomCamera != null)
+            midZoomCamera.gameObject.SetActive(true);
     }
 
     private void Update()
@@ -63,6 +72,41 @@ public class TargetDetector : MonoBehaviour
         }
     }
 
+    private void HandleManualActivationInput()
+    {
+        var joystick = Joystick.current;
+        if (joystick == null || popupUI == null) return;
+
+        if (joystick.TryGetChildControl<ButtonControl>("button2")?.wasPressedThisFrame == true)
+        {
+            TryActivateTarget();
+        }
+    }
+
+    public void TryActivateTarget()
+    {
+        if (currentDetectedTarget == null || popupUI == null) return;
+
+        string dir = GetCardinalDirection(transform.eulerAngles.y);
+        popupUI.ShowTargetInfo(currentDetectedTarget.targetId, dir);
+        MoveZoomCameraToTarget(currentDetectedTarget);
+    }
+
+    private void MoveZoomCameraToTarget(TargetData target)
+    {
+        if (midZoomCamera == null) return;
+
+        Vector3 dronePos = transform.position;
+        Vector3 targetPos = target.transform.position;
+
+        Vector3 midPoint = Vector3.Lerp(dronePos, targetPos, 0.5f); // 🔍 Zoom al 50%
+        midZoomCamera.transform.position = midPoint;
+        midZoomCamera.transform.LookAt(targetPos);
+
+        float distance = Vector3.Distance(dronePos, targetPos);
+        midZoomCamera.fieldOfView = Mathf.Clamp(60f * (distance / 50f), 20f, 60f);
+    }
+
     private void DetectVisibleTarget()
     {
         Camera cam = Camera.main;
@@ -80,44 +124,6 @@ public class TargetDetector : MonoBehaviour
                 break;
             }
         }
-    }
-
-    private void HandleManualActivationInput()
-    {
-        var joystick = Joystick.current;
-        if (joystick == null) return;
-
-        if (joystick.TryGetChildControl<ButtonControl>("button2")?.wasPressedThisFrame == true)
-        {
-            TryActivateTarget();
-        }
-    }
-
-    public void TryActivateTarget()
-    {
-        if (currentDetectedTarget == null || popupUI == null) return;
-
-        string dir = GetCardinalDirection(transform.eulerAngles.y);
-        popupUI.ShowTargetInfo(currentDetectedTarget.targetId, dir);
-        ActivateZoomView(currentDetectedTarget);
-    }
-
-    private void ActivateZoomView(TargetData target)
-    {
-        if (zoomCamera == null || zoomRawImage == null) return;
-
-        Vector3 dronePos = transform.position;
-        Vector3 targetPos = target.transform.position;
-
-        Vector3 midPoint = Vector3.Lerp(dronePos, targetPos, 0.5f);
-        zoomCamera.transform.position = midPoint;
-        zoomCamera.transform.LookAt(targetPos);
-
-        float distance = Vector3.Distance(dronePos, targetPos);
-        zoomCamera.fieldOfView = Mathf.Clamp(60f * (distance / 50f), 20f, 60f);
-
-        zoomCamera.gameObject.SetActive(true);
-        zoomRawImage.gameObject.SetActive(true);
     }
 
     private bool IsTargetInsideVisor(TargetData target, Camera cam)

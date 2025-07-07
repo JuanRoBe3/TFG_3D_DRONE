@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
+using UnityEngine.UI;
 
 public class TargetDetector : MonoBehaviour
 {
@@ -7,8 +10,16 @@ public class TargetDetector : MonoBehaviour
     public TargetPopupUI popupUI;
     public RectTransform visorRect;
     private TargetData[] allTargets;
+    private TargetData currentDetectedTarget;
 
-    void Start()
+    [Header("Zoom dinámico (configurado externamente)")]
+    [SerializeField] private Camera zoomCamera;
+    [SerializeField] private RawImage zoomRawImage;
+
+    // 🔧 Cambia este valor directamente aquí para alternar modo automático/manual
+    private bool automaticMode = false; //si pones true, se activa de manera automatica
+
+    private void Start()
     {
         popupUI = FindObjectOfType<TargetPopupUI>();
         if (popupUI == null)
@@ -23,16 +34,41 @@ public class TargetDetector : MonoBehaviour
         allTargets = FindObjectsOfType<TargetData>();
     }
 
-    void Update()
+    private void Update()
     {
-        if (popupUI == null || visorRect == null) return;
+        if (visorRect == null || popupUI == null) return;
+
         DetectVisibleTarget();
+
+        if (automaticMode)
+        {
+            if (currentDetectedTarget != null)
+            {
+                string dir = GetCardinalDirection(transform.eulerAngles.y);
+                popupUI.ShowTargetInfo(currentDetectedTarget.targetId, dir);
+            }
+            else
+            {
+                popupUI.Hide();
+            }
+        }
+        else
+        {
+            HandleManualActivationInput();
+
+            if (currentDetectedTarget == null)
+            {
+                popupUI.Hide();
+            }
+        }
     }
 
-    void DetectVisibleTarget()
+    private void DetectVisibleTarget()
     {
         Camera cam = Camera.main;
         if (cam == null) return;
+
+        currentDetectedTarget = null;
 
         foreach (var target in allTargets)
         {
@@ -40,11 +76,48 @@ public class TargetDetector : MonoBehaviour
 
             if (IsTargetInsideVisor(target, cam))
             {
-                string dir = GetCardinalDirection(transform.eulerAngles.y);
-                popupUI.ShowTargetInfo(target.targetId, dir);
-                return;
+                currentDetectedTarget = target;
+                break;
             }
         }
+    }
+
+    private void HandleManualActivationInput()
+    {
+        var joystick = Joystick.current;
+        if (joystick == null) return;
+
+        if (joystick.TryGetChildControl<ButtonControl>("button2")?.wasPressedThisFrame == true)
+        {
+            TryActivateTarget();
+        }
+    }
+
+    public void TryActivateTarget()
+    {
+        if (currentDetectedTarget == null || popupUI == null) return;
+
+        string dir = GetCardinalDirection(transform.eulerAngles.y);
+        popupUI.ShowTargetInfo(currentDetectedTarget.targetId, dir);
+        ActivateZoomView(currentDetectedTarget);
+    }
+
+    private void ActivateZoomView(TargetData target)
+    {
+        if (zoomCamera == null || zoomRawImage == null) return;
+
+        Vector3 dronePos = transform.position;
+        Vector3 targetPos = target.transform.position;
+
+        Vector3 midPoint = Vector3.Lerp(dronePos, targetPos, 0.5f);
+        zoomCamera.transform.position = midPoint;
+        zoomCamera.transform.LookAt(targetPos);
+
+        float distance = Vector3.Distance(dronePos, targetPos);
+        zoomCamera.fieldOfView = Mathf.Clamp(60f * (distance / 50f), 20f, 60f);
+
+        zoomCamera.gameObject.SetActive(true);
+        zoomRawImage.gameObject.SetActive(true);
     }
 
     private bool IsTargetInsideVisor(TargetData target, Camera cam)

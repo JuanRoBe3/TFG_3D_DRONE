@@ -2,71 +2,87 @@
 
 public class TargetDetector : MonoBehaviour
 {
-    public LayerMask detectableLayer;
-    public float detectionRange = 100f;
-    public float sphereRadius = 4.0f;
-    public TargetPopupUI popupUI;
+    private const float maxDetectionDistance = 10000f;
 
-    private RaycastHit lastHit;
-    private bool hasHit = false;
+    public TargetPopupUI popupUI;
+    public RectTransform visorRect;
+    private TargetData[] allTargets;
+
+    void Start()
+    {
+        popupUI = FindObjectOfType<TargetPopupUI>();
+        if (popupUI == null)
+            Debug.LogError("❌ No se encontró TargetPopupUI en la escena.");
+
+        GameObject visorGO = GameObject.FindWithTag("TargetVisor");
+        if (visorGO != null)
+            visorRect = visorGO.GetComponent<RectTransform>();
+        else
+            Debug.LogError("❌ No se encontró ningún objeto con tag 'TargetVisor'.");
+
+        allTargets = FindObjectsOfType<TargetData>();
+    }
 
     void Update()
     {
-        DetectTarget();
+        if (popupUI == null || visorRect == null) return;
+        DetectVisibleTarget();
     }
 
-    void DetectTarget()
+    void DetectVisibleTarget()
     {
-        Vector3 origin = transform.position;
-        Vector3 direction = transform.forward;
+        Camera cam = Camera.main;
+        if (cam == null) return;
 
-        hasHit = Physics.SphereCast(origin, sphereRadius, direction, out lastHit, detectionRange, detectableLayer);
-
-        if (hasHit)
+        foreach (var target in allTargets)
         {
-            GameObject target = lastHit.collider.gameObject;
-            TargetData data = target.GetComponent<TargetData>();
+            if (target == null) continue;
 
-            if (data != null)
+            if (IsTargetInsideVisor(target, cam))
             {
-                string directionText = GetCardinalDirection(transform.eulerAngles.y);
-                popupUI.ShowTargetInfo(data.targetId, directionText);
+                string dir = GetCardinalDirection(transform.eulerAngles.y);
+                popupUI.ShowTargetInfo(target.targetId, dir);
+                return;
             }
         }
     }
 
-    string GetCardinalDirection(float yaw)
+    private bool IsTargetInsideVisor(TargetData target, Camera cam)
+    {
+        Renderer rend = target.GetComponentInChildren<Renderer>();
+        if (rend == null) return false;
+
+        Bounds bounds = rend.bounds;
+
+        Vector3[] pointsToCheck = {
+            bounds.center,
+            bounds.min,
+            bounds.max,
+            bounds.min + new Vector3(bounds.size.x, 0, 0),
+            bounds.min + new Vector3(0, bounds.size.y, 0),
+            bounds.min + new Vector3(0, 0, bounds.size.z)
+        };
+
+        foreach (var point in pointsToCheck)
+        {
+            Vector3 screenPoint = cam.WorldToScreenPoint(point);
+            if (screenPoint.z < 0) continue;
+
+            if (RectTransformUtility.RectangleContainsScreenPoint(visorRect, screenPoint, cam))
+            {
+                float distance = Vector3.Distance(transform.position, point);
+                if (distance <= maxDetectionDistance)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    private string GetCardinalDirection(float yaw)
     {
         string[] directions = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" };
         int index = Mathf.RoundToInt(yaw / 45f) % 8;
         return directions[index];
-    }
-
-    void OnDrawGizmos()
-    {
-        if (!Application.isPlaying) return;
-
-        Vector3 origin = transform.position;
-        Vector3 direction = transform.forward;
-
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawRay(origin, direction * detectionRange);
-
-        // Dibujar el "cono" como dos líneas laterales (aproximación visual)
-        Vector3 leftDir = Quaternion.Euler(0, -15f, 0) * direction;
-        Vector3 rightDir = Quaternion.Euler(0, 15f, 0) * direction;
-        Gizmos.DrawRay(origin, leftDir * detectionRange);
-        Gizmos.DrawRay(origin, rightDir * detectionRange);
-
-        // Dibujar esfera en el punto de impacto si hubo detección
-        if (hasHit)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(lastHit.point, sphereRadius * 0.5f);
-        }
-
-        // Dibujar la "tubería" de colisión al final del alcance
-        Gizmos.color = new Color(0f, 1f, 1f, 0.25f);
-        Gizmos.DrawWireSphere(origin + direction * detectionRange, sphereRadius);
     }
 }

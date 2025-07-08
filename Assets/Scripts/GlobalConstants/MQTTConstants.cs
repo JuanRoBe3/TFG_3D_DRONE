@@ -29,4 +29,9 @@
 
     public const string PendingSearchZonesTopic = "searchzones/pending";
     public const string PendingSearchZonesRequestTopic = "searchzones/request";
+
+    // 🚨 Descubrimiento de targets (pilot → commander)
+    public const string DiscoveredTargetTopic = "targets/discovered";
+
+
 }

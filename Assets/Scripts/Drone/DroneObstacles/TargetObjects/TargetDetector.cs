@@ -95,7 +95,14 @@ public class TargetDetector : MonoBehaviour
 
         string dir = GetCardinalDirection(transform.eulerAngles.y);
         popupUI.ShowTargetInfo(currentDetectedTarget.targetId, dir);
-
+        // 🔥 Confirmar el descubrimiento solo aquí
+        if (!currentDetectedTarget.IsDiscovered)
+        {
+            TargetDiscoveryManager.Instance.HandleTargetDiscovered(
+                currentDetectedTarget,
+                Camera.main.transform
+            );
+        }
         StartZoomEffect();
     }
 
@@ -195,7 +202,7 @@ public class TargetDetector : MonoBehaviour
                             (obj == target.gameObject || obj.transform.IsChildOf(target.transform)))
                         {
                             Debug.DrawRay(ray.origin, ray.direction * hit.distance, Color.green, 0.5f);
-                            currentDetectedTarget = target;
+                            currentDetectedTarget = target; 
                             visible = true;
                             break;
                         }

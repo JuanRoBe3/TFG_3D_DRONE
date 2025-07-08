@@ -73,6 +73,7 @@ public class TargetDetector : MonoBehaviour
             if (currentDetectedTarget == null)
             {
                 popupUI.Hide();
+                ResetZoomState(); // 🔁 Esto garantiza que isZoomed se vuelve false
             }
         }
     }
@@ -217,6 +218,16 @@ public class TargetDetector : MonoBehaviour
         }
     }
 
+    private void ResetZoomState()
+    {
+        isZoomed = false;
+
+        if (zoomCoroutine != null)
+            StopCoroutine(zoomCoroutine);
+
+        if (midZoomCamera != null)
+            midZoomCamera.gameObject.SetActive(false);
+    }
 
     private string GetCardinalDirection(float yaw)
     {

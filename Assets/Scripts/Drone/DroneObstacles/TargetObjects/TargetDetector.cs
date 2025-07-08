@@ -15,7 +15,6 @@ public class TargetDetector : MonoBehaviour
     [Header("Modo automático (interno, no editable)")]
     private bool automaticMode = false;
 
-    // Referencias asignadas dinámicamente
     private Camera midZoomCamera;
 
     private void Start()
@@ -38,7 +37,6 @@ public class TargetDetector : MonoBehaviour
 
         allTargets = FindObjectsOfType<TargetData>();
 
-        // Activar la cámara de zoom desde el principio
         if (midZoomCamera != null)
             midZoomCamera.gameObject.SetActive(true);
     }
@@ -89,21 +87,47 @@ public class TargetDetector : MonoBehaviour
 
         string dir = GetCardinalDirection(transform.eulerAngles.y);
         popupUI.ShowTargetInfo(currentDetectedTarget.targetId, dir);
-        MoveZoomCameraToTarget(currentDetectedTarget);
+
+        ActivateVisorZoomView(currentDetectedTarget);
     }
 
-    private void MoveZoomCameraToTarget(TargetData target)
+    private void ActivateVisorZoomView(TargetData target)
     {
         if (midZoomCamera == null) return;
 
+        // Siempre lanzamos un raycast desde el centro del visor
+        Ray ray = Camera.main.ViewportPointToRay(new Vector2(0.5f, 0.5f));
+
         Vector3 dronePos = transform.position;
-        Vector3 targetPos = target.transform.position;
+        Vector3 direction = ray.direction.normalized;
 
-        Vector3 midPoint = Vector3.Lerp(dronePos, targetPos, 0.5f); // 🔍 Zoom al 50%
+        // Puedes ajustar esta distancia para cambiar el "zoom"
+        float zoomDistance = Vector3.Distance(dronePos, target.transform.position);
+
+        // Punto a donde debería mirar la cámara (aunque no haya colisión)
+        Vector3 targetPoint = dronePos + direction * zoomDistance;
+
+        // Posición a mitad de camino entre el dron y ese punto
+        Vector3 midPoint = Vector3.Lerp(dronePos, targetPoint, 0.5f);
+
         midZoomCamera.transform.position = midPoint;
-        midZoomCamera.transform.LookAt(targetPos);
+        midZoomCamera.transform.rotation = Quaternion.LookRotation(direction);
 
-        float distance = Vector3.Distance(dronePos, targetPos);
+        midZoomCamera.fieldOfView = Mathf.Clamp(60f * (zoomDistance / 50f), 20f, 60f);
+
+        Debug.Log($"🔭 Zoom activado hacia dirección del visor. Distancia: {zoomDistance:F2}");
+    }
+
+
+    private void FocusCameraOn(Vector3 targetPoint)
+    {
+        Vector3 dronePos = transform.position;
+        Vector3 midPoint = Vector3.Lerp(dronePos, targetPoint, 0.5f); // Zoom al 50%
+
+        midZoomCamera.transform.position = midPoint;
+        midZoomCamera.transform.LookAt(targetPoint);
+
+        float distance = Vector3.Distance(dronePos, targetPoint);
         midZoomCamera.fieldOfView = Mathf.Clamp(60f * (distance / 50f), 20f, 60f);
     }
 
@@ -131,31 +155,10 @@ public class TargetDetector : MonoBehaviour
         Renderer rend = target.GetComponentInChildren<Renderer>();
         if (rend == null) return false;
 
-        Bounds bounds = rend.bounds;
+        Vector3 screenPoint = cam.WorldToScreenPoint(rend.bounds.center);
+        if (screenPoint.z < 0) return false;
 
-        Vector3[] pointsToCheck = {
-            bounds.center,
-            bounds.min,
-            bounds.max,
-            bounds.min + new Vector3(bounds.size.x, 0, 0),
-            bounds.min + new Vector3(0, bounds.size.y, 0),
-            bounds.min + new Vector3(0, 0, bounds.size.z)
-        };
-
-        foreach (var point in pointsToCheck)
-        {
-            Vector3 screenPoint = cam.WorldToScreenPoint(point);
-            if (screenPoint.z < 0) continue;
-
-            if (RectTransformUtility.RectangleContainsScreenPoint(visorRect, screenPoint, cam))
-            {
-                float distance = Vector3.Distance(transform.position, point);
-                if (distance <= maxDetectionDistance)
-                    return true;
-            }
-        }
-
-        return false;
+        return RectTransformUtility.RectangleContainsScreenPoint(visorRect, screenPoint, cam);
     }
 
     private string GetCardinalDirection(float yaw)

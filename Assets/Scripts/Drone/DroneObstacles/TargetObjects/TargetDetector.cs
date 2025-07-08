@@ -16,9 +16,11 @@ public class TargetDetector : MonoBehaviour
     [Header("Modo automático (interno, no editable)")]
     private bool automaticMode = false;
 
+    [Header("Detección por raycast")]
+    public LayerMask obstacleMask; // capas que bloquean (como terreno)
+
     private Camera midZoomCamera;
     private Coroutine zoomCoroutine;
-
     private bool isZoomed = false;
     private float originalFOV;
 
@@ -43,7 +45,7 @@ public class TargetDetector : MonoBehaviour
         allTargets = FindObjectsOfType<TargetData>();
 
         if (midZoomCamera != null)
-            midZoomCamera.gameObject.SetActive(false); // Se activa solo al hacer zoom
+            midZoomCamera.gameObject.SetActive(false);  // Se activa solo al hacer zoom
     }
 
     private void Update()
@@ -62,7 +64,6 @@ public class TargetDetector : MonoBehaviour
             else
             {
                 popupUI.Hide();
-                ResetZoomState(); // 🧠 Resetea zoom si se pierde el target
             }
         }
         else
@@ -72,7 +73,6 @@ public class TargetDetector : MonoBehaviour
             if (currentDetectedTarget == null)
             {
                 popupUI.Hide();
-                ResetZoomState(); // 🧠 También resetea en modo manual
             }
         }
     }
@@ -146,46 +146,77 @@ public class TargetDetector : MonoBehaviour
             midZoomCamera.gameObject.SetActive(false);
     }
 
-    private void ResetZoomState()
-    {
-        isZoomed = false;
-
-        if (zoomCoroutine != null)
-            StopCoroutine(zoomCoroutine);
-
-        if (midZoomCamera != null)
-            midZoomCamera.gameObject.SetActive(false);
-    }
-
     private void DetectVisibleTarget()
     {
         Camera cam = Camera.main;
-        if (cam == null) return;
+        if (cam == null || visorRect == null) return;
 
         currentDetectedTarget = null;
+
+        int gridResolution = 8;
+        float terrainLayer = LayerMask.NameToLayer("Terrain");
+        int detectableLayer = LayerMask.NameToLayer("DetectableTarget");
+
+        // 🖼️ Obtener los bordes del visor en coordenadas de pantalla
+        Vector3[] corners = new Vector3[4];
+        visorRect.GetWorldCorners(corners); // orden: 0=bottomLeft, 1=topLeft, 2=topRight, 3=bottomRight
+
+        Vector3 bottomLeft = RectTransformUtility.WorldToScreenPoint(cam, corners[0]);
+        Vector3 topRight = RectTransformUtility.WorldToScreenPoint(cam, corners[2]);
+
+        float width = topRight.x - bottomLeft.x;
+        float height = topRight.y - bottomLeft.y;
 
         foreach (var target in allTargets)
         {
             if (target == null) continue;
+            bool visible = false;
 
-            if (IsTargetInsideVisor(target, cam))
+            for (int x = 0; x < gridResolution && !visible; x++)
             {
-                currentDetectedTarget = target;
-                break;
+                for (int y = 0; y < gridResolution && !visible; y++)
+                {
+                    float px = bottomLeft.x + (width * x) / (gridResolution - 1);
+                    float py = bottomLeft.y + (height * y) / (gridResolution - 1);
+                    Vector3 screenPoint = new Vector3(px, py, 0f);
+
+                    Ray ray = cam.ScreenPointToRay(screenPoint);
+                    RaycastHit[] hits = Physics.RaycastAll(ray, maxDetectionDistance);
+                    System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+                    foreach (var hit in hits)
+                    {
+                        GameObject obj = hit.collider.gameObject;
+                        int layer = obj.layer;
+
+                        // 🎯 Target válido
+                        if (layer == detectableLayer &&
+                            (obj == target.gameObject || obj.transform.IsChildOf(target.transform)))
+                        {
+                            Debug.DrawRay(ray.origin, ray.direction * hit.distance, Color.green, 0.5f);
+                            currentDetectedTarget = target;
+                            visible = true;
+                            break;
+                        }
+
+                        // 🧱 Bloqueado por terreno u obstáculo
+                        if (layer == terrainLayer || (obstacleMask.value & (1 << layer)) != 0)
+                        {
+                            Debug.DrawRay(ray.origin, ray.direction * hit.distance, Color.red, 0.2f);
+                            break;
+                        }
+
+                        // ⚪ Ignorar otras cosas
+                        Debug.DrawRay(ray.origin, ray.direction * hit.distance, Color.yellow, 0.05f);
+                    }
+                }
             }
+
+            if (currentDetectedTarget != null)
+                break;
         }
     }
 
-    private bool IsTargetInsideVisor(TargetData target, Camera cam)
-    {
-        Renderer rend = target.GetComponentInChildren<Renderer>();
-        if (rend == null) return false;
-
-        Vector3 screenPoint = cam.WorldToScreenPoint(rend.bounds.center);
-        if (screenPoint.z < 0) return false;
-
-        return RectTransformUtility.RectangleContainsScreenPoint(visorRect, screenPoint, cam);
-    }
 
     private string GetCardinalDirection(float yaw)
     {

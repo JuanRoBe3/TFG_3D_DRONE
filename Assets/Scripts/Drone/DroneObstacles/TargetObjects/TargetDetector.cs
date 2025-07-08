@@ -2,6 +2,7 @@
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.UI;
+using System.Collections;
 
 public class TargetDetector : MonoBehaviour
 {
@@ -16,6 +17,10 @@ public class TargetDetector : MonoBehaviour
     private bool automaticMode = false;
 
     private Camera midZoomCamera;
+    private Coroutine zoomCoroutine;
+
+    private bool isZoomed = false;
+    private float originalFOV;
 
     private void Start()
     {
@@ -38,7 +43,7 @@ public class TargetDetector : MonoBehaviour
         allTargets = FindObjectsOfType<TargetData>();
 
         if (midZoomCamera != null)
-            midZoomCamera.gameObject.SetActive(true);
+            midZoomCamera.gameObject.SetActive(false); // Se activa solo al hacer zoom
     }
 
     private void Update()
@@ -57,6 +62,7 @@ public class TargetDetector : MonoBehaviour
             else
             {
                 popupUI.Hide();
+                ResetZoomState(); // 🧠 Resetea zoom si se pierde el target
             }
         }
         else
@@ -66,6 +72,7 @@ public class TargetDetector : MonoBehaviour
             if (currentDetectedTarget == null)
             {
                 popupUI.Hide();
+                ResetZoomState(); // 🧠 También resetea en modo manual
             }
         }
     }
@@ -88,47 +95,66 @@ public class TargetDetector : MonoBehaviour
         string dir = GetCardinalDirection(transform.eulerAngles.y);
         popupUI.ShowTargetInfo(currentDetectedTarget.targetId, dir);
 
-        ActivateVisorZoomView(currentDetectedTarget);
+        StartZoomEffect();
     }
 
-    private void ActivateVisorZoomView(TargetData target)
+    private void StartZoomEffect()
     {
-        if (midZoomCamera == null) return;
+        if (midZoomCamera == null || Camera.main == null) return;
 
-        // Siempre lanzamos un raycast desde el centro del visor
-        Ray ray = Camera.main.ViewportPointToRay(new Vector2(0.5f, 0.5f));
+        if (!isZoomed)
+        {
+            midZoomCamera.transform.position = Camera.main.transform.position;
+            midZoomCamera.transform.rotation = Camera.main.transform.rotation;
 
-        Vector3 dronePos = transform.position;
-        Vector3 direction = ray.direction.normalized;
+            originalFOV = Camera.main.fieldOfView;
 
-        // Puedes ajustar esta distancia para cambiar el "zoom"
-        float zoomDistance = Vector3.Distance(dronePos, target.transform.position);
+            if (zoomCoroutine != null)
+                StopCoroutine(zoomCoroutine);
 
-        // Punto a donde debería mirar la cámara (aunque no haya colisión)
-        Vector3 targetPoint = dronePos + direction * zoomDistance;
+            zoomCoroutine = StartCoroutine(ZoomToFOV(20f));
+            isZoomed = true;
+        }
+        else
+        {
+            if (zoomCoroutine != null)
+                StopCoroutine(zoomCoroutine);
 
-        // Posición a mitad de camino entre el dron y ese punto
-        Vector3 midPoint = Vector3.Lerp(dronePos, targetPoint, 0.5f);
-
-        midZoomCamera.transform.position = midPoint;
-        midZoomCamera.transform.rotation = Quaternion.LookRotation(direction);
-
-        midZoomCamera.fieldOfView = Mathf.Clamp(60f * (zoomDistance / 50f), 20f, 60f);
-
-        Debug.Log($"🔭 Zoom activado hacia dirección del visor. Distancia: {zoomDistance:F2}");
+            zoomCoroutine = StartCoroutine(ZoomToFOV(originalFOV, disableAfter: true));
+            isZoomed = false;
+        }
     }
 
-
-    private void FocusCameraOn(Vector3 targetPoint)
+    private IEnumerator ZoomToFOV(float targetFOV, bool disableAfter = false)
     {
-        Vector3 dronePos = transform.position;
-        Vector3 midPoint = Vector3.Lerp(dronePos, targetPoint, 0.5f); // Zoom al 50%
+        float duration = 0.4f;
+        float startFOV = midZoomCamera.fieldOfView;
+        float elapsed = 0f;
 
-        midZoomCamera.transform.position = midPoint;
-        midZoomCamera.transform.LookAt(targetPoint);
+        midZoomCamera.gameObject.SetActive(true);
 
-        float distance = Vector3.Distance(dronePos, targetPoint);
-        midZoomCamera.fieldOfView = Mathf.Clamp(60f * (distance / 50f), 20f, 60f);
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            midZoomCamera.fieldOfView = Mathf.Lerp(startFOV, targetFOV, elapsed / duration);
+            yield return null;
+        }
+
+        midZoomCamera.fieldOfView = targetFOV;
+
+        if (disableAfter)
+            midZoomCamera.gameObject.SetActive(false);
+    }
+
+    private void ResetZoomState()
+    {
+        isZoomed = false;
+
+        if (zoomCoroutine != null)
+            StopCoroutine(zoomCoroutine);
+
+        if (midZoomCamera != null)
+            midZoomCamera.gameObject.SetActive(false);
     }
 
     private void DetectVisibleTarget()

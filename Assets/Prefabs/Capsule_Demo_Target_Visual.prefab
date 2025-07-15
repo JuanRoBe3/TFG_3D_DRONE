@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 4859667836876960942}
   - component: {fileID: 2498603730198550016}
   - component: {fileID: 8599644974463749515}
+  - component: {fileID: 2596129508800628316}
+  - component: {fileID: 4538737021885029437}
   m_Layer: 10
   m_Name: Capsule_Demo_Target_Visual
   m_TagString: Untagged
@@ -110,3 +112,30 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2596129508800628316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2033117622772693756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d47f23c6d1348764089a7ece478ee74b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetId: 
+--- !u!114 &4538737021885029437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2033117622772693756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ca748754089e2245a53956143ea8110, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clicker: {fileID: 2596129508800628316}
+  visualTransform: {fileID: 4327733742820864462}

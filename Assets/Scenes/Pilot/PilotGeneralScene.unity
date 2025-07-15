@@ -4659,9 +4659,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1585144003}
     m_Modifications:
+    - target: {fileID: 660269893833916921, guid: 4571c741a5d9e0146a5fc18b1ea828d4, type: 3}
+      propertyPath: targetId
+      value: Cube2
+      objectReference: {fileID: 0}
     - target: {fileID: 1142589889562904385, guid: 4571c741a5d9e0146a5fc18b1ea828d4, type: 3}
       propertyPath: targetId
-      value: cubo2
+      value: Cube2
       objectReference: {fileID: 0}
     - target: {fileID: 2252872840294633733, guid: 4571c741a5d9e0146a5fc18b1ea828d4, type: 3}
       propertyPath: m_Name
@@ -5785,9 +5789,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1585144003}
     m_Modifications:
+    - target: {fileID: 660269893833916921, guid: 4571c741a5d9e0146a5fc18b1ea828d4, type: 3}
+      propertyPath: targetId
+      value: Cube3
+      objectReference: {fileID: 0}
     - target: {fileID: 1142589889562904385, guid: 4571c741a5d9e0146a5fc18b1ea828d4, type: 3}
       propertyPath: targetId
-      value: cubo3
+      value: Cube3
       objectReference: {fileID: 0}
     - target: {fileID: 2252872840294633733, guid: 4571c741a5d9e0146a5fc18b1ea828d4, type: 3}
       propertyPath: m_Name
@@ -6961,6 +6969,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1585144003}
     m_Modifications:
+    - target: {fileID: 660269893833916921, guid: 4571c741a5d9e0146a5fc18b1ea828d4, type: 3}
+      propertyPath: targetId
+      value: Cube1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1142589889562904385, guid: 4571c741a5d9e0146a5fc18b1ea828d4, type: 3}
+      propertyPath: targetId
+      value: Cube1
+      objectReference: {fileID: 0}
     - target: {fileID: 2252872840294633733, guid: 4571c741a5d9e0146a5fc18b1ea828d4, type: 3}
       propertyPath: m_Name
       value: Cube_Target_1

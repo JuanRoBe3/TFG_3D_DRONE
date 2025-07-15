@@ -3,10 +3,24 @@ using System.Collections.Generic;
 
 public class TargetDiscoveryReceiver : MonoBehaviour
 {
+    public static TargetDiscoveryReceiver Instance { get; private set; } // 🧩 Singleton
+
     private const string discoveryTopic = MQTTConstants.DiscoveredTargetTopic;
 
     // Guarda la vista de cada target descubierto
     private Dictionary<string, (Vector3 pos, Quaternion rot)> discoveryViews = new();
+
+    private void Awake()
+    {
+        // ✅ Inicializar singleton
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
 
     private void OnEnable()
     {
@@ -53,4 +67,14 @@ public class TargetDiscoveryReceiver : MonoBehaviour
         rot = Quaternion.identity;
         return false;
     }
+
+    /// <summary>
+    /// Registra manualmente la vista de un target desde otro script.
+    /// </summary>
+    public void Register(string targetId, Vector3 pos, Quaternion rot)
+    {
+        if (string.IsNullOrEmpty(targetId)) return;
+        discoveryViews[targetId] = (pos, rot);
+    }
+
 }

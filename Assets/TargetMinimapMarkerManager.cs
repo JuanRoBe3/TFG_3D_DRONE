@@ -26,6 +26,16 @@ public class TargetMinimapMarkerManager : MonoBehaviour
         GameObject marker = Instantiate(markerPrefab, target.transform.position, Quaternion.identity);
         activeMarkers[target.targetId] = marker;
 
-        Debug.Log($"📌 Marcador generado en la misma posición de target {target.targetId}");
+        // ✅ AÑADIR ClickableTarget
+        var clickable = marker.GetComponent<ClickableTarget>();
+        if (clickable == null)
+        {
+            Debug.LogWarning($"⚠️ El marcador del target {target.targetId} no tiene ClickableTarget");
+            return;
+        }
+        clickable.SetTargetId(target.targetId);
+
+        Debug.Log($"📌 Marcador generado y ClickableTarget asignado para {target.targetId}");
     }
+
 }

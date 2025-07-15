@@ -83,8 +83,9 @@ public class CommanderTargetReplicaManager : MonoBehaviour
         if (targetMarkers.ContainsKey(msg.targetId))
             return;
 
-        // Instanciar marcador visual del target
-        var marker = Instantiate(targetReplicaPrefab, pos, Quaternion.identity);
+        // ❌ NO queremos instanciar un marcador 3D aquí  (this creates a visual representation of the target in the position of the drone when it did the zoom)
+        /*
+         var marker = Instantiate(targetReplicaPrefab, pos, Quaternion.identity);
         targetMarkers[msg.targetId] = marker;
 
         // Asignar ID al componente interactivo
@@ -96,7 +97,8 @@ public class CommanderTargetReplicaManager : MonoBehaviour
         else
         {
             Debug.LogWarning("⚠️ Prefab del target no tiene ClickableTarget");
-        }
+        } 
+        */
     }
 
     /// <summary>

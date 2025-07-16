@@ -192,13 +192,33 @@ public class TaskListManager : MonoBehaviour
         if (taskData != null && taskData.assignedDrone != null && taskData.status.Trim().ToLowerInvariant().StartsWith("executing"))
         {
             string droneId = taskData.assignedDrone.droneName;
+            DroneData droneData = taskData.assignedDrone;
+
             Debug.Log($"🔁 Mostrando vista para dron asignado: {droneId}");
             DroneViewPanelManager.ShowAllViews(droneId);
+
+            // 🧩 Buscar réplica para mostrar datos en Panel_DroneInfo
+            CommanderDroneReplicaManager replicaManager = CommanderDroneReplicaManager.Instance;
+            if (replicaManager != null)
+            {
+                CommanderDroneReplica replica = replicaManager.GetReplicaByDroneId(droneId);
+                if (replica != null)
+                {
+                    CommanderDroneInfoPanel.Instance.SetDrone(replica.transform, droneData);
+                }
+                else
+                {
+                    Debug.LogWarning($"❌ No hay réplica aún para el dron '{droneId}'. Limpiando panel.");
+                    CommanderDroneInfoPanel.Instance.ClearPanel();
+                }
+            }
         }
         else
         {
-            Debug.Log("ℹ️ Tarea seleccionada sin dron asignado o sin estado ejecutando.");
+            // Tarea no en ejecución o sin dron asignado → limpiar panel
+            CommanderDroneInfoPanel.Instance.ClearPanel();
         }
+
     }
 
     private void OnTaskSelectedReceived(string json)

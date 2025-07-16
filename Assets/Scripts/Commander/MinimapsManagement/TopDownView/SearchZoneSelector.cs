@@ -98,6 +98,18 @@ public class SearchZoneSelector : MonoBehaviour
         hasPending = false;
 
         Debug.Log("✅ Zona creada y publicada por MQTT.");
+
+        // Llama directamente a la generación de la ruta para esta zona
+        SearchRouteGenerator routeGenerator = FindObjectOfType<SearchRouteGenerator>();
+        if (routeGenerator != null)
+        {
+            routeGenerator.GenerateRouteForZone(zone);  // 🔸 LLAMA A VERSIÓN PÚBLICA (ver abajo)
+        }
+        else
+        {
+            Debug.LogError("❌ No se encontró SearchRouteGenerator en la escena.");
+        }
+
     }
 
     private bool RayToTerrain(out Vector3 hit)

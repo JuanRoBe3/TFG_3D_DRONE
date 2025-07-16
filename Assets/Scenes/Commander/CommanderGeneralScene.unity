@@ -11282,6 +11282,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1678425531}
   m_CullTransparentMesh: 1
+--- !u!1 &1704129261
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1704129263}
+  - component: {fileID: 1704129262}
+  m_Layer: 0
+  m_Name: SearchRoutesManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1704129262
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1704129261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f5f53260308a2441aa61b5053a6c058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  routePointPrefab: {fileID: 6696077749105996877, guid: 22bcf83090500da439f7f487703b7565, type: 3}
+  arrowPrefab: {fileID: 7887338009057623833, guid: 9ec608d583cbb2c4a82080627ad0ded6, type: 3}
+  margin: 50
+  spacingBetweenPasses: 150
+  spacingBetweenPoints: 50
+--- !u!4 &1704129263
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1704129261}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 180.20001, y: 201.3, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1704854294
 GameObject:
   m_ObjectHideFlags: 0
@@ -14263,3 +14312,4 @@ SceneRoots:
   - {fileID: 434653814}
   - {fileID: 2052393141}
   - {fileID: 119025530}
+  - {fileID: 1704129263}

@@ -106,6 +106,9 @@ public class DroneLoader : MonoBehaviour
         // 🔔 Avisar a quien escuche
         OnDroneInstantiated?.Invoke(drone);
 
+        // 🟢 Notificar al sistema de UI en tiempo real
+        DroneRealTimeUIManager.Instance?.SetDroneReference(drone.transform, selectedDrone);
+
         // 🔟 Limpiar PlayerPrefs
         PlayerPrefs.DeleteKey("SelectedTaskId");
         PlayerPrefs.DeleteKey("SelectedDroneId");

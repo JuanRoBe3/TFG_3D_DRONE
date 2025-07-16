@@ -1699,6 +1699,7 @@ GameObject:
   - component: {fileID: 443206725}
   - component: {fileID: 443206724}
   - component: {fileID: 443206723}
+  - component: {fileID: 443206726}
   m_Layer: 5
   m_Name: PanelDataRealTime
   m_TagString: Untagged
@@ -1796,6 +1797,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 443206721}
   m_CullTransparentMesh: 1
+--- !u!114 &443206726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 443206721}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e0a8dcf84a3d9e47b18d27219f5d2ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textDuration: {fileID: 2030858679}
+  textUsedData: {fileID: 1181671535}
+  textDistance: {fileID: 840718331}
+  textHeight: {fileID: 885786891}
+  dataUsageRate: 0.5
 --- !u!1 &449141693
 GameObject:
   m_ObjectHideFlags: 0

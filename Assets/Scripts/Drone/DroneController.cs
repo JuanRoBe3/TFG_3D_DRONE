@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
-using UnityEngine.InputSystem; // NUEVO
+using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(Rigidbody))]
 public class DroneController : MonoBehaviour
@@ -22,14 +23,39 @@ public class DroneController : MonoBehaviour
     public float gimbalMaxAngle = 80f;
 
     private float currentGimbalPitch = 0f;
-
-    //private float positionUpdateTimer = 0f; //NO SIRVE YA CREO
     private Rigidbody rb;
 
     private float currentPitch = 0f;
     private float currentRoll = 0f;
     private float targetPitch = 0f;
     private float targetRoll = 0f;
+
+    // 🟩 ESTABILIZACIÓN HACIA ESTADO ANTERIOR (rebote suave forzado)
+    private bool isStabilizing = false;
+    private float stabilizeTimer = 0f;
+    private float stabilizeDuration = 2f;
+    private Vector3 reboundTargetPosition;
+    private Quaternion reboundTargetRotation;
+    private Quaternion reboundStartRotation;
+    private Vector3 reboundStartPosition;
+
+    // 🧠 HISTORIAL DE ESTADOS (para recuperación)
+    private class DroneState
+    {
+        public Vector3 position;
+        public Quaternion rotation;
+
+        public DroneState(Vector3 pos, Quaternion rot)
+        {
+            position = pos;
+            rotation = rot;
+        }
+    }
+
+    private Queue<DroneState> stateHistory = new Queue<DroneState>();
+    private float stateRecordInterval = 0.1f;
+    private float timeSinceLastRecord = 0f;
+    private float stateMemoryDuration = 2f; // segundos hacia atrás
 
     private void Start()
     {
@@ -47,14 +73,43 @@ public class DroneController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (isStabilizing)
+        {
+            stabilizeTimer += Time.fixedDeltaTime;
+            float t = Mathf.Clamp01(stabilizeTimer / stabilizeDuration);
+
+            // ✅ Interpolación suave entre estado actual y estado de hace 2s
+            Vector3 interpolatedPosition = Vector3.Lerp(reboundStartPosition, reboundTargetPosition, t);
+            Quaternion interpolatedRotation = Quaternion.Slerp(reboundStartRotation, reboundTargetRotation, t);
+
+            rb.MovePosition(interpolatedPosition);
+            rb.MoveRotation(interpolatedRotation);
+
+            if (stabilizeTimer >= stabilizeDuration)
+            {
+                isStabilizing = false;
+            }
+        }
+
         HandleMovement();
         HandleVisualTilt();
-        //UpdateGimbalCamera();
+
+        // 🧠 Guardar estado en historial cada intervalo
+        timeSinceLastRecord += Time.fixedDeltaTime;
+        if (timeSinceLastRecord >= stateRecordInterval)
+        {
+            stateHistory.Enqueue(new DroneState(rb.position, rb.rotation));
+            timeSinceLastRecord = 0f;
+
+            while (stateHistory.Count > stateMemoryDuration / stateRecordInterval)
+            {
+                stateHistory.Dequeue();
+            }
+        }
     }
 
     private void Update()
     {
-        //HandlePositionUpdate();
         Debug.Log("Pitch: " + gimbalCamera.localRotation.eulerAngles.x);
         Debug.DrawRay(gimbalCamera.position, gimbalCamera.right * 2f, Color.red);
         Debug.DrawRay(gimbalCamera.position, gimbalCamera.up * 2f, Color.green);
@@ -104,6 +159,8 @@ public class DroneController : MonoBehaviour
 
     private void HandleVisualTilt()
     {
+        if (isStabilizing) return;
+
         currentPitch = Mathf.Lerp(currentPitch, targetPitch, Time.fixedDeltaTime * tiltSmoothSpeed);
         currentRoll = Mathf.Lerp(currentRoll, targetRoll, Time.fixedDeltaTime * tiltSmoothSpeed);
 
@@ -111,55 +168,24 @@ public class DroneController : MonoBehaviour
         transform.rotation = tilt;
     }
 
-    /* //NOT WANTED ANYMORE THE ROTATION OF THE CAMERA
-    private void UpdateGimbalCamera()
+    private void OnCollisionEnter(Collision collision)
     {
-        if (gimbalCamera == null) return;
-
-        float gimbalInput = 0f;
-
-        // 🎮 Control con botones del joystick (13 = abajo, 11 = arriba)
-        var joystick = Joystick.current;
-        if (joystick != null)
+        if (!isStabilizing && stateHistory.Count > 0)
         {
-            if (joystick.TryGetChildControl<ButtonControl>("button5")?.isPressed == true)
-                gimbalInput = 1f; // mirar hacia abajo
-            if (joystick.TryGetChildControl<ButtonControl>("button6")?.isPressed == true)
-                gimbalInput = -1f; // mirar hacia arriba
-        }
+            isStabilizing = true;
+            stabilizeTimer = 0f;
 
-        // ⌨️ Control alternativo (F / R)
-        if (Input.GetKey(KeyCode.F)) gimbalInput = 1f;
-        if (Input.GetKey(KeyCode.R)) gimbalInput = -1f;
+            // 🔁 Estado objetivo al que volver (≈ 2s atrás)
+            DroneState reboundState = stateHistory.Peek();
+            reboundTargetPosition = reboundState.position;
+            reboundTargetRotation = reboundState.rotation;
 
-        currentGimbalPitch += gimbalInput * gimbalPitchSpeed * Time.fixedDeltaTime;
-        currentGimbalPitch = Mathf.Clamp(currentGimbalPitch, gimbalMinAngle, gimbalMaxAngle);
+            // 🔁 Estado actual de partida
+            reboundStartPosition = rb.position;
+            reboundStartRotation = rb.rotation;
 
-        Quaternion localRotation = Quaternion.Euler(currentGimbalPitch, 0f, 0f);
-        gimbalCamera.localRotation = localRotation;
-    }
-    */
-
-    // CREO QUE YA NO SIRVE LA VERDAD
-    /*
-    private void HandlePositionUpdate()
-    {
-        positionUpdateTimer += Time.deltaTime;
-        if (positionUpdateTimer >= DroneConstants.PositionUpdateInterval && MQTTClient.Instance != null)
-        {
-            SendPosition();
-            positionUpdateTimer = 0f;
+            // ✅ Cortamos rotación libre actual
+            rb.angularVelocity = Vector3.zero;
         }
     }
-
-    private void SendPosition()
-    {
-        if (MQTTClient.Instance != null)
-        {
-            Vector3 position = transform.position;
-            string message = $"{{\"x\": {position.x}, \"y\": {position.y}, \"z\": {position.z}}}";
-            //publisher.PublishMessage(MQTTConstants.DroneCameraTopic, message);
-        }
-    }
-    */
 }

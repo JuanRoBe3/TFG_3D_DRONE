@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+//Script for adjusting the position of the Canvas in front of the camera in the piloting scene
+
 public class HUDRebinder : MonoBehaviour
 {
     [SerializeField] Canvas canvasHUD;     // arrastra tu CanvasHUD aquí
@@ -29,7 +31,7 @@ public class HUDRebinder : MonoBehaviour
 
         // Re-parent y reseteo local
         canvasHUD.transform.SetParent(eye, worldPositionStays: false);
-        canvasHUD.transform.localPosition = new Vector3(0, 0, 4f);
+        canvasHUD.transform.localPosition = new Vector3(0, -0.5f, 3f);
         canvasHUD.transform.localRotation = Quaternion.identity;
         canvasHUD.transform.localScale = Vector3.one * 0.002f;
 

@@ -49,7 +49,7 @@ public class DroneController : MonoBehaviour
     {
         HandleMovement();
         HandleVisualTilt();
-        UpdateGimbalCamera();
+        //UpdateGimbalCamera();
     }
 
     private void Update()
@@ -71,9 +71,9 @@ public class DroneController : MonoBehaviour
         float joystickVertical = 0f;
         if (joystick != null)
         {
-            if (joystick.TryGetChildControl<ButtonControl>("button6")?.isPressed == true)
+            if (joystick.TryGetChildControl<ButtonControl>("button11")?.isPressed == true)
                 joystickVertical = 1f;
-            if (joystick.TryGetChildControl<ButtonControl>("button5")?.isPressed == true)
+            if (joystick.TryGetChildControl<ButtonControl>("button13")?.isPressed == true)
                 joystickVertical = -1f;
         }
 
@@ -111,6 +111,7 @@ public class DroneController : MonoBehaviour
         transform.rotation = tilt;
     }
 
+    /* //NOT WANTED ANYMORE THE ROTATION OF THE CAMERA
     private void UpdateGimbalCamera()
     {
         if (gimbalCamera == null) return;
@@ -121,9 +122,9 @@ public class DroneController : MonoBehaviour
         var joystick = Joystick.current;
         if (joystick != null)
         {
-            if (joystick.TryGetChildControl<ButtonControl>("button13")?.isPressed == true)
+            if (joystick.TryGetChildControl<ButtonControl>("button5")?.isPressed == true)
                 gimbalInput = 1f; // mirar hacia abajo
-            if (joystick.TryGetChildControl<ButtonControl>("button11")?.isPressed == true)
+            if (joystick.TryGetChildControl<ButtonControl>("button6")?.isPressed == true)
                 gimbalInput = -1f; // mirar hacia arriba
         }
 
@@ -137,6 +138,7 @@ public class DroneController : MonoBehaviour
         Quaternion localRotation = Quaternion.Euler(currentGimbalPitch, 0f, 0f);
         gimbalCamera.localRotation = localRotation;
     }
+    */
 
     // CREO QUE YA NO SIRVE LA VERDAD
     /*

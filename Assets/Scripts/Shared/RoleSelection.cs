@@ -1,5 +1,12 @@
 ﻿using UnityEngine;
 
+/*
+   ////NOTES////
+ - used in role selection scene
+ - role selectd saved on PlayerPrefs so it is accesible during the whole "system run" + 
+   corresponding scene loaded depending on the role +
+   subscription to the corresponding topics depending on the role chosen: "assignRoleMQTTClient()"
+*/ 
 public class RoleSelection : MonoBehaviour
 {
     // Constants for roles to avoid hardcoded strings

@@ -2,6 +2,13 @@
 using UnityEngine.UI;
 using TMPro;
 
+/*
+   ////NOTES////
+ - used in IP selection scene (pilot)
+ - saving IP and conneting to it: "SaveIPAndConnect()"
+ - should write as an input the IP of the commander if it the commander is conneted in another PC of the same net +
+   for testing in the sae computer should write 127.0.0.1 
+*/
 public class IPConfigUI : MonoBehaviour
 {
     public TMP_InputField ipInputField;

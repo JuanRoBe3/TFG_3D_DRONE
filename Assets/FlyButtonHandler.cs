@@ -53,6 +53,9 @@ public class FlyButtonHandler : MonoBehaviour
         PlayerPrefs.SetString("SelectedDroneId", selectedDrone.droneName);
         PlayerPrefs.Save();
 
+        SelectedTaskHolder.TaskTitle = selectedTask.title;
+        SelectedTaskHolder.TaskDescription = selectedTask.description;
+
         // 4. Cambiar de escena
         SceneLoader.LoadPilotUI();
     }

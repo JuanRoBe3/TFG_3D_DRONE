@@ -6,6 +6,7 @@ public class SearchZoneReceiverManager : MonoBehaviour
 {
     [Header("Prefab visual para representar zonas")]
     [SerializeField] private GameObject zonePrefab;
+    [SerializeField] private SearchRouteGenerator routeGenerator;
 
     private const string pendingZonesTopic = MQTTConstants.PendingSearchZonesTopic;
     private const string pendingRequestTopic = MQTTConstants.PendingSearchZonesRequestTopic;
@@ -124,8 +125,31 @@ public class SearchZoneReceiverManager : MonoBehaviour
 
             Debug.Log($"✅ Zona visual instanciada → ID: {summary.id}, Pos: {center}, Tamaño: {size}");
             instantiatedZones.Add(go);
+
+            // 🔵 Generar ruta para esta zona
+            if (routeGenerator != null)
+            {
+                routeGenerator.GenerateRouteForZone(go);
+                Debug.Log($"📍 Ruta generada para la zona: {summary.id}");
+            }
+            else
+            {
+                Debug.LogWarning("⚠️ No se encontró SearchRouteGenerator en escena del piloto.");
+            }
+        }
+        // Al terminar de generar todas las rutas
+        PilotRouteProgressManager progressManager = FindObjectOfType<PilotRouteProgressManager>();
+        if (progressManager != null)
+        {
+            progressManager.RefreshRoutePoints();
+            Debug.Log("🔁 PilotRouteProgressManager refrescado tras generar rutas.");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ No se encontró PilotRouteProgressManager para refrescar puntos.");
         }
     }
+
 
     private void RequestPendingZones()
     {

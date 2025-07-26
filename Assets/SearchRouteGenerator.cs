@@ -94,15 +94,27 @@ public class SearchRouteGenerator : MonoBehaviour
             }
         }
 
-        InstantiatePoints(pathPoints);
+        InstantiatePoints(pathPoints, searchZone.name);
         InstantiateArrow(pathPoints);
     }
 
-    private void InstantiatePoints(List<Vector3> points)
+    private void InstantiatePoints(List<Vector3> points, string zoneID)
+
     {
         foreach (Vector3 pos in points)
         {
-            Instantiate(routePointPrefab, pos, Quaternion.identity);
+            GameObject point = Instantiate(routePointPrefab, pos, Quaternion.identity);
+
+            // Asegúrate de que el componente ya está en el prefab
+            RoutePoint rp = point.GetComponent<RoutePoint>();
+            if (rp != null)
+            {
+                rp.zoneID = zoneID;
+            }
+            else
+            {
+                Debug.LogWarning("❌ RoutePoint no encontrado en prefab instanciado.");
+            }
         }
     }
 
